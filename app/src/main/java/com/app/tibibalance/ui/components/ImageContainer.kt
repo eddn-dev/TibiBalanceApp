@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
+@Suppress("UNUSED_FUNCTION")
 @Composable
 fun ImageContainer(
     imageResId: Int,
