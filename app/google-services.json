@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "467927540157",
+    "project_id": "tibibalnce",
+    "storage_bucket": "tibibalnce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467927540157:android:9617f4b1a218f4d03fb2d4",
+        "android_client_info": {
+          "package_name": "com.app.tibibalance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467927540157-sg6o96ab0117plqm2dmhd1lrpc9eu9cr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.tibibalance",
+            "certificate_hash": "a5f6e0d430aef124c649c40da8228422ff151364"
+          }
+        },
+        {
+          "client_id": "467927540157-tvu0re0msga2o01tsj9t1r1o6kqvek3j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-oGFTFxTx-s6rqTo3QU82aKtQ5cjCyms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467927540157-tvu0re0msga2o01tsj9t1r1o6kqvek3j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
