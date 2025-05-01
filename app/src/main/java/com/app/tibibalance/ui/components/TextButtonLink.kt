@@ -1,4 +1,5 @@
-package com.irmanay.myfirstcomposeapp.components.layouts
+package com.app.tibibalance.ui.components
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
