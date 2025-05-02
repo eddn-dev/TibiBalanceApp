@@ -78,7 +78,7 @@ fun FeatureResetPasswordScreen() {
 
                 FormContainer (
                     modifier = Modifier
-                        .height(190.dp)  // Establece un alto específico
+                        .height(170.dp)  // Establece un alto específico
                 ){
                     var newpassword by remember { mutableStateOf("") }
 
@@ -87,7 +87,7 @@ fun FeatureResetPasswordScreen() {
                         onValueChange = { newpassword = it },
                         placeholder = "Nueva Contraseña" // ← placeholder personalizado en inglés
                     )
-
+                    Spacer(modifier = Modifier.height(10.dp))
                     var confirmPassword by remember { mutableStateOf("") }
 
                     InputPassword(
@@ -96,23 +96,6 @@ fun FeatureResetPasswordScreen() {
                         placeholder = "Confirmar Contraseña" // ← placeholder personalizado en inglés
                     )
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Description(
-                            text = "¿Olvidaste tu contraseña? ",
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        TextButtonLink(
-                            text = "Clic aquí",
-                            onClick = {}
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
