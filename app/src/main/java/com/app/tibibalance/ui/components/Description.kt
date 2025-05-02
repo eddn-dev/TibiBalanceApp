@@ -1,13 +1,21 @@
+// file: ui/components/Description.kt
 package com.app.tibibalance.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun Description(
@@ -22,17 +30,25 @@ fun Description(
         text = text,
         modifier = modifier,
         color = color,
-        style = MaterialTheme.typography.bodyMedium,
+        style = TextStyle(
+            fontFamily = FontFamily.Default,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp
+        ),
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = overflow
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, widthDp = 320, heightDp = 40)
 @Composable
 fun DescriptionPreview() {
-    MaterialTheme {
-        Description(text = "This is a sample description paragraph.")
-    }
+    Description(
+        text = "Descripciones",
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(Alignment.CenterVertically),
+        textAlign = TextAlign.Center
+    )
 }

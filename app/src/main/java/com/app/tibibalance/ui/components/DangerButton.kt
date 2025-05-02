@@ -1,4 +1,4 @@
-package com.irmanay.myfirstcomposeapp.components.layouts
+package com.app.tibibalance.ui.components
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
