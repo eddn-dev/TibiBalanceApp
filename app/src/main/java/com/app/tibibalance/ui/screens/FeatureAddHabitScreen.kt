@@ -1,5 +1,6 @@
 package com.app.tibibalance.ui.screens
 
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import com.app.tibibalance.ui.components.InputSelect
 import com.app.tibibalance.ui.components.InputText
 import com.app.tibibalance.ui.components.SecondaryButton
 import com.app.tibibalance.ui.components.Subtitle
+import com.app.tibibalance.ui.components.ImageButton
 
 @Composable
 fun FeatureAddHabitScreen() {
@@ -52,7 +54,7 @@ fun FeatureAddHabitScreen() {
 
                     FormContainer(
                         modifier = Modifier
-                            .height(734.dp)  // Establece un alto específico
+                            .height(850.dp)  // Establece un alto específico
                     ) {
 
                         Subtitle(
@@ -63,7 +65,19 @@ fun FeatureAddHabitScreen() {
                             textAlign = TextAlign.Center
                         )
 
-                        Description(
+
+                        ImageButton(
+                            onClick = { /* Acción */ },
+                            imageRes = com.app.tibibalance.R.drawable.ic_button_habit,
+                            modifier = Modifier
+                                .width(100.dp) // Cambia el ancho
+                                .height(100.dp) // Cambia el alto
+                            ,
+                            size = 64, // Tamaño de la imagen interna (puedes dejar este valor si no quieres cambiarlo)
+                        )
+
+
+                            Description(
                             text = "Nombre: *",
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -74,7 +88,7 @@ fun FeatureAddHabitScreen() {
                             value = nombre,
                             onValueChange = { nombre = it }
                         )
-                        Spacer(modifier = Modifier.height(7.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Description(
                             text = "Descripción:",
@@ -87,7 +101,7 @@ fun FeatureAddHabitScreen() {
                             value = descripcion,
                             onValueChange = { descripcion = it }
                         )
-                        Spacer(modifier = Modifier.height(7.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Description(
                             text = "frecuencia: *",
@@ -101,7 +115,7 @@ fun FeatureAddHabitScreen() {
                             selectedOption = frecuencia,
                             onOptionSelected = { frecuencia = it }
                         )
-                        Spacer(modifier = Modifier.height(7.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Description(
                             text = "Duración:",
@@ -109,12 +123,12 @@ fun FeatureAddHabitScreen() {
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start
                         )
-                        var duracion by remember { mutableStateOf("Nora Soto") }
+                        var duracion by remember { mutableStateOf("") }
                         InputText(
                             value = duracion,
                             onValueChange = { duracion = it }
                         )
-                        Spacer(modifier = Modifier.height(7.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
 
                         Description(
@@ -130,7 +144,7 @@ fun FeatureAddHabitScreen() {
                             onOptionSelected = { categoria = it }
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(5.dp))
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -144,6 +158,16 @@ fun FeatureAddHabitScreen() {
                                     .fillMaxWidth(),
                                 textAlign = TextAlign.Start
                             )
+
+                           /* ImageButton(
+                                onClick = { /* Acción */ },
+                                imageRes = com.app.tibibalance.R.drawable.ic_button_notification,
+                                modifier = Modifier
+                                    .width(64.dp) // Cambia el ancho
+                                    .height(64.dp) // Cambia el alto
+                                ,
+                               size = 64, // Tamaño de la imagen interna (puedes dejar este valor si no quieres cambiarlo)
+                            )*/
 
                         }
 

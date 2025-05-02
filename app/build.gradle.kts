@@ -43,15 +43,6 @@ android {
 }
 
 dependencies {
-    implementation ("androidx.compose.ui:ui:1.6.0") // O la versión más reciente
-    implementation ("androidx.compose.material3:material3:1.2.0")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0")
-    implementation ("androidx.compose.foundation:foundation:1.6.0")
-    implementation ("androidx.compose.runtime:runtime:1.6.0")
-
-    // Para cargar recursos como imágenes
-    implementation ("androidx.compose.ui:ui-resources:1.6.0")
-
     // Íconos extendidos (válidos y estables)
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
