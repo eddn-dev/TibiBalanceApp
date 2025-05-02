@@ -25,92 +25,81 @@ import com.app.tibibalance.ui.components.ImageContainer
 import com.app.tibibalance.ui.components.InputPassword
 import com.app.tibibalance.ui.components.PrimaryButton
 
+
 @Composable
 fun FeatureResetPasswordScreen() {
-    // Contenido de la pantalla
-    // Contenido de la pantalla
-    GradientBackgroundScreen {
-        // Contenido de la pantalla
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-            //.background(Color(0xFFf5f5f5)) // Fondo gris claro
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
 
-            Column(
+        // 1. Fondo con gradiente
+        GradientBackgroundScreen {
+            // Contenido con gradiente, sin el Header
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .padding(top = 80.dp) // Espacio para que el header no lo tape
             ) {
-
-
-                Header(
-                    title = "Reestablecer Contraseña",
-                    showBackButton = false,
-                    profileImage = null
-                )
-
-
-
-
-                ImageContainer(
-                    imageResId = R.drawable.ic_reset_password_image,  // Reemplaza con tu imagen
-                    contentDescription = "Imagen de inicio", // Descripción de la imagen
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(398.dp)
-                        .padding(bottom = 32.dp)
-                )
-
-                Description(
-                    text = "Ingresa tu nueva contraseña",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(Alignment.CenterVertically),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                FormContainer (
-                    modifier = Modifier
-                        .height(170.dp)  // Establece un alto específico
-                ){
-                    var newpassword by remember { mutableStateOf("") }
-
-                    InputPassword(
-                        value = newpassword,
-                        onValueChange = { newpassword = it },
-                        placeholder = "Nueva Contraseña" // ← placeholder personalizado en inglés
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    var confirmPassword by remember { mutableStateOf("") }
-
-                    InputPassword(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        placeholder = "Confirmar Contraseña" // ← placeholder personalizado en inglés
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                ) {
+                    ImageContainer(
+                        imageResId = R.drawable.ic_reset_password_image,
+                        contentDescription = "Imagen de inicio",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(398.dp)
+                            .padding(bottom = 32.dp)
                     )
 
+                    Description(
+                        text = "Ingresa tu nueva contraseña",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(Alignment.CenterVertically),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    FormContainer(
+                        modifier = Modifier.height(170.dp)
+                    ) {
+                        var newpassword by remember { mutableStateOf("") }
+
+                        InputPassword(
+                            value = newpassword,
+                            onValueChange = { newpassword = it },
+                            placeholder = "Nueva Contraseña"
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        var confirmPassword by remember { mutableStateOf("") }
+
+                        InputPassword(
+                            value = confirmPassword,
+                            onValueChange = { confirmPassword = it },
+                            placeholder = "Confirmar Contraseña"
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    PrimaryButton(
+                        text = "Enviar",
+                        onClick = { /* Acción del botón */ },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
-                // Primer PrimaryButton
-                PrimaryButton(
-                    text = "Enviar",  // Pasamos el texto al botón
-                    onClick = { /* Acción del primer botón */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
-
-
-
-
-
-
-
             }
         }
+
+        // 2. Header encima del gradiente (posición fija arriba)
+        Header(
+            title = "Reestablecer Contraseña",
+            showBackButton = false,
+            profileImage = null,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+        )
     }
 }

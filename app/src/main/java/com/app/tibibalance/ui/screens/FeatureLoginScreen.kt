@@ -21,54 +21,92 @@ import com.app.tibibalance.ui.components.*
 @Composable
 fun FeatureLoginScreen() {
     // Contenido de la pantalla
-    GradientBackgroundScreen {
-        // Contenido de la pantalla
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-            //.background(Color(0xFFf5f5f5)) // Fondo gris claro
-        ) {
-
-            Column(
+    Box(modifier = Modifier.fillMaxSize()) {
+        GradientBackgroundScreen {
+            // Contenido de la pantalla
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
+                    .fillMaxSize()
             ) {
-                Header(
-                    title = "Iniciar Sesión",
-                    showBackButton = true,
-                    onBackClick = {
-                        // Lógica al hacer clic en la flecha de retroceso
-                    },
-                    profileImage = null // No mostrar imagen de perfil
-                )
 
-
-
-
-                ImageContainer(
-                    imageResId = R.drawable.ic_login_image,  // Reemplaza con tu imagen
-                    contentDescription = "Imagen de inicio", // Descripción de la imagen
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(398.dp)
-                        .padding(bottom = 32.dp)
-                )
+                        .align(Alignment.Center)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
 
-                FormContainer (
-                    modifier = Modifier
-                    .height(190.dp)  // Establece un alto específico
-                ){
-                    var email by remember { mutableStateOf("") }
-                    InputEmail(
-                        value = email,
-                        onValueChange = { email = it },
-                        placeholder = "Correo electrónico"
+
+                    ImageContainer(
+                        imageResId = R.drawable.ic_login_image,  // Reemplaza con tu imagen
+                        contentDescription = "Imagen de inicio", // Descripción de la imagen
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(398.dp)
+                            .padding(bottom = 32.dp)
                     )
-                    var pwd by remember { mutableStateOf("") }
-                    InputPassword(
-                        value = pwd,
-                        onValueChange = { pwd = it }
+
+                    FormContainer(
+                        modifier = Modifier
+                            .height(185.dp)  // Establece un alto específico
+                    ) {
+                        var email by remember { mutableStateOf("") }
+                        InputEmail(
+                            value = email,
+                            onValueChange = { email = it },
+                            placeholder = "Correo electrónico"
+                        )
+                        var pwd by remember { mutableStateOf("") }
+                        InputPassword(
+                            value = pwd,
+                            onValueChange = { pwd = it }
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Description(
+                                text = "¿Olvidaste tu contraseña? ",
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            TextButtonLink(
+                                text = "Clic aquí",
+                                onClick = {}
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(15.dp))
+                    // Primer PrimaryButton
+
+
+                    PrimaryButton(
+                        text = "Iniciar sesión",
+                        onClick = { /* Acción del botón */ },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                        // .padding(bottom = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    ImageContainer(
+                        imageResId = R.drawable.ic_separador_image,  // Reemplaza con tu imagen
+                        contentDescription = "Imagen de inicio", // Descripción de la imagen
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally) // Centra horizontalmente en Column
+                            .width(240.dp) // Ancho fijo
+                            .height(15.dp)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    GoogleSignButton(
+                        onClick = { /* Acción del botón */ },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
                     )
 
                     Row(
@@ -79,65 +117,30 @@ fun FeatureLoginScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Description(
-                            text = "¿Olvidaste tu contraseña? ",
+                            text = "¿Aún no tienes una cuenta?",
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         TextButtonLink(
-                            text = "Clic aquí",
+                            text = "Regístrate",
                             onClick = {}
                         )
                     }
+
+
                 }
-
-               Spacer(modifier = Modifier.height(20.dp))
-                // Primer PrimaryButton
-                PrimaryButton(
-                    text = "Iniciar Sesión",  // Pasamos el texto al botón
-                    onClick = { /* Acción del primer botón */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
-
-
-               /* ImageContainer(
-                    imageResId = R.drawable.ic_separador_image,  // Reemplaza con tu imagen
-                    contentDescription = "Imagen de inicio", // Descripción de la imagen
-                    modifier = Modifier
-
-                        .width(279.dp) // Ancho fijo
-                        .height(30.dp)
-                        .padding(bottom = 32.dp)
-                )*/
-
-                GoogleSignButton(
-                    onClick = { /* Acción del botón */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp) // Ajusta el espacio entre botones
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Description(
-                        text = "¿Aún no tienes una cuenta?",
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    TextButtonLink(
-                        text = "Regístrate",
-                        onClick = {}
-                    )
-                }
-
-
             }
         }
+
+        // 2. Header encima del gradiente (posición fija arriba)
+        Header(
+            //profileImage = dummyProfile
+            title = "Iniciar Sesión",
+            showBackButton = true,
+            onBackClick = { },
+            profileImage = null,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+        )
     }
 }

@@ -58,7 +58,7 @@ fun FeatureHomeScreen() {
                     contentDescription = "Imagen de inicio", // Descripción de la imagen
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+                        .height(310.dp)
                         .padding(bottom = 32.dp)
                 )
                 Description(
@@ -70,21 +70,28 @@ fun FeatureHomeScreen() {
                 )
 
                 // Primer PrimaryButton
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+
                 PrimaryButton(
-                    text = "Iniciar Sesión",  // Pasamos el texto al botón
-                    onClick = { /* Acción del primer botón */ },
+                    text = "Iniciar sesión",
+                    onClick = { /* Acción del botón */ },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                    // .padding(bottom = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(25.dp))
+
+                PrimaryButton(
+                    text = "Registrarse",
+                    onClick = { /* Acción del botón */ },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
                         .padding(bottom = 16.dp)
                 )
 
-                PrimaryButton(
-                    text = "Registrarse",  // Pasamos el texto al botón
-                    onClick = { /* Acción del primer botón */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
 
 
             }
