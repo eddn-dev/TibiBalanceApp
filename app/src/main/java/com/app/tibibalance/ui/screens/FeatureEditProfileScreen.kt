@@ -16,6 +16,14 @@ import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+
+
 
 
 @Composable
@@ -44,10 +52,18 @@ fun FeatureEditProfileScreen() {
                     size = 110.dp,
                     contentDescription = "Foto de perfil"
                 )
-
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 190.dp)
+            ) {
                 // Este es otro botón? Falta el componente? <- - - - - - - - alargar componente
                 SecondaryButton(
-                    modifier = Modifier.padding(top=10.dp),
+                    modifier = Modifier
+                        .width(150.dp) // Cambia aquí el ancho
+                        .height(50.dp) // Y aquí el alto si quieres,
+                        .padding(top = 10.dp),
                     text = "Cambiar Foto",
                     onClick = { } //Cambiar Foto de perfil
                 )
@@ -69,6 +85,11 @@ fun FeatureEditProfileScreen() {
                     text = "Correo electrónico:",
                     modifier = Modifier.padding(top=20.dp)
                 )
+                /*var email by remember { mutableStateOf("") } //Este input tiene el formato de registro
+                InputEmail(
+                    value = email,
+                    onValueChange = { email = it }
+                )*/
                 InputText(
                     value = "norasoto5@gmail.com", //Colocar el nombre del usuario desde Firebase
                     onValueChange = {  },
@@ -82,12 +103,8 @@ fun FeatureEditProfileScreen() {
                     text = "Fecha de nacimiento:",
                     modifier = Modifier.padding(top=20.dp)
                 )
-                //Falta incono de calendario
-                InputText(
-                    value = "29/07/2004", //Colocar el nombre del usuario desde Firebase
-                    onValueChange = {  },
-                    modifier = Modifier.padding(top = 10.dp)
-                )
+                var date by remember { mutableStateOf("01/05/2025") }
+                InputDate(selectedDate = date, onDateSelected = { date = it })
                 //Falta icono de editar (lapiz)
 
                 Subtitle(
