@@ -1,5 +1,8 @@
 package com.app.tibibalance.ui.screens.login
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,6 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -54,8 +58,11 @@ import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.ImageContainer
 import com.app.tibibalance.ui.components.PrimaryButton
 import com.app.tibibalance.ui.data.AuthManager
-import com.app.tibibalance.ui.theme.PrimaryLight
 
+import com.app.tibibalance.ui.theme.PrimaryLight
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import com.app.tibibalance.ui.data.GoogleSignInHelper
 
 
 @Preview(showBackground = true)
@@ -66,8 +73,33 @@ fun LoginScreen() {
 
     var errorMessage by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
-
     val isFormValid = email.isNotBlank() && password.isNotBlank()
+
+
+    /* --------------- Google Sign‑In clásico --------------- */
+    val context = LocalContext.current as Activity
+    val googleHelper = remember {
+        GoogleSignInHelper(
+            activity      = context,
+            webClientId   = "467927540157-tvu0re0msga2o01tsj9t1r1o6kqvek3j.apps.googleusercontent.com"
+        )
+    }
+    var googleError by remember { mutableStateOf("") }
+    var loadingGoogle by remember { mutableStateOf(false) }
+
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        loadingGoogle = false
+        googleHelper.handleResult(
+            data = result.data,
+            onSuccess = {
+                googleError = ""
+                // navegar a Home
+            },
+            onFailure = { googleError = it }
+        )
+    }
 
 
     Column(
@@ -181,12 +213,12 @@ fun LoginScreen() {
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 24.dp)
         )
-        if (loading) {
+        /*if (loading) {
             CircularProgressIndicator(
                 strokeWidth = 3.dp,
                 modifier = Modifier.size(30.dp)
             )
-        }
+        }*/
 
 
         Spacer(modifier = Modifier.height(1.dp))
@@ -194,13 +226,48 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(1.dp))
 
 
-        CustomButton(
+        /*CustomButton(
             modifier = Modifier.clickable { },
             painter = painterResource(id = R.drawable.google),
             title = "Continuar con Google"
+        )*/
+
+        // ───────────── Botón “Continuar con Google” ─────────────
+        CustomButton(
+            painter = painterResource(id = R.drawable.google),
+            title = "Continuar con Google",
+            onClick = {
+                if (!loadingGoogle) {
+                    loadingGoogle = true
+                    // 1) cerramos sesión previa para forzar que siempre aparezca el selector
+                    googleHelper.signOut {
+                        // 2) lanzamos el selector de cuentas
+                        googleLauncher.launch(googleHelper.getSignInIntent())
+                    }
+                }
+            }
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+// Loader mientras esperamos la selección / autenticación
+       /* if (loadingGoogle) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 2.dp
+            )
+        }*/
+
+// Mensaje de error si el correo no está registrado o se cancela
+        if (googleError.isNotEmpty()) {
+            Text(
+                text = googleError,
+                color = Color.Red,
+                modifier = Modifier.padding(top = 8.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+
+
+        Spacer(modifier = Modifier.height(15.dp))
 
 
         Row(
@@ -247,33 +314,25 @@ fun DividerWithText() {
     }
 }
 
+
 @Composable
-fun CustomButton(modifier: Modifier, painter: Painter, title: String) {
+fun CustomButton(
+    modifier: Modifier = Modifier,
+    painter: Painter,
+    title: String,
+    onClick: () -> Unit
+) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .height(42.dp)
             .padding(horizontal = 70.dp)
-            .background(
-                color = Color.Transparent,
-                shape = ButtonDefaults.shape
-            )
-            .border(
-                width = 1.dp,
-                color = Color.Black,
-                shape = ButtonDefaults.shape
-            ),
+            .clickable(onClick = onClick)          // <- aquí
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(Color.Transparent, ButtonDefaults.shape)
+            .border(1.dp, Color.Black, ButtonDefaults.shape),
         contentAlignment = Alignment.Center
     ) {
-
-        Text(
-            text = title,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold
-        )
-
-
+        Text(title, color = Color.Black, fontWeight = FontWeight.Bold)
         Image(
             painter = painter,
             contentDescription = null,
@@ -284,6 +343,7 @@ fun CustomButton(modifier: Modifier, painter: Painter, title: String) {
         )
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
