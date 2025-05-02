@@ -11,6 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import com.app.tibibalance.R
+
 
 @Suppress("UNUSED_FUNCTION")
 @Composable
@@ -34,4 +37,14 @@ fun ImageContainer(
             modifier = Modifier.fillMaxSize()
         )
     }
+}
+
+@Preview
+@Composable
+fun ImageContainerPreview() {
+    ImageContainer(
+        imageResId = R.drawable.imagenprueba,
+        contentDescription = "ImagenPrueba",
+        modifier = Modifier.size(100.dp)
+    )
 }
