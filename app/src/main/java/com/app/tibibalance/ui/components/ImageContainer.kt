@@ -19,7 +19,7 @@ fun ImageContainer(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     cornerRadius: Int = 12,
-    backgroundColor: Color = Color.LightGray,
+    backgroundColor: Color = Color.Transparent,
     contentScale: ContentScale = ContentScale.Crop
 ) {
     Box(
