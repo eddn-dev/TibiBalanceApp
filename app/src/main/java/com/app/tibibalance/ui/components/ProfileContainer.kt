@@ -40,7 +40,7 @@ fun ProfileContainer(
     }
 }
 
-/**
+
 @Preview
 @Composable
 fun ProfilePreview() {
@@ -50,4 +50,3 @@ fun ProfilePreview() {
         contentDescription = "Foto de perfil"
     )
 }
-*/

@@ -34,7 +34,7 @@ fun ImageContainer(
             modifier = Modifier.fillMaxSize()
         )
     }
-}/**
+}
 @Preview
 @Composable
 fun ImageContainerPreview() {
@@ -43,4 +43,4 @@ fun ImageContainerPreview() {
         contentDescription = "ImagenPrueba",
         modifier = Modifier.size(100.dp)
     )
-}**/
+}
