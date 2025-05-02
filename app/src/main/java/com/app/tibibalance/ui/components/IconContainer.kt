@@ -1,5 +1,6 @@
 package com.app.tibibalance.ui.components
 
+import com.app.tibibalance.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -9,13 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
 @Suppress("UNUSED_FUNCTION")
 @Composable
 fun IconContainer(
     icon: ImageVector,
     contentDescription: String?,
-    backgroundColor: Color = Color.LightGray,
+    backgroundColor: Color = Color.Transparent,
     iconTint: Color = Color.Black,
     size: Int = 48,
     modifier: Modifier = Modifier
