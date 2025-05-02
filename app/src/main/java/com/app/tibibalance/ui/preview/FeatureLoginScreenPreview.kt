@@ -1,4 +1,11 @@
 package com.app.tibibalance.ui.preview
 
-class FeatureLoginScreenPreview {
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.app.tibibalance.ui.screens.FeatureLoginScreen
+
+@Preview
+@Composable
+fun FeatureLoginScreenPreview() {
+    FeatureLoginScreen()
 }
