@@ -1,14 +1,10 @@
 package com.app.tibibalance.ui.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.Caption
@@ -27,9 +21,12 @@ import com.app.tibibalance.ui.components.Header
 import com.app.tibibalance.ui.components.ImageContainer
 import com.app.tibibalance.ui.components.InputEmail
 import com.app.tibibalance.ui.components.InputPassword
-import com.app.tibibalance.ui.components.InputPasswordPreview
 import com.app.tibibalance.ui.components.PrimaryButton
 import com.app.tibibalance.ui.components.TextButtonLink
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 
 @Composable
 fun FeatureLoginScreen() {
@@ -98,7 +95,7 @@ fun FeatureLoginScreen() {
                 onClick = { /* Acción */ },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            Caption(
+            /*Caption(
                 text = "¿Ya tienes una cuenta?",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,7 +107,21 @@ fun FeatureLoginScreen() {
                 text = "Iniciar sesión",
                 onClick = { },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            )*/
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Caption(text = "¿Ya tienes una cuenta?")
+                Spacer(modifier = Modifier.width(4.dp))
+                TextButtonLink(
+                    text = "Iniciar sesión",
+                    onClick = { }
+                )
+            }
         }
     }
 }
