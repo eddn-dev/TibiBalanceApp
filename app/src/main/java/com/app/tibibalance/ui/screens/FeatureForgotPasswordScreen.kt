@@ -74,6 +74,7 @@ fun FeatureForgotPasswordScreen() {
                         .fillMaxWidth()
                         .padding(bottom = 16.dp, top = 16.dp)
                 )
+
             }
         }
 
