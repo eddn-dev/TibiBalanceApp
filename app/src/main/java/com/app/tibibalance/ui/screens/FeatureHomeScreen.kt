@@ -35,7 +35,7 @@ fun FeatureHomeScreen() {
 
             // Primer PrimaryButton
             PrimaryButton(
-                text = "Botón 1",  // Pasamos el texto al botón
+                text = "Iniciar Sesión",  // Pasamos el texto al botón
                 onClick = { /* Acción del primer botón */ },
                 modifier = Modifier
                     .fillMaxWidth()
