@@ -58,7 +58,7 @@ fun FeatureHomeScreen() {
                     contentDescription = "Imagen de inicio", // Descripción de la imagen
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
+                        .height(300.dp)
                         .padding(bottom = 32.dp)
                 )
                 Description(
