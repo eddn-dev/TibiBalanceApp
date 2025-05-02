@@ -1,4 +1,8 @@
 package com.app.tibibalance.ui.screens
 
-class FeatureHomeScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun FeatureHomeScreen() {
+    // Contenido de la pantalla
 }

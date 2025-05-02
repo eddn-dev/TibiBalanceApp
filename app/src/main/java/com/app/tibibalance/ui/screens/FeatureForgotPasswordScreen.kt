@@ -1,4 +1,8 @@
 package com.app.tibibalance.ui.screens
 
-class FeatureForgotPasswordScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun FeatureForgotPasswordScreen() {
+    // Contenido de la pantalla
 }

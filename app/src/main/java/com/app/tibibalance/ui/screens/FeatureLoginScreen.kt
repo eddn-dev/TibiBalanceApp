@@ -1,4 +1,8 @@
 package com.app.tibibalance.ui.screens
 
-class FeatureLoginScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun FeatureLoginScreen() {
+    // Contenido de la pantalla
 }

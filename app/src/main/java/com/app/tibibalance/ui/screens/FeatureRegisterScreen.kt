@@ -1,4 +1,8 @@
 package com.app.tibibalance.ui.screens
 
-class FeatureRegisterScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun FeatureRegisterScreen() {
+    // Contenido de la pantalla
 }
