@@ -27,7 +27,7 @@ app/
 El directorio `ui/components` está destinado a albergar **elementos de UI reutilizables y atómicos (o de bajo nivel de composición)**. Estos componentes son la base fundamental sobre la cual se construyen pantallas más complejas. Idealmente, estos componentes deberían ser:
 
 1.  **Sin estado (Stateless):** Reciben datos y callbacks como parámetros y no gestionan su propio estado interno complejo.
-3.  **Foco único:** Cada componente realiza una tarea específica de UI.
+.  **Foco único:** Cada componente realiza una tarea específica de UI.
 
 ### Organización Interna
 

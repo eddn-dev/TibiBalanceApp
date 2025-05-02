@@ -34,4 +34,18 @@ fun ImageContainer(
             modifier = Modifier.fillMaxSize()
         )
     }
+<<<<<<< HEAD
 }
+=======
+}
+/*
+@Preview
+@Composable
+fun ImageContainerPreview() {
+    ImageContainer(
+        imageResId = R.drawable.imagenprueba,
+        contentDescription = "ImagenPrueba",
+        modifier = Modifier.size(100.dp)
+    )
+}*/
+>>>>>>> main
