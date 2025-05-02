@@ -31,7 +31,6 @@ fun FeatureForgotPasswordScreen() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            //Encabezado/Header - - - - -> Falta un componente?
             Header(
                 title = "Recuperar Contraseña",
                 showBackButton = true,

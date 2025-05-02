@@ -26,7 +26,8 @@ fun SecondaryButton(
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Black
+            contentColor = Color.Black,
+            containerColor = Color.White
         ),
         border = BorderStroke(1.dp, Color.Black)
     ) {

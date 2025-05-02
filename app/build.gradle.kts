@@ -43,7 +43,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.material3:material3-icons-extended:1.2.0-alpha03")
+    //implementation("androidx.compose.material3:material3-icons-extended:1.2.0-alpha03")
+    implementation("androidx.compose.foundation:foundation-layout:1.6.0")
     implementation("androidx.compose.material:material-icons-extended:<versión>")
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
