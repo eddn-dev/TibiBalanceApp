@@ -1,4 +1,3 @@
-// file: ui/components/ProgressBar.kt
 package com.app.tibibalance.ui.components
 
 import androidx.compose.foundation.background

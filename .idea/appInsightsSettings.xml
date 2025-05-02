@@ -8,10 +8,17 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
+<<<<<<< HEAD
+                  <option name="appId" value="PLACEHOLDER" />
+                  <option name="mobileSdkAppId" value="" />
+                  <option name="projectId" value="" />
+                  <option name="projectNumber" value="" />
+=======
                   <option name="appId" value="com.app.tibibalance" />
                   <option name="mobileSdkAppId" value="1:467927540157:android:9617f4b1a218f4d03fb2d4" />
                   <option name="projectId" value="tibibalnce" />
                   <option name="projectNumber" value="467927540157" />
+>>>>>>> main
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -43,23 +43,43 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.compose.ui:ui:1.6.0") // O la versión más reciente
+    implementation ("androidx.compose.material3:material3:1.2.0")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.0")
+    implementation ("androidx.compose.foundation:foundation:1.6.0")
+    implementation ("androidx.compose.runtime:runtime:1.6.0")
+
+    // Para cargar recursos como imágenes
+    implementation ("androidx.compose.ui:ui-resources:1.6.0")
+
+    // Íconos extendidos (válidos y estables)
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    // Material 3 base (botones, layouts, etc.)
+    implementation(libs.androidx.material3)
+
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth-ktx") // La extensión -ktx es para soporte de Kotlin
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    // Core de AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling) 
+    debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.compose.material:material-icons-extended")
 }

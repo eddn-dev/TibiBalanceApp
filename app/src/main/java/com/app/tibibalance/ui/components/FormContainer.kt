@@ -39,7 +39,7 @@ fun FormContainer(
     )
 }
 
-/*
+
 @Preview
 @Composable
 fun LoginScreen() {
@@ -51,4 +51,40 @@ fun LoginScreen() {
         }
     }
 }
-*/
+
+/*@Preview
+@Composable
+fun LoginS() {
+
+
+    FormContainer {
+        // Nombre de Usuario
+        TextField(value = "", onValueChange = { }, label = { Text("Nombre de Usuario*") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Fecha de Nacimiento (con ícono)
+        TextField(
+            value = "", onValueChange = { }, label = { Text("Fecha de nacimiento*") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Correo
+        TextField(
+            value = "", onValueChange = {}, label = { Text("Correo*") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Contraseña
+        TextField(
+            value = "", onValueChange = { }, label = { Text("Contraseña*") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Confirmar Contraseña
+        TextField(
+            value = "", onValueChange = { }, label = { Text("Confirmar contraseña*") },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}*/
