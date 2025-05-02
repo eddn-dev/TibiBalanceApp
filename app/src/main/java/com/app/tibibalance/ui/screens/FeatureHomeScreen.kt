@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.ui.components.PrimaryButton
 import com.app.tibibalance.ui.components.ImageContainer
+import com.app.tibibalance.R
+
 @Composable
 fun FeatureHomeScreen() {
     // Contenido de la pantalla
@@ -23,11 +25,11 @@ fun FeatureHomeScreen() {
                 .padding(16.dp)
         ) {
             ImageContainer(
-                imageResId = painterResource(id = R.drawable.ic_home_image), // Reemplaza con tu imagen
-            contentDescription = "Imagen de inicio", // Descripción de la imagen
-            modifier = Modifier
+                imageResId = R.drawable.ic_home_image,  // Reemplaza con tu imagen
+                contentDescription = "Imagen de inicio", // Descripción de la imagen
+                modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(320.dp)
                 .padding(bottom = 32.dp)
             )
 
