@@ -12,6 +12,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun InputSelect(
@@ -29,15 +32,24 @@ fun InputSelect(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .width(300.dp)
-                .height(45.dp)
+                .height(30.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White)
                 .clickable { expanded = true },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "Desplegar opciones"
                 )
-            }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.White,
+                focusedBorderColor = Color.White,
+                cursorColor = Color.Transparent,
+                disabledBorderColor = Color.White
+            )
         )
+
 
         DropdownMenu(
             expanded = expanded,

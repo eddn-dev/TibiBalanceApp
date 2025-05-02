@@ -20,173 +20,176 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.app.tibibalance.R
+import androidx.compose.ui.graphics.Color
+
 import com.app.tibibalance.ui.components.Description
 import com.app.tibibalance.ui.components.FormContainer
 import com.app.tibibalance.ui.components.Header
-import com.app.tibibalance.ui.components.ImageContainer
+
 import com.app.tibibalance.ui.components.InputSelect
 import com.app.tibibalance.ui.components.InputText
 import com.app.tibibalance.ui.components.SecondaryButton
 import com.app.tibibalance.ui.components.Subtitle
 
-
 @Composable
 fun FeatureAddHabitScreen() {
     // Contenido de la pantalla
-    GradientBackgroundScreen {
-        // Contenido de la pantalla
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-            //.background(Color(0xFFf5f5f5)) // Fondo gris claro
-        ) {
-
-            Column(
+    Box(modifier = Modifier.fillMaxSize()) {
+        GradientBackgroundScreen {
+            // Contenido de la pantalla
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
+                    .fillMaxSize()
+                //.background(Color(0xFFf5f5f5)) // Fondo gris claro
             ) {
-                Header(
-                    title = "Agregar Hábito",
-                    showBackButton = false,
-                    profileImage = null
-                )
 
-                FormContainer (
+                Column(
                     modifier = Modifier
-                        .height(734.dp)  // Establece un alto específico
-                ){
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                ) {
 
-                    Subtitle(
-                        text = "Crear mi propio hábito",
+
+                    FormContainer(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(Alignment.CenterVertically),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Description(
-                        text = "Nombre: *",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
-                    var nombre by remember { mutableStateOf("Nora Soto") }
-                    InputText(
-                        value = nombre,
-                        onValueChange = { nombre = it }
-                    )
-                    Spacer(modifier = Modifier.height(7.dp))
-
-                    Description(
-                        text = "Descripción:",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
-                    var descripcion by remember { mutableStateOf("Nora Soto") }
-                    InputText(
-                        value = descripcion,
-                        onValueChange = { descripcion = it }
-                    )
-                    Spacer(modifier = Modifier.height(7.dp))
-
-                    Description(
-                        text = "frecuencia: *",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
-                    var frecuencia by remember { mutableStateOf("Diario") }
-                    InputSelect(
-                        options = listOf("Diario", "Semanal", "Mensual"),
-                        selectedOption = frecuencia,
-                        onOptionSelected = { frecuencia = it }
-                    )
-                    Spacer(modifier = Modifier.height(7.dp))
-
-                    Description(
-                        text = "Duración:",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
-                    var duracion by remember { mutableStateOf("Nora Soto") }
-                    InputText(
-                        value = duracion,
-                        onValueChange = { duracion = it }
-                    )
-                    Spacer(modifier = Modifier.height(7.dp))
-
-
-                    Description(
-                        text = "Categoría: *",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
-                    var categoria by remember { mutableStateOf("Diario") }
-                    InputSelect(
-                        options = listOf("Diario", "Semanal", "Mensual"),
-                        selectedOption = categoria,
-                        onOptionSelected = { categoria = it }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                            .height(734.dp)  // Establece un alto específico
                     ) {
+
+                        Subtitle(
+                            text = "Crear mi propio hábito",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(Alignment.CenterVertically),
+                            textAlign = TextAlign.Center
+                        )
+
                         Description(
-                            text = "Notificación: *",
+                            text = "Nombre: *",
                             modifier = Modifier
                                 .fillMaxWidth(),
                             textAlign = TextAlign.Start
                         )
+                        var nombre by remember { mutableStateOf("Nora Soto") }
+                        InputText(
+                            value = nombre,
+                            onValueChange = { nombre = it }
+                        )
+                        Spacer(modifier = Modifier.height(7.dp))
 
-                        /*ImageContainer(
-                            imageResId = R.drawable.ic_buttonnotification_image,  // Reemplaza con tu imagen
-                            contentDescription = "Imagen de inicio", // Descripción de la imagen
+                        Description(
+                            text = "Descripción:",
                             modifier = Modifier
-                                //.fillMaxWidth()
-                                .height(70.dp)
-                                .width(70.dp)
-                                .padding(bottom = 32.dp)
-                        )*/
-                    }
-
-
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Spacer(modifier = Modifier.width(8.dp))
-                        SecondaryButton(
-                            text = "Guardar",
-                            onClick = {}
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
                         )
-                        Spacer(modifier = Modifier.width(20.dp)) // 1f es un peso relativo
-
-
-                        SecondaryButton(
-                            text = "Cancelar",
-                            onClick = {}
+                        var descripcion by remember { mutableStateOf("") }
+                        InputText(
+                            value = descripcion,
+                            onValueChange = { descripcion = it }
                         )
+                        Spacer(modifier = Modifier.height(7.dp))
+
+                        Description(
+                            text = "frecuencia: *",
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                        var frecuencia by remember { mutableStateOf("Diario") }
+                        InputSelect(
+                            options = listOf("Diario", "Semanal", "Mensual"),
+                            selectedOption = frecuencia,
+                            onOptionSelected = { frecuencia = it }
+                        )
+                        Spacer(modifier = Modifier.height(7.dp))
+
+                        Description(
+                            text = "Duración:",
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                        var duracion by remember { mutableStateOf("Nora Soto") }
+                        InputText(
+                            value = duracion,
+                            onValueChange = { duracion = it }
+                        )
+                        Spacer(modifier = Modifier.height(7.dp))
+
+
+                        Description(
+                            text = "Categoría: *",
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                        var categoria by remember { mutableStateOf("Diario") }
+                        InputSelect(
+                            options = listOf("Diario", "Semanal", "Mensual"),
+                            selectedOption = categoria,
+                            onOptionSelected = { categoria = it }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Description(
+                                text = "Notificación: *",
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Start
+                            )
+
+                        }
+
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Spacer(modifier = Modifier.width(8.dp))
+                            SecondaryButton(
+                                text = "Guardar",
+                                onClick = {},
+                                backgroundColor = Color.White
+                            )
+
+
+                            Spacer(modifier = Modifier.width(20.dp)) // 1f es un peso relativo
+
+
+                            SecondaryButton(
+                                text = "Cancelar",
+                                onClick = {},
+                                backgroundColor = Color.White
+                            )
+                        }
+
                     }
 
                 }
-
             }
         }
+
+        // 2. Header encima del gradiente (posición fija arriba)
+        Header(
+            title = "Agregar Hábito",
+            showBackButton = false,
+            profileImage = null,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+        )
+
     }
 }

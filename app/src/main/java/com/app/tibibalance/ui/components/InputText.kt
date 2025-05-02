@@ -29,7 +29,7 @@ fun InputText(
     Box(
         modifier = modifier
             .width(300.dp)
-            .height(26.dp)
+            .height(30.dp)
             .padding(start = 5.dp)
             .background(
                 color = MaterialTheme.colorScheme.surface,
