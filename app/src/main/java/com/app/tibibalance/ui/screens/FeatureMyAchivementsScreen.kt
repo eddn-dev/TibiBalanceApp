@@ -24,42 +24,58 @@ import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+
 
 @Composable
 fun FeatureMyAchivementsScreen() {
-    //Degradado del background
-    GradientBackgroundScreen {
-        // Contenido de la pantalla
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Header(
-                title = "Mis Logros",
-                // Si se ingresa a esta pantalla desde los ajustes, el boton de regreso onBackClick lleva a ajustes, no a Visualizar perfil *
-                showBackButton = true,
-                onBackClick = { }, //Redireccionar a Visualizar perfil
-                profileImage = null
-            )
-            Column(
+    // Contenido de la pantalla
+    Box(modifier = Modifier.fillMaxSize()) {
+        GradientBackgroundScreen {
+            // Contenido de la pantalla
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 80.dp)
-            ){
-                Row() {
-                    /*AchivementContainer( - - - - - - - - - - -> Falta componente
-
-                    )*/
-                    //Racha
-                    //Usaste la app 3 días seguidos.q
-                    ImageContainer(
-                        imageResId = R.drawable.racha, //Mandar el nombre de la img desde Firebase
-                        contentDescription = "racha", //Nombre del logro
-                        modifier = Modifier.size(100.dp)
+                    .fillMaxSize()
+            )
+            {
+                Column(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 80.dp)
+                )
+                {
+                    FormContainer(
+                        modifier = Modifier
+                            .height(734.dp)  // Establece un alto específico
+                            .padding(20.dp)
                     )
-                    ProgressBar(percent = 0) //Enviar el progreso del logro desde Firebase
+                    {
+                        //Mostrar todos los logros cargados en Firebase (agregar un for aqui) - - - - -> Firebase
+                        Row() {
+                            AchievementContainer(
+                                icon = {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.racha),
+                                        contentDescription = "Ícono de logro"
+                                    )
+                                },
+                                title = "Racha", //Cambiar por el nombre del i-esimo logro
+                                description = "Usaste la app 3 días seguidos", //Cambiar por la descripción del i-esimo logro
+                                percent = 75 //Cambiar por el porcentaje del usuario en el i-ésimo Firebase
+                            )
+                        }
+                    }
+
                 }
             }
+            }
         }
-    }
+        Header(
+            title = "Mis Logros",
+            // Si se ingresa a esta pantalla desde los ajustes, el boton de regreso onBackClick lleva a ajustes, no a Visualizar perfil *
+            showBackButton = true,
+            onBackClick = { }, //Redireccionar a Visualizar perfil
+            profileImage = null
+        )
 }

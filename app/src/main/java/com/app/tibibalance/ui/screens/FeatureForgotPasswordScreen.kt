@@ -16,20 +16,12 @@ import com.app.tibibalance.ui.components.*
 
 @Composable
 fun FeatureForgotPasswordScreen() {
-    //Degradado del background
-    GradientBackgroundScreen {
-    // Contenido de la pantalla
+    Box(modifier = Modifier.fillMaxSize()){
+        GradientBackgroundScreen {
         Box(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            //Encabezado/Header - - - - -> Falta un componente?
-            Header(
-                title = "Recuperar Contraseña",
-                showBackButton = true,
-                onBackClick = { }, //Redireccionar a iniciar sesión
-                profileImage = null
-            )
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -69,6 +61,13 @@ fun FeatureForgotPasswordScreen() {
 
             }
         }
-
+        }
+        //Encabezado/Header - - - - -> Falta un componente?
+        Header(
+            title = "Recuperar Contraseña",
+            showBackButton = true,
+            onBackClick = { }, //Redireccionar a iniciar sesión
+            profileImage = null
+        )
     }
 }
