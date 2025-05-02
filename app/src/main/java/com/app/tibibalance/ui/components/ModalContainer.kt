@@ -103,3 +103,24 @@ fun ModalContainer(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun ModalContainerPreview() {
+    MaterialTheme {
+        // Usamos un Box para simular una pantalla base
+        Box(modifier = Modifier.fillMaxSize()) {
+            ModalContainer(
+                onDismissRequest = {}, // Aquí puedes conectar a una variable si lo deseas
+                closeButtonEnabled = true
+            ) {
+                Text("Este es un ejemplo de contenido del modal.")
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = {}) {
+                    Text("Aceptar")
+                }
+            }
+        }
+    }
+}
+
