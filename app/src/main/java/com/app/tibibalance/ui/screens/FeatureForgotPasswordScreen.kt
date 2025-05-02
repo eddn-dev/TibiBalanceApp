@@ -28,11 +28,10 @@ fun FeatureForgotPasswordScreen() {
                 .fillMaxSize()
         ) {
             //Encabezado/Header - - - - -> Falta un componente?
-            Text(
-                text = "Recuperar Contraseña",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.Black,
-                fontSize = 18.sp
+            Header(
+                title = "Recuperar Contraseña",
+                showBackButton = false,
+                profileImage = null
             )
             Column(
                 modifier = Modifier

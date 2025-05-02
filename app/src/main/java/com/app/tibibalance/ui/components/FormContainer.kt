@@ -39,7 +39,7 @@ fun FormContainer(
     )
 }
 
-/*
+
 @Preview
 @Composable
 fun LoginScreen() {
@@ -51,4 +51,3 @@ fun LoginScreen() {
         }
     }
 }
-*/
