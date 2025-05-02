@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,12 +53,22 @@ import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.ImageContainer
 import com.app.tibibalance.ui.components.PrimaryButton
+import com.app.tibibalance.ui.data.AuthManager
 import com.app.tibibalance.ui.theme.PrimaryLight
+
+
+
 @Preview(showBackground = true)
 @Composable
 fun LoginScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    var errorMessage by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+
+    val isFormValid = email.isNotBlank() && password.isNotBlank()
+
 
     Column(
         modifier = Modifier
@@ -68,12 +79,12 @@ fun LoginScreen() {
                 )
             )
     ) {
-        // Barra superior
+
         AppBar()
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Imagen ilustrativa
+
         Image(
             painter = painterResource(id = R.drawable.login),
             contentDescription = null,
@@ -84,7 +95,7 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Tarjeta con los campos de texto
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,7 +134,17 @@ fun LoginScreen() {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Enlace recuperar contraseña
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(start = 8.dp)
+                    )
+                }
+
                 Row {
                     Text("¿Olvidaste tu contraseña?")
                     Spacer(Modifier.width(5.dp))
@@ -136,14 +157,37 @@ fun LoginScreen() {
             }
         }
 
-        // Botón principal
         PrimaryButton(
             text = "Iniciar sesión",
-            onClick = { },
+            enabled = isFormValid && !loading,
+            onClick = {
+                loading = true
+                AuthManager.loginWithEmail(
+                    email = email.trim(),
+                    password = password,
+                    onSuccess = {
+                        loading = false
+                        errorMessage = ""
+                        // navegar a Home
+                    },
+                    onFailure = {
+                        loading = false
+                        password = ""                              // limpia contraseña
+                        errorMessage = "Correo o contraseña incorrectos"
+                    }
+                )
+            },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 24.dp)
         )
+        if (loading) {
+            CircularProgressIndicator(
+                strokeWidth = 3.dp,
+                modifier = Modifier.size(30.dp)
+            )
+        }
+
 
         Spacer(modifier = Modifier.height(1.dp))
         DividerWithText()
