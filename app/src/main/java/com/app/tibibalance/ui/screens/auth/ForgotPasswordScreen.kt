@@ -1,57 +1,27 @@
 // ui/screens/auth/ForgotPasswordScreen.kt
 package com.app.tibibalance.ui.screens.auth
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.*
+
+
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
-import com.app.tibibalance.ui.navigation.Screen
-import kotlinx.coroutines.launch
 
 @Composable
-fun ForgotPasswordScreen(
-    nav: NavController,
-    vm : ForgotPasswordViewModel = hiltViewModel()
-) {
-    val uiState  by vm.ui.collectAsState()
-    val snackbar = remember { SnackbarHostState() }
-    val scope    = rememberCoroutineScope()
-
-    /* ─── Snackbar para errores ─── */
-    LaunchedEffect(uiState) {
-        if (uiState is ForgotUiState.Error) {
-            snackbar.showSnackbar((uiState as ForgotUiState.Error).message)
-            vm.clearStatus()
-        }
-    }
-
-    /* ─── Dialogo genérico (spinner + éxito) ─── */
-    ModalInfoDialog(                     // NEW
-        loading  = uiState is ForgotUiState.Loading,
-        message  = if (uiState is ForgotUiState.Success)
-            "Hemos enviado un enlace de recuperación a tu correo."
-        else null,
-        onAccept = vm::clearStatus
-    )
-
-    /* ─── Fondo con degradado ─── */
+fun ForgotPasswordScreen(){
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
-
-    Box(Modifier.fillMaxSize()) {
-
+    Box(modifier = Modifier.fillMaxSize()){
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -60,53 +30,49 @@ fun ForgotPasswordScreen(
             Column(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(16.dp)
             ) {
-
                 ImageContainer(
                     resId = R.drawable.password1,
-                    contentDescription = null,
+                    contentDescription = "Recuperar contraseña",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(340.dp)
-                        .padding(bottom = 24.dp)
+                        .height(400.dp)
+                        .padding(vertical = 16.dp)
                 )
-
                 Description(
                     text = "Ingresa tu correo electrónico y enviaremos un link para recuperar tu contraseña",
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
                     textAlign = TextAlign.Center
                 )
-
-                Spacer(Modifier.height(20.dp))
-
                 FormContainer {
+                    var email by remember { mutableStateOf("") }
                     InputEmail(
-                        value = vm.email,
-                        onValueChange = vm::onEmailChange,
-                        placeholder   = "Correo electrónico"
+                        value = email,
+                        onValueChange = { email = it },
+                        placeholder = "Correo electrónico"
                     )
                 }
 
-                Spacer(Modifier.height(24.dp))
-
                 PrimaryButton(
-                    text    = "Enviar",
-                    enabled = uiState !is ForgotUiState.Loading,
-                    onClick = vm::sendResetLink,
-                    modifier = Modifier.fillMaxWidth()
+                    text = "Enviar",  // Pasamos el texto al botón
+                    onClick = { /* Acción del primer botón */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp, top = 16.dp)
                 )
+
             }
         }
 
+        //Encabezado/Header - - - - -> Falta un componente?
         Header(
-            title          = "Recuperar Contraseña",
+            title = "Recuperar Contraseña",
             showBackButton = true,
-            onBackClick    = { nav.navigateUp() },
-            modifier       = Modifier.align(Alignment.TopCenter)
+            onBackClick = { }, //Redireccionar a iniciar sesión
+            profileImage = null
         )
-        SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter))
     }
 }
