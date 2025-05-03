@@ -43,7 +43,7 @@ fun GradientBackgroundScreen(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun FeatureHomeScreen() {
+fun HomeScreen() {
     GradientBackgroundScreen {
         // Contenido de la pantalla
         Box(
