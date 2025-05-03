@@ -2,6 +2,7 @@
 package com.app.tibibalance.data.repository
 
 import com.app.tibibalance.data.remote.firebase.AuthService
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -63,4 +64,19 @@ class FirebaseAuthRepository @Inject constructor(
             )
         }
     }
+
+    override suspend fun syncVerification(): Boolean {
+        val user = FirebaseAuth.getInstance().currentUser ?: return false
+        if (!user.isEmailVerified) return false                  // nada que hacer
+
+        val ref = db.collection("profiles").document(user.uid)
+        val snap = ref.get().await()
+        val verifiedInDb = snap.getBoolean("verified") ?: false
+
+        if (!verifiedInDb) {
+            ref.update("verified", true)
+        }
+        return true                                             // estaba o quedó en true
+    }
+
 }

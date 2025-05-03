@@ -35,7 +35,7 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _ui.value = SignUpUiState.Loading
-                repo.signUp(email, password)            // firma del repo corregida
+                repo.signUpEmail(email, password)            // firma del repo corregida
                 _ui.value = SignUpUiState.Success(email)
             } catch (e: Exception) {
                 _ui.value = SignUpUiState.Error(e.message ?: "Error")

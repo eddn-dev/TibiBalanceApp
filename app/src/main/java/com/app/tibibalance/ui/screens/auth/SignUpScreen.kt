@@ -69,6 +69,23 @@ fun SignUpScreen(
         }
     }
 
+    /* ───── Navegar tras crear la cuenta (e-mail enviado) ───── */
+    LaunchedEffect(uiState) {
+        if (uiState is SignUpUiState.Success) {
+            // (opcional) deja visible el modal 1200 ms
+            kotlinx.coroutines.delay(1_200)
+
+            nav.navigate(Screen.VerifyEmail.route) {
+                // Mantén en back-stack Launch para que el botón “Cerrar sesión”
+                // pueda regresar allí; evita múltiples copias de SignUp.
+                popUpTo(Screen.SignUp.route) { inclusive = true }
+            }
+
+            vm.dismissSuccess()   // limpia el estado para futuros reintentos
+        }
+    }
+
+
     /* -------- Date-picker nativo -------- */
     val formatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
     fun openDatePicker() {
@@ -111,9 +128,7 @@ fun SignUpScreen(
 
         /* Modal loader / éxito */
         SignUpProgressDialog(
-            loading   = uiState is SignUpUiState.Loading,
-            emailSent = uiState is SignUpUiState.Success,
-            onDismiss = vm::dismissSuccess
+            loading   = uiState is SignUpUiState.Loading
         )
 
         /* Contenido scrollable */

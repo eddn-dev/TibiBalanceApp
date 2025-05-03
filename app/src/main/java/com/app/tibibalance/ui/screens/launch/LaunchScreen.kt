@@ -9,9 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,20 +23,24 @@ import com.app.tibibalance.ui.navigation.Screen
 @Composable
 fun LaunchScreen(
     nav: NavController,
-    vm: LaunchViewModel = hiltViewModel()
+    vm : LaunchViewModel = hiltViewModel()
 ) {
-    val loggedIn by vm.isLoggedIn.collectAsState()
+    val session by vm.sessionState.collectAsState()
 
-    /* ─── Redirect if already logged ─── */
-    LaunchedEffect(loggedIn) {
-        if (loggedIn) {
-            nav.navigate(Screen.Home.route) {
+    /* ── Navegación reactiva ─────────────────────────────── */
+    LaunchedEffect(session) {
+        when {
+            !session.loggedIn               -> Unit                // sigue en Launch
+            session.verified                -> nav.navigate(Screen.Home.route) {
+                popUpTo(Screen.Launch.route) { inclusive = true }
+            }
+            else /* logged && !verified */  -> nav.navigate(Screen.VerifyEmail.route) {
                 popUpTo(Screen.Launch.route) { inclusive = true }
             }
         }
     }
 
-    /* ─── Vertical gradient background ─── */
+    /* ── UI de bienvenida (idéntica salvo el LaunchedEffect) ── */
     val gradient = Brush.verticalGradient(
         listOf(
             MaterialTheme.colorScheme.primary.copy(alpha = .15f),
@@ -60,16 +62,17 @@ fun LaunchScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            /* ─── Illustration ─── */
+
+            /* Ilustración */
             ImageContainer(
-                resId = R.drawable.launch,              // 🔧 nombre drawable claro
+                resId = R.drawable.launch,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(190.dp)
             )
 
-            /* ─── Subtitle ─── */
+            /* Sub-título */
             Text(
                 text = stringResource(R.string.launch_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
@@ -78,7 +81,7 @@ fun LaunchScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            /* ─── Buttons ─── */
+            /* Botones */
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 PrimaryButton(
                     text = stringResource(R.string.btn_sign_in),

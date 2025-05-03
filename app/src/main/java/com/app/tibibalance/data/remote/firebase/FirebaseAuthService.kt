@@ -1,6 +1,7 @@
 // data/remote/firebase/FirebaseAuthService.kt
 package com.app.tibibalance.data.remote.firebase
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -39,11 +40,12 @@ class FirebaseAuthService @Inject constructor(
     }
 
     override suspend fun signUpAndVerify(email: String, pass: String): FirebaseUser = withContext(io) {
-        val user = auth.createUserWithEmailAndPassword(email, pass).await().user
-            ?: error("User is null after sign-up")
+        val user = auth.createUserWithEmailAndPassword(email, pass).await().user!!
         user.sendEmailVerification().await()
+        Log.d("AUTH", "Verification e-mail sent to ${user.email}")
         user
     }
+
 
     override suspend fun sendPasswordReset(email: String) = withContext(io) {
         auth.sendPasswordResetEmail(email).await()
