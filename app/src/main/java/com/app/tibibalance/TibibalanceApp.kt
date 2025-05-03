@@ -1,5 +1,5 @@
-// TibibalanceApp.kt  (si no la creaste antes)
-package com.app.tibibalance
+// app/src/main/java/com/app/tibibalance/TibibalanceApp.kt
+package com.app.tibibalance        // usa EXACTAMENTE el mismo package del código
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

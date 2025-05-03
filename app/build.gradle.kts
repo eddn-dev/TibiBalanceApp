@@ -11,11 +11,11 @@ plugins {
 
 
 android {
-    namespace = "com.example.tibibalance"
+    namespace = "com.app.tibibalance"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.tibibalance"
+        applicationId = "com.app.tibibalance"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
