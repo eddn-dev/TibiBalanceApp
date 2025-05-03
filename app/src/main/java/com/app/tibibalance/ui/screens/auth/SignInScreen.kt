@@ -1,142 +1,145 @@
-// ui/screens/auth/SignInScreen.kt
 package com.app.tibibalance.ui.screens.auth
+
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
-// Componentes personalizados de tu app
-import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.navigation.Screen
+import kotlinx.coroutines.launch
 
 @Composable
-fun SignInScreen() {
-    // Contenido de la pantalla
-    Box(modifier = Modifier.fillMaxSize()) {
-        GradientBackgroundScreen {
-            // Contenido de la pantalla
-            Box(
+fun SignInScreen(
+    nav: NavController,
+    vm: SignInViewModel = hiltViewModel()
+) {
+    var email by remember { mutableStateOf("") }
+    var pass  by remember { mutableStateOf("") }
+
+    val snackbar = remember { SnackbarHostState() }
+    val scope    = rememberCoroutineScope()          // ← para lanzar coroutines
+
+    val gradient = Brush.verticalGradient(
+        listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(gradient)
+    ) {
+        /* ---------- Contenido ---------- */
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 80.dp, start = 24.dp, end = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            ImageContainer(
+                resId = R.drawable.ic_login_image,
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .padding(bottom = 24.dp)
+            )
+
+            Text(
+                text = "¡Ingresa para continuar!",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            FormContainer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(170.dp),
+                cornerRadiusDp = 16
             ) {
+                InputEmail(
+                    value = email,
+                    onValueChange = { email = it }
+                )
+                Spacer(Modifier.height(12.dp))
+                InputPassword(
+                    value = pass,
+                    onValueChange = { pass = it }
+                )
+            }
 
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
+            Spacer(Modifier.height(16.dp))
 
+            TextButtonLink(
+                text = "¿Olvidaste tu contraseña? Clic aquí",
+                onClick = { nav.navigate(Screen.Forgot.route) }
+            )
 
-                    ImageContainer(
-                        imageResId = R.drawable.ic_login_image,  // Reemplaza con tu imagen
-                        contentDescription = "Imagen de inicio", // Descripción de la imagen
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(398.dp)
-                            .padding(bottom = 32.dp)
-                    )
+            Spacer(Modifier.height(24.dp))
 
-                    FormContainer(
-                        modifier = Modifier
-                            .height(185.dp)  // Establece un alto específico
-                    ) {
-                        var email by remember { mutableStateOf("") }
-                        InputEmail(
-                            value = email,
-                            onValueChange = { email = it },
-                            placeholder = "Correo electrónico"
-                        )
-                        var pwd by remember { mutableStateOf("") }
-                        InputPassword(
-                            value = pwd,
-                            onValueChange = { pwd = it }
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Description(
-                                text = "¿Olvidaste tu contraseña? ",
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            TextButtonLink(
-                                text = "Clic aquí",
-                                onClick = {}
-                            )
-                        }
+            PrimaryButton(
+                text = stringResource(R.string.btn_sign_in),
+                onClick = {
+                    vm.signIn(email, pass) { msg ->
+                        scope.launch { snackbar.showSnackbar(msg) }   // ✅
                     }
-
-                    Spacer(modifier = Modifier.height(15.dp))
-                    // Primer PrimaryButton
-
-
-                    PrimaryButton(
-                        text = "Iniciar sesión",
-                        onClick = { /* Acción del botón */ },
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                        // .padding(bottom = 16.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    ImageContainer(
-                        imageResId = R.drawable.ic_separador_image,  // Reemplaza con tu imagen
-                        contentDescription = "Imagen de inicio", // Descripción de la imagen
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally) // Centra horizontalmente en Column
-                            .width(240.dp) // Ancho fijo
-                            .height(15.dp)
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    GoogleSignButton(
-                        onClick = { /* Acción del botón */ },
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Description(
-                            text = "¿Aún no tienes una cuenta?",
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        TextButtonLink(
-                            text = "Regístrate",
-                            onClick = {}
-                        )
-                    }
-
-
                 }
+            )
+
+            Spacer(Modifier.height(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Divider(Modifier.weight(1f))
+                Text("  •  ", fontSize = 22.sp)
+                Divider(Modifier.weight(1f))
+            }
+            Spacer(Modifier.height(8.dp))
+
+            GoogleSignButton(onClick = { vm.signInWithGoogle() })
+
+            Spacer(Modifier.height(24.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "¿Aún no tienes una cuenta? ",
+                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall
+                )
+                TextButtonLink(
+                    text = "Regístrate",
+                    onClick = { nav.navigate(Screen.SignUp.route) },
+                    underline = false
+                )
             }
         }
 
-        // 2. Header encima del gradiente (posición fija arriba)
+        /* Header */
         Header(
-            //profileImage = dummyProfile
             title = "Iniciar Sesión",
             showBackButton = true,
-            onBackClick = { },
-            profileImage = null,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
+            onBackClick = { nav.navigateUp() },
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+
+        /* Snackbar */
+        SnackbarHost(
+            hostState = snackbar,
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }

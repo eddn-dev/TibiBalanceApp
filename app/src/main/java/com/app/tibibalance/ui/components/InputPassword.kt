@@ -1,7 +1,6 @@
-// file: ui/components/InputPassword.kt
+// ui/components/InputPassword.kt
 package com.app.tibibalance.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -14,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -26,90 +24,78 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun InputPassword(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    placeholder: String = "Contraseña"
+    modifier: Modifier = Modifier,
+    placeholder: String = "Contraseña",
+    isError: Boolean = false,
+    supportingText: String? = null
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
-    val visualTransformation: VisualTransformation =
-        if (passwordVisible) VisualTransformation.None
-        else PasswordVisualTransformation()
+    var visible by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier.fillMaxWidth()) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp), // altura suficiente para centrar texto
+                .height(40.dp)
         ) {
-            // Campo de texto: ocupa todo el ancho menos espacio para el ojo
+            /* Campo de texto */
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
-                visualTransformation = visualTransformation,
+                visualTransformation = if (visible)
+                    VisualTransformation.None else PasswordVisualTransformation(),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 textStyle = TextStyle(
-                    color = Color(0xFF000000),
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 40.dp), // deja espacio para el icono
-                decorationBox = { inner ->
-                    Box(
-                        Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center // centra texto
-                    ) {
-                        if (value.isEmpty()) {
-                            Text(
-                                text = placeholder,
-                                style = TextStyle(
-                                    color = Color(0xFF000000).copy(alpha = 0.5f),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            )
-                        }
-                        inner()
-                    }
+                    .padding(end = 40.dp)   // deja sitio al icono
+            ) { inner ->
+                Box(Modifier.fillMaxSize(), Alignment.CenterStart) {
+                    AnimatedPlaceholder(value.isEmpty(), placeholder, isError)
+                    inner()
                 }
-            )
+            }
 
-            // Icono de ojo a la derecha, centrado verticalmente
+            /* Icono ojo */
             Icon(
-                imageVector = if (passwordVisible)
-                    Icons.Filled.VisibilityOff
-                else
-                    Icons.Filled.Visibility,
+                imageVector = if (visible) Icons.Filled.VisibilityOff
+                else Icons.Filled.Visibility,
                 contentDescription = null,
-                tint = Color(0xFF000000),
+                tint = if (isError) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .size(24.dp)
                     .padding(end = 8.dp)
-                    .clickable { passwordVisible = !passwordVisible }
+                    .clickable { visible = !visible }
             )
         }
 
-        // Línea inferior
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Color(0xFF000000))
-        )
+        FieldUnderline(isError)
+
+        supportingText?.let {
+            Text(
+                text = it,
+                color = if (isError) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 2.dp, start = 2.dp)
+            )
+        }
     }
 }
 
-@Preview(showBackground = true, widthDp = 320, heightDp = 50)
+@Preview(showBackground = true)
 @Composable
-fun InputPasswordPreview() {
+private fun PasswordPreview() {
     var pwd by remember { mutableStateOf("") }
-    InputPassword(
-        value = pwd,
-        onValueChange = { pwd = it }
-    )
+    InputPassword(value = pwd, onValueChange = { pwd = it })
 }

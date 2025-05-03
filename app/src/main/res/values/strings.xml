@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">TibiBalance</string>
+    <string name="btn_sign_in">Iniciar sesión</string>
+    <string name="btn_google">Continuar con Google</string>
+    <string name="forgot_pwd">¿Olvidaste tu contraseña? Clic aquí</string>
+    <string name="no_account">¿Aún no tienes una cuenta?</string>
+    <string name="register_here">Regístrate</string>
+    <string name="launch_welcome">¡Bienvenido!</string>
+    <string name="launch_subtitle">La app que te ayuda a mantener un estilo de vida saludable</string>
+    <string name="btn_sign_up">Registrarse</string>
+    <string name="sign_up_title">Registrarse</string>
+
 </resources>

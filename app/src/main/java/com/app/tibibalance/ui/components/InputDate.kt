@@ -1,60 +1,53 @@
+// ui/components/InputDate.kt
 package com.app.tibibalance.ui.components
 
-import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import java.util.*
-
 
 @Composable
 fun InputDate(
-    selectedDate: String,
-    onDateSelected: (String) -> Unit
+    value: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "Fecha de nacimiento*",
+    isError: Boolean = false,
+    supportingText: String? = null
 ) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-    val datePickerDialog = remember {
-        DatePickerDialog(context, { _, y, m, d ->
-            val formattedDate = "%02d/%02d/%04d".format(d, m + 1, y)
-            onDateSelected(formattedDate)
-        }, year, month, day)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        InputText(
+            value = value,
+            onValueChange = {},                   // no editable
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onClick),
+            placeholder = placeholder,
+            isError = isError,
+            supportingText = supportingText,
+            singleLine = true
+        )
+        Spacer(Modifier.width(4.dp))
+        Icon(
+            imageVector = Icons.Default.CalendarToday,
+            contentDescription = null,
+            tint = if (isError) MaterialTheme.colorScheme.error
+            else Color(0xFF000000),
+            modifier = Modifier
+                .size(20.dp)
+                .clickable(onClick = onClick)
+        )
     }
-
-    OutlinedTextField(
-        value = selectedDate,
-        onValueChange = {},
-        readOnly = true,
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.DateRange,
-                contentDescription = "Seleccionar fecha"
-            )
-        },
-        modifier = Modifier
-            .width(300.dp)
-            .height(45.dp)
-            .clickable { datePickerDialog.show() },
-        shape = RoundedCornerShape(16.dp)
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InputDatePreview() {
-    var date by remember { mutableStateOf("01/05/2025") }
-    InputDate(selectedDate = date, onDateSelected = { date = it })
 }

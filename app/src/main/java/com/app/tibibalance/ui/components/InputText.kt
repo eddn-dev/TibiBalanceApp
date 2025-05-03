@@ -1,70 +1,84 @@
-// file: ui/components/InputText.kt
+// ui/components/InputText.kt
 package com.app.tibibalance.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.*
 
+/**
+ * Campo de texto genérico estilo “underline”.
+ *
+ * @param value            Texto actual.
+ * @param onValueChange    Callback de cambios.
+ * @param placeholder      Texto fantasma cuando está vacío.
+ * @param isError          Marca el campo en rojo.
+ * @param supportingText   Mensaje debajo (p. ej. error o ayuda); `null` para ninguno.
+ * @param singleLine       Una sola línea (default) o multilinea.
+ * @param visualTransformation   Permite formatear (p.ej. PasswordVisualTransformation).
+ */
 @Composable
 fun InputText(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "",
+    isError: Boolean = false,
+    supportingText: String? = null,
+    singleLine: Boolean = true,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-    Box(
-        modifier = modifier
-            .width(300.dp)
-            .height(26.dp)
-            .padding(start = 5.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(13.dp)
-            ),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            singleLine = true,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            textStyle = TextStyle(
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal
-            ),
-            modifier = Modifier.fillMaxSize()
-        ) { innerTextField ->
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                innerTextField()
+    Column(modifier.fillMaxWidth()) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 40.dp),                 // alto mínimo
+            contentAlignment = Alignment.CenterStart
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                singleLine = singleLine,
+                visualTransformation = visualTransformation,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                textStyle = TextStyle(
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onBackground,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) { inner ->
+                Box(Modifier.fillMaxSize(), Alignment.CenterStart) {
+                    AnimatedPlaceholder(value.isEmpty(), placeholder, isError)
+                    inner()
+                }
             }
         }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun InputTextPrefilledPreview() {
-    var nombre by remember { mutableStateOf("Nora Soto") }
-    InputText(
-        value = nombre,
-        onValueChange = { nombre = it }
-    )
+        FieldUnderline(isError)
+
+        supportingText?.let {
+            Text(
+                text = it,
+                color = if (isError) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 2.dp, start = 2.dp)
+            )
+        }
+    }
 }

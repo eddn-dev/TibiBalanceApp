@@ -1,5 +1,6 @@
 package com.app.tibibalance.ui.components
 
+import androidx.annotation.DrawableRes
 import com.app.tibibalance.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,36 +13,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-@Suppress("UNUSED_FUNCTION")
 @Composable
 fun ImageContainer(
-    imageResId: Int,
+    @DrawableRes resId: Int,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.LightGray,
-    contentScale: ContentScale = ContentScale.Crop
+    backgroundColor: Color = Color.Transparent,          // sin gris por defecto
+    contentScale: ContentScale = ContentScale.Fit,       // evita recorte
+    cornerRadius: Dp = 0.dp
 ) {
     Box(
         modifier = modifier
+            .clip(RoundedCornerShape(cornerRadius))
             .background(backgroundColor)
     ) {
         Image(
-            painter = painterResource(id = imageResId),
+            painter = painterResource(id = resId),
             contentDescription = contentDescription,
             contentScale = contentScale,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
-/*
-@Preview
-@Composable
-fun ImageContainerPreview() {
-    ImageContainer(
-        imageResId = R.drawable.imagenprueba,
-        contentDescription = "ImagenPrueba",
-        modifier = Modifier.size(100.dp)
-    )
-}*/

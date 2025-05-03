@@ -1,36 +1,58 @@
 [versions]
-agp = "8.9.1"
-kotlin = "2.0.21"
-coreKtx = "1.16.0"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.1"
-composeBom = "2024.09.00"
-navigationCompose = "2.8.0"
-kotlinSerialization = "1.6.3"
-
-[libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+kotlin                = "2.2.0-Beta2"
+agp                   = "8.9.2"            # AGP estable; 8.6+ es preview :contentReference[oaicite:0]{index=0}
+compose-bom           = "2025.04.01"
+material3             = "1.3.2"
+activity-compose      = "1.10.1"           # último estable (23-Abr-25) :contentReference[oaicite:1]{index=1}
+navigation-compose    = "2.8.9"            # último estable (29-Ene-25) :contentReference[oaicite:2]{index=2}
+hilt                  = "2.56.2"
+ksp                   = "2.2.0-Beta2-2.0.1"
+firebase-bom          = "33.13.0"
+credential-manager    = "1.5.0"
+googleid              = "1.1.1"
+play-services-auth    = "21.3.0"
+kotlinx-serialization = "1.7.3"
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+android-application   = { id = "com.android.application",            version.ref = "agp" }
+kotlin-android        = { id = "org.jetbrains.kotlin.android",       version.ref = "kotlin" }
+kotlin-serialization  = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compose        = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services       = { id = "com.google.gms.google-services",     version = "4.4.2" }
+hilt                  = { id = "com.google.dagger.hilt.android",     version.ref = "hilt" }
+ksp                   = { id = "com.google.devtools.ksp",            version.ref = "ksp" }
+
+[libraries]
+# Compose (sin versiones, lo dicta el BOM)
+compose-bom           = { group = "androidx.compose", name = "compose-bom",           version.ref = "compose-bom" }
+compose-icons-extended= { group = "androidx.compose.material",     name = "material-icons-extended" }
+material3             = { group = "androidx.compose.material3",    name = "material3",                  version.ref = "material3" }
+activity-compose      = { group = "androidx.activity",             name = "activity-compose",           version.ref = "activity-compose" }
+navigation-compose    = { group = "androidx.navigation",           name = "navigation-compose",         version.ref = "navigation-compose" }
+compose-ui-tooling        = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview= { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+# Auth / DI / Core
+credential-core       = { group = "androidx.credentials",          name = "credentials",                version.ref = "credential-manager" }
+credential-play       = { group = "androidx.credentials",          name = "credentials-play-services-auth", version.ref = "credential-manager" }
+googleid              = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+play-auth             = { group = "com.google.android.gms",        name = "play-services-auth",         version.ref = "play-services-auth" }
+hilt-android          = { group = "com.google.dagger",             name = "hilt-android",               version.ref = "hilt" }
+hilt-compiler         = { group = "com.google.dagger",             name = "hilt-compiler",              version.ref = "hilt" }
+hilt-navigation       = { group = "androidx.hilt",                 name = "hilt-navigation-compose",    version = "1.2.0" }
+firebase-bom          = { group = "com.google.firebase",           name = "firebase-bom",               version.ref = "firebase-bom" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx",    name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+[bundles]
+compose = [
+    "compose-bom",
+    "material3",
+    "compose-icons-extended",
+    "activity-compose",
+    "navigation-compose"
+]
+auth = [
+    "credential-core",
+    "credential-play",
+    "googleid",
+    "play-auth"
+]

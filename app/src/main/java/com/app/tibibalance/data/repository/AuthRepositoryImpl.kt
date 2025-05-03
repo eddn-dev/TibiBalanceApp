@@ -12,5 +12,13 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signIn(e: String, p: String)   = service.signIn(e, p)
     override suspend fun signUp(e: String, p: String)   = service.signUp(e, p)
     override suspend fun resetPass(e: String)           = service.sendPasswordReset(e)
+    override suspend fun signUpEmail(email: String, pass: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun signInGoogle(idToken: String) {
+        TODO("Not yet implemented")
+    }
+
     override fun signOut()                              = service.signOut()
 }

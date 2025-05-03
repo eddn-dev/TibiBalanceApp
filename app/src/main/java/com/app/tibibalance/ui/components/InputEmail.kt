@@ -1,7 +1,6 @@
-// file: ui/components/InputEmail.kt
+// ui/components/InputEmail.kt
 package com.app.tibibalance.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
@@ -9,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -19,21 +17,21 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun InputEmail(
-    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    placeholder: String = "Nombre de usuario/correo"
+    modifier: Modifier = Modifier,
+    placeholder: String = "Correo electrónico",
+    isError: Boolean = false,
+    supportingText: String? = null        // muestra debajo si no es nulo
 ) {
-    Column(
-        modifier
-            .fillMaxWidth()
-    ) {
-        // Campo de texto centrado
+    Column(modifier.fillMaxWidth()) {
+
+        /* Campo */
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp),               // altura suficiente para centrar 16sp
-            contentAlignment = Alignment.Center // centra horizontal y verticalmente
+                .height(40.dp),
+            contentAlignment = Alignment.CenterStart
         ) {
             BasicTextField(
                 value = value,
@@ -41,53 +39,38 @@ fun InputEmail(
                 singleLine = true,
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 textStyle = TextStyle(
-                    color = Color(0xFF000000),
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal
                 ),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                decorationBox = { inner ->
-                    Box(
-                        Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (value.isEmpty()) {
-                            Text(
-                                text = placeholder,
-                                style = TextStyle(
-                                    color = Color(0xFF000000).copy(alpha = 0.5f),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            )
-                        }
-                        inner()
-                    }
+                modifier = Modifier.fillMaxWidth()
+            ) { inner ->
+                Box(Modifier.fillMaxSize(), Alignment.CenterStart) {
+                    AnimatedPlaceholder(value.isEmpty(), placeholder, isError)
+                    inner()
                 }
+            }
+        }
+
+        FieldUnderline(isError)
+
+        /* Mensaje de apoyo / error */
+        supportingText?.let {
+            Text(
+                text = it,
+                color = if (isError) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 2.dp, start = 2.dp)
             )
         }
-        // Línea inferior visible
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Color(0xFF000000))
-        )
     }
 }
 
-@Preview(
-    showBackground = true,
-    widthDp = 320,
-    heightDp = 50
-)
+@Preview(showBackground = true)
 @Composable
-fun InputEmailPreview() {
-    var email by remember { mutableStateOf("") }
-    InputEmail(
-        value = email,
-        onValueChange = { email = it }
-    )
+private fun EmailPreview() {
+    var text by remember { mutableStateOf("") }
+    InputEmail(value = text, onValueChange = { text = it })
 }
