@@ -40,5 +40,16 @@ class FirebaseAuthService @Inject constructor(
         }
     }
 
+    override suspend fun updatePassword(password: String) {
+        withContext(io) {
+            val user = auth.currentUser
+            if (user != null) {
+                user.updatePassword(password).await()
+            } else {
+                throw IllegalStateException("No hay un usuario autenticado.")
+            }
+        }
+    }
+
     override fun signOut() = auth.signOut()
 }
