@@ -56,6 +56,7 @@ fun FeatureAddHabitScreen() {
                         modifier = Modifier
                             .height(850.dp)  // Establece un alto específico
                     ) {
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Subtitle(
                             text = "Crear mi propio hábito",
@@ -189,9 +190,7 @@ fun FeatureAddHabitScreen() {
                                 backgroundColor = Color.White
                             )
 
-
                             Spacer(modifier = Modifier.width(20.dp)) // 1f es un peso relativo
-
 
                             SecondaryButton(
                                 text = "Cancelar",

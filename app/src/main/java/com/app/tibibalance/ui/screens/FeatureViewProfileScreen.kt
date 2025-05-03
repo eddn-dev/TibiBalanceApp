@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun FeatureViewProfileScreen() {
@@ -87,13 +88,16 @@ fun FeatureViewProfileScreen() {
                     ){
                         SecondaryButton(
                             text = "Editar perfil",
-                            onClick = {}
+                            onClick = {},
+                            backgroundColor = Color.White
                         )
 
                         SecondaryButton(
                             text = "Cerrar sesión",
-                            onClick = {}
+                            onClick = {},
+                            backgroundColor = Color.White
                         )
+
                     }
                 }
 
