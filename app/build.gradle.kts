@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.hilt)
+    id("org.jetbrains.kotlin.kapt")
     alias(libs.plugins.ksp)
 }
 
@@ -43,33 +44,32 @@ android {
 }
 
 dependencies {
-    // UI
+
+    /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
-    implementation(libs.bundles.compose)
+    implementation(libs.bundles.compose)                 // Material-3, Nav, Icons, Activity
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
+    /* ──────────────── Firebase ──────────────── */
+    implementation(platform(libs.firebase.bom))           // BOM v34.1.0
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation(libs.firebase.auth.ktx)                // ← FirebaseAuth & GoogleAuthProvider (KTX)
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
-    // Hilt
+    /* ──────────────── Inyección de dependencias (Hilt) ──────────────── */
     implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    kapt(libs.hilt.compiler)                              // Hilt requiere KAPT, no KSP
     implementation(libs.hilt.navigation)
 
-    // Credential Manager + GIS
-    implementation(libs.bundles.auth)
+    /* ──────────────── Google Identity / Credential Manager ──────────────── */
+    implementation(libs.bundles.auth)                    // credential-core, GIS googleid, play-auth
 
-    // KotlinX
+    /* ──────────────── KotlinX ──────────────── */
     implementation(libs.kotlinx.serialization.json)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
-    // Dependencias para habilitar la previsualización de @Preview en Android Studio
-    implementation(libs.compose.ui.tooling.preview) // Contiene la anotación @Preview
-    debugImplementation(libs.compose.ui.tooling)     // Necesario para renderizar la preview en el IDE (solo debug)
-
-    // Core / tests
+    /* ──────────────── Core & tests ──────────────── */
     implementation("androidx.core:core-ktx:1.13.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

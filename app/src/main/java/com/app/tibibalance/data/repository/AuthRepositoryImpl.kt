@@ -4,21 +4,42 @@ package com.app.tibibalance.data.repository
 import com.app.tibibalance.data.remote.firebase.AuthService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val service: AuthService
 ) : AuthRepository {
+
     override val isLoggedIn: Flow<Boolean> = service.authState
-    override suspend fun signIn(e: String, p: String)   = service.signIn(e, p)
-    override suspend fun signUp(e: String, p: String)   = service.signUp(e, p)
-    override suspend fun resetPass(e: String)           = service.sendPasswordReset(e)
+
+    /* ---------------- Correo / contraseña ---------------- */
+    override suspend fun signIn(email: String, pass: String) {
+        service.signIn(email, pass)          // devuelve FirebaseUser
+        Unit                                 // …pero el contrato pide Unit
+    }
+
+    override suspend fun signUp(email: String, pass: String) {
+        service.signUpAndVerify(email, pass)
+        Unit
+    }
+
     override suspend fun signUpEmail(email: String, pass: String) {
-        TODO("Not yet implemented")
+        service.signUpAndVerify(email, pass)
+        Unit
     }
 
+    override suspend fun resetPass(email: String) {
+        service.sendPasswordReset(email)
+        Unit
+    }
+
+    /* ---------------- Google One-Tap --------------------- */
     override suspend fun signInGoogle(idToken: String) {
-        TODO("Not yet implemented")
+        service.signInGoogle(idToken)
+        Unit
     }
 
-    override fun signOut()                              = service.signOut()
+    /* ---------------- Sign-out --------------------------- */
+    override fun signOut() = service.signOut()
 }

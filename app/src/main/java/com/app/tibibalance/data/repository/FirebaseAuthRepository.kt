@@ -1,52 +1,66 @@
 // data/repository/FirebaseAuthRepository.kt
 package com.app.tibibalance.data.repository
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import com.app.tibibalance.data.remote.firebase.AuthService
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@ActivityRetainedScoped
+@Singleton
 class FirebaseAuthRepository @Inject constructor(
-    private val auth: FirebaseAuth
+    private val service: AuthService,
+    private val db: FirebaseFirestore
 ) : AuthRepository {
 
-    /* ---------- Estado de sesión ---------- */
-    override val isLoggedIn: Flow<Boolean> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { a ->
-            trySend(a.currentUser != null)
-        }
-        auth.addAuthStateListener(listener)
-        awaitClose { auth.removeAuthStateListener(listener) }
-    }.distinctUntilChanged()
+    override val isLoggedIn: Flow<Boolean> = service.authState
 
-    /* ---------- Correo/contraseña ---------- */
+    /* ------------ Registro con verificación ------------ */
+    override suspend fun signUpEmail(email: String, pass: String) {
+        val user = service.signUpAndVerify(email, pass)
+        createProfileIfAbsent(user)
+        /* devolvemos Unit ⇒ nada que hacer */
+    }
+
+    /* ------------ Registro SIN verificación ------------ */
     override suspend fun signUp(email: String, pass: String) {
-        auth.createUserWithEmailAndPassword(email, pass).await()
-            .user?.sendEmailVerification()?.await()
+        val user = service.signUp(email, pass)
+        createProfileIfAbsent(user)
     }
 
-    // ⚠️  Alias para la firma antigua
-    override suspend fun signUpEmail(email: String, pass: String) =
-        signUp(email, pass)
-
+    /* ------------ Inicio de sesión e-mail -------------- */
     override suspend fun signIn(email: String, pass: String) {
-        auth.signInWithEmailAndPassword(email, pass).await()
+        val user = service.signIn(email, pass)
+        createProfileIfAbsent(user)          // por si inicia en nuevo dispositivo
     }
 
-    override suspend fun resetPass(email: String) {
-        auth.sendPasswordResetEmail(email).await()
-    }
-
-    /* ---------- Google ---------- */
+    /* ------------ Google One-Tap ----------------------- */
     override suspend fun signInGoogle(idToken: String) {
-        val cred = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(cred).await()
+        val user = service.signInGoogle(idToken)
+        createProfileIfAbsent(user)
     }
 
-    /* ---------- Sign-out ---------- */
-    override fun signOut() = auth.signOut()
+    /* ------------ Utilidades --------------------------- */
+    override suspend fun resetPass(email: String) =
+        service.sendPasswordReset(email)
+
+    override fun signOut() = service.signOut()
+
+    /* ------------ Helper privado ----------------------- */
+    private suspend fun createProfileIfAbsent(user: FirebaseUser) {
+        val ref = db.collection("profiles").document(user.uid)
+        if (!ref.get().await().exists()) {
+            ref.set(
+                mapOf(
+                    "email"     to user.email,
+                    "provider"  to user.providerData.first().providerId,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "verified"  to user.isEmailVerified
+                )
+            )
+        }
+    }
 }
