@@ -5,3 +5,9 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
 }
+
+allprojects {
+    configurations.all {
+        resolutionStrategy.force("com.squareup:javapoet:1.13.0")
+    }
+}
