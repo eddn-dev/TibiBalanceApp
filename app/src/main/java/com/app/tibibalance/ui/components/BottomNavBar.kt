@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,13 +22,14 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.mutableIntStateOf
 
 @Composable
 fun BottomNavBar(
     items: List<BottomNavItem>,
     modifier: Modifier = Modifier
 ) {
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
 
     Surface(
         modifier = modifier
@@ -60,7 +60,7 @@ fun BottomNavBar(
 fun PreviewBottomNavBar() {
     val menuItems = listOf(
         BottomNavItem("Emociones", Icons.Filled.DateRange),
-        BottomNavItem("Hábitos",   Icons.Filled.List),
+        BottomNavItem("Hábitos",   Icons.AutoMirrored.Filled.List),
         BottomNavItem("Inicio",    Icons.Filled.Home),
         BottomNavItem("Perfil",    Icons.Filled.Person),
         BottomNavItem("Ajustes",   Icons.Filled.Settings)

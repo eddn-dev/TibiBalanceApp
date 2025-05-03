@@ -126,9 +126,10 @@ fun SignUpScreen(
             .background(gradient)
     ) {
 
-        /* Modal loader / éxito */
-        SignUpProgressDialog(
-            loading   = uiState is SignUpUiState.Loading
+        ModalInfoDialog(
+            loading  = uiState is SignUpUiState.Loading,
+            message  = null,              // no mostramos éxito aquí
+            onAccept = {}                 // nunca se llama (no hay mensaje)
         )
 
         /* Contenido scrollable */
