@@ -1,13 +1,12 @@
 // ui/theme/Theme.kt
 package com.app.tibibalance.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-/* ─── ColorScheme Light ─── */
-private val LightColors = lightColorScheme(
+/* ─── ColorScheme ─── */
+private val AppColorScheme = lightColorScheme(
     primary       = Blue80,
     onPrimary     = Color.Black,
 
@@ -23,33 +22,13 @@ private val LightColors = lightColorScheme(
     outline       = Grey10
 )
 
-/* ─── ColorScheme Dark ─── */
-private val DarkColors = darkColorScheme(
-    primary       = Blue80,
-    onPrimary     = Color.Black,
-
-    secondary     = Blue40,
-    onSecondary   = Color.White,
-
-    background    = Grey90,
-    onBackground  = White,
-
-    surface       = Grey90,
-    onSurface     = White,
-
-    outline       = Blue40
-)
-
-/* ─── Tema raíz ─── */
+/* ─── Tema raíz (solo light) ─── */
 @Composable
 fun TibiBalanceTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (useDarkTheme) DarkColors else LightColors
-
     MaterialTheme(
-        colorScheme = colors,
+        colorScheme = AppColorScheme,
         typography  = Typography,
         shapes      = AppShapes,
         content     = content
