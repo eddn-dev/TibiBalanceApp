@@ -13,7 +13,6 @@ import com.app.tibibalance.ui.screens.auth.SignInScreen
 import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
 import com.app.tibibalance.ui.screens.home.HomeScreen
-// import com.app.tibibalance.ui.screens.auth.ForgotPasswordScreen   // cuando la crees
 
 @Composable
 fun AppNavGraph(navController: NavHostController = rememberNavController()) {

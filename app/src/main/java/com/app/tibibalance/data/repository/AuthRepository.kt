@@ -1,10 +1,12 @@
 // data/repository/AuthRepository.kt
 package com.app.tibibalance.data.repository
 
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     val isLoggedIn: Flow<Boolean>
+    val currentUser: FirebaseUser?
     suspend fun signIn(email: String, pass: String)
     suspend fun signUp(email: String, pass: String)
     suspend fun resetPass(email: String)

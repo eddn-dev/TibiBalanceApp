@@ -18,6 +18,8 @@ class FirebaseAuthRepository @Inject constructor(
 ) : AuthRepository {
 
     override val isLoggedIn: Flow<Boolean> = service.authState
+    override val currentUser: FirebaseUser?
+        get() = FirebaseAuth.getInstance().currentUser
 
     /* ------------ Registro con verificación ------------ */
     override suspend fun signUpEmail(email: String, pass: String) {
