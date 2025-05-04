@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.bundles.compose)                 // Material-3, Nav, Icons, Activity
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.accompanist.navanim)
+
 
     /* ──────────────── Firebase ──────────────── */
     implementation(platform(libs.firebase.bom))           // BOM v34.1.0

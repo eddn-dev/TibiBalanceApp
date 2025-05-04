@@ -64,7 +64,7 @@ fun SignInScreen(
     LaunchedEffect(uiState) {
         (uiState as? SignInUiState.Success)?.let { success ->
             if (success.verified) {
-                nav.navigate(Screen.Home.route) {
+                nav.navigate(Screen.Main.route) {
                     popUpTo(Screen.Launch.route) { inclusive = true }
                 }
             } else {

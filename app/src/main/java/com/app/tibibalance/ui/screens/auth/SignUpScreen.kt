@@ -1,10 +1,8 @@
 /*
  * ui/screens/auth/SignUpScreen.kt
- *
- * • Diálogo ModalInfoDialog para LOADING, SUCCESS y ERROR
- * • Snackbar solo para incidentes locales (Google One-Tap)
- * • Inputs con errores de campo vía SignUpUiState.FieldError
- * • Flujo One-Tap, DatePicker y Credential Manager
+ * – ModalInfoDialog para Loading / Success / Error   (no se muestra en GoogleSuccess)
+ * – Snackbar solo para incidentes locales de One-Tap
+ * – Navegación automática: VerifyEmail (Success) o Home (GoogleSuccess)
  */
 
 package com.app.tibibalance.ui.screens.auth
@@ -50,31 +48,28 @@ fun SignUpScreen(
     nav: NavController,
     vm : SignUpViewModel = hiltViewModel()
 ) {
-    /* ------------- estado local de inputs ------------- */
+    /* -------- estado local de inputs -------- */
     var username  by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf<LocalDate?>(null) }
     var email     by remember { mutableStateOf("") }
     var pass1     by remember { mutableStateOf("") }
     var pass2     by remember { mutableStateOf("") }
 
-    /* ------------- estado global ------------- */
+    /* -------- estado global -------- */
     val uiState  by vm.ui.collectAsState()
-    val snackbar = remember { SnackbarHostState() }         // solo Google One-Tap
+    val snackbar = remember { SnackbarHostState() }       // solo Google fallos locales
     val scope    = rememberCoroutineScope()
 
-    /* ------------- Android helpers ------------- */
+    /* -------- Android helpers -------- */
     val ctx      = LocalContext.current
     val activity = ctx as Activity
     val cm       = remember(activity) { CredentialManager.create(activity) }
 
-    /* ------------- One-Tap helper ------------- */
+    /* -------- One-Tap -------- */
     fun launchGoogleSignIn() = scope.launch {
         try {
-            val response = cm.getCredential(
-                activity,
-                vm.buildGoogleRequest(WEB_CLIENT_ID)
-            )
-            val idToken = GoogleIdTokenCredential
+            val response = cm.getCredential(activity, vm.buildGoogleRequest(WEB_CLIENT_ID))
+            val idToken  = GoogleIdTokenCredential
                 .createFrom(response.credential.data).idToken
             if (idToken.isBlank()) {
                 snackbar.showSnackbar("Token vacío, intenta de nuevo"); return@launch
@@ -85,7 +80,32 @@ fun SignUpScreen(
         }
     }
 
-    /* ------------- DatePicker ------------- */
+    /* -------- navegación según estado -------- */
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is SignUpUiState.Success -> {
+                nav.navigate(Screen.VerifyEmail.route) {
+                    popUpTo(Screen.SignUp.route) { inclusive = true }
+                }
+                vm.dismissSuccess()
+            }
+            SignUpUiState.GoogleSuccess -> {
+                nav.navigate(Screen.Main.route) {
+                    popUpTo(Screen.Launch.route) { inclusive = true }
+                }
+                vm.dismissSuccess()
+            }
+            else -> Unit
+        }
+    }
+
+    /* -------- flags para ModalInfoDialog -------- */
+    val isLoading = uiState is SignUpUiState.Loading
+    val isSuccess = uiState is SignUpUiState.Success      // solo formulario
+    val isError   = uiState is SignUpUiState.Error
+    val dialogVisible = isLoading || isSuccess || isError // GoogleSuccess queda fuera
+
+    /* -------- DatePicker -------- */
     val formatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
     fun openDatePicker() {
         val c = Calendar.getInstance()
@@ -96,19 +116,10 @@ fun SignUpScreen(
         ).show()
     }
 
-    /* ------------- ModalInfoDialog ------------- */
-    val isLoading = uiState is SignUpUiState.Loading
-    val isSuccess = uiState is SignUpUiState.Success
-    val isError   = uiState is SignUpUiState.Error
-    val dialogVisible = isLoading || isSuccess || isError
-
+    /* -------- ModalInfoDialog -------- */
     ModalInfoDialog(
         visible = dialogVisible,
-
-        /* LOADING */
         loading = isLoading,
-
-        /* SUCCESS || ERROR */
         icon    = when {
             isSuccess -> Icons.Default.Check
             isError   -> Icons.Default.Error
@@ -148,10 +159,10 @@ fun SignUpScreen(
         dismissOnClickOutside = !isLoading
     )
 
-    /* ------------- errores de campo ------------- */
+    /* -------- errores de campo -------- */
     val fieldErr = uiState as? SignUpUiState.FieldError
 
-    /* ------------- UI principal ------------- */
+    /* -------- UI principal -------- */
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
@@ -161,8 +172,7 @@ fun SignUpScreen(
             .fillMaxSize()
             .background(gradient)
     ) {
-
-        /* -------- contenido scrollable -------- */
+        /* contenido scrollable */
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -180,7 +190,7 @@ fun SignUpScreen(
                     .padding(bottom = 24.dp)
             )
 
-            /* ----- formulario ----- */
+            /* formulario */
             FormContainer {
                 InputText(
                     value = username,
@@ -220,7 +230,7 @@ fun SignUpScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            /* ---------- botón Registrar ---------- */
+            /* botón Registrar */
             PrimaryButton(
                 text    = stringResource(R.string.btn_sign_up),
                 enabled = !isLoading,
@@ -232,15 +242,13 @@ fun SignUpScreen(
                         password  = pass1,
                         confirm   = pass2
                     )
-
-                    /* guardar en Credential Manager si luego hay éxito */
                     scope.launch {
                         try {
                             cm.createCredential(
                                 activity,
                                 CreatePasswordRequest(id = username, password = pass1)
                             )
-                        } catch (_: Exception) { /* ignorar fallos locales */ }
+                        } catch (_: Exception) { }
                     }
                 }
             )

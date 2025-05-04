@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,13 +21,6 @@ class FirebaseAuthRepository @Inject constructor(
     override val isLoggedIn: Flow<Boolean> = service.authState
     override val currentUser: FirebaseUser?
         get() = FirebaseAuth.getInstance().currentUser
-
-    /* ------------ Registro con verificación ------------ */
-    override suspend fun signUpEmail(email: String, pass: String) {
-        val user = service.signUpAndVerify(email, pass)
-        createProfileIfAbsent(user)
-        /* devolvemos Unit ⇒ nada que hacer */
-    }
 
     /* ------------ Registro SIN verificación ------------ */
     override suspend fun signUp(email: String, pass: String) {
@@ -53,15 +47,22 @@ class FirebaseAuthRepository @Inject constructor(
     override fun signOut() = service.signOut()
 
     /* ------------ Helper privado ----------------------- */
-    private suspend fun createProfileIfAbsent(user: FirebaseUser) {
+    private suspend fun createProfileIfAbsent(
+        user      : FirebaseUser,
+        userName  : String?    = null,
+        birthDate : LocalDate? = null
+    ) {
         val ref = db.collection("profiles").document(user.uid)
         if (!ref.get().await().exists()) {
             ref.set(
                 mapOf(
-                    "email"     to user.email,
-                    "provider"  to user.providerData.first().providerId,
-                    "createdAt" to FieldValue.serverTimestamp(),
-                    "verified"  to user.isEmailVerified
+                    "email"      to user.email,
+                    "provider"   to user.providerData.first().providerId,
+                    "createdAt"  to FieldValue.serverTimestamp(),
+                    "verified"   to user.isEmailVerified,
+                    /* nuevos campos */
+                    "userName"   to userName,
+                    "birthDate"  to birthDate?.toString()       // ISO-8601
                 )
             )
         }
@@ -80,4 +81,16 @@ class FirebaseAuthRepository @Inject constructor(
         }
         return true                                             // estaba o quedó en true
     }
+
+    /* data/repository/FirebaseAuthRepository.kt */
+    override suspend fun signUpEmail(
+        email    : String,
+        pass     : String,
+        userName : String,
+        birthDate: LocalDate
+    ) {
+        val user = service.signUpAndVerify(email, pass)
+        createProfileIfAbsent(user, userName, birthDate)
+    }
+
 }

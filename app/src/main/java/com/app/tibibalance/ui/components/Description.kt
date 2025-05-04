@@ -40,15 +40,3 @@ fun Description(
         overflow = overflow
     )
 }
-
-@Preview(showBackground = true, widthDp = 320, heightDp = 40)
-@Composable
-fun DescriptionPreview() {
-    Description(
-        text = "Descripciones",
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(Alignment.CenterVertically),
-        textAlign = TextAlign.Center
-    )
-}

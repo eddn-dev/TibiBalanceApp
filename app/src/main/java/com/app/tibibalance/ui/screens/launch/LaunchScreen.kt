@@ -31,7 +31,7 @@ fun LaunchScreen(
     LaunchedEffect(session) {
         when {
             !session.loggedIn               -> Unit                // sigue en Launch
-            session.verified                -> nav.navigate(Screen.Home.route) {
+            session.verified                -> nav.navigate(Screen.Main.route) {
                 popUpTo(Screen.Launch.route) { inclusive = true }
             }
             else /* logged && !verified */  -> nav.navigate(Screen.VerifyEmail.route) {

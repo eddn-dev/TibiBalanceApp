@@ -34,31 +34,31 @@ fun ForgotPasswordScreen(
 
     /* Snackbar solo para error */
     LaunchedEffect(uiState) {
-        if (uiState is ForgotUiState.Error) {
-            snackbar.showSnackbar((uiState as ForgotUiState.Error).message)
+        if (uiState is ForgotPasswordUiState.Error) {
+            snackbar.showSnackbar((uiState as ForgotPasswordUiState.Error).message)
             vm.clearStatus()
         }
     }
 
     /* ---------- ModalInfoDialog ---------- */
 
-    val dialogVisible = uiState is ForgotUiState.Loading ||
-            uiState is ForgotUiState.Success
+    val dialogVisible = uiState is ForgotPasswordUiState.Loading ||
+            uiState is ForgotPasswordUiState.Success
 
     ModalInfoDialog(
         visible = dialogVisible,
 
         /* fase SPINNER */
-        loading = uiState is ForgotUiState.Loading,
+        loading = uiState is ForgotPasswordUiState.Loading,
 
         /* fase ÉXITO */
-        icon    = if (uiState is ForgotUiState.Success) Icons.Default.Check else null,
-        message = if (uiState is ForgotUiState.Success)
+        icon    = if (uiState is ForgotPasswordUiState.Success) Icons.Default.Check else null,
+        message = if (uiState is ForgotPasswordUiState.Success)
             "Hemos enviado un enlace para restablecer tu contraseña.\nRevisa tu correo."
         else null,
 
         /* botón “Aceptar” sólo en éxito */
-        primaryButton = if (uiState is ForgotUiState.Success)
+        primaryButton = if (uiState is ForgotPasswordUiState.Success)
             DialogButton("Aceptar") {
                 vm.clearStatus()
                 nav.navigate(Screen.SignIn.route) {
@@ -68,8 +68,8 @@ fun ForgotPasswordScreen(
         else null,
 
         /* bloqueo de back/click-outside mientras carga */
-        dismissOnBack         = uiState !is ForgotUiState.Loading,
-        dismissOnClickOutside = uiState !is ForgotUiState.Loading
+        dismissOnBack         = uiState !is ForgotPasswordUiState.Loading,
+        dismissOnClickOutside = uiState !is ForgotPasswordUiState.Loading
     )
 
     /* ---- Fondo degradado ---- */
@@ -117,7 +117,7 @@ fun ForgotPasswordScreen(
 
             PrimaryButton(
                 text    = "Enviar",
-                enabled = uiState !is ForgotUiState.Loading,
+                enabled = uiState !is ForgotPasswordUiState.Loading,
                 onClick = vm::sendResetLink,
                 modifier = Modifier.fillMaxWidth()
             )

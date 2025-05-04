@@ -63,7 +63,7 @@ fun VerifyEmailScreen(
             success != null -> DialogButton("Aceptar") {
                 vm.clear()
                 if (success.goHome) {
-                    nav.navigate(Screen.Home.route) {
+                    nav.navigate(Screen.Main.route) {
                         popUpTo(Screen.Launch.route) { inclusive = true }
                     }
                 }

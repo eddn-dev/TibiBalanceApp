@@ -40,19 +40,3 @@ fun Caption(
         overflow = overflow
     )
 }
-
-@Preview(
-    showBackground = true,
-    widthDp = 320,
-    heightDp = 25
-)
-@Composable
-fun CaptionPreview() {
-    Caption(
-        text = "Texto auxiliar",
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(Alignment.CenterVertically),
-        textAlign = TextAlign.Center
-    )
-}

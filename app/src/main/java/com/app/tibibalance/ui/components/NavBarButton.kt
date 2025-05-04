@@ -14,10 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class BottomNavItem(
-    val label: String,
-    val icon: ImageVector
-)
 
 @Composable
 fun NavBarButton(

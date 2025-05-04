@@ -23,25 +23,25 @@ class ForgotPasswordViewModel @Inject constructor(
         private set
 
     /** Exponer estados a la pantalla */
-    private val _ui = MutableStateFlow<ForgotUiState>(ForgotUiState.Idle)
-    val ui: StateFlow<ForgotUiState> = _ui
+    private val _ui = MutableStateFlow<ForgotPasswordUiState>(ForgotPasswordUiState.Idle)
+    val ui: StateFlow<ForgotPasswordUiState> = _ui
 
     fun onEmailChange(newValue: String) { email = newValue.trim() }
 
     /** Envía el mail de recuperación (link de Firebase) */
     fun sendResetLink() {
         if (email.isBlank()) {
-            _ui.value = ForgotUiState.Error("Escribe tu correo")
+            _ui.value = ForgotPasswordUiState.Error("Escribe tu correo")
             return
         }
 
         viewModelScope.launch {
             try {
-                _ui.value = ForgotUiState.Loading
+                _ui.value = ForgotPasswordUiState.Loading
                 repo.resetPass(email)
-                _ui.value = ForgotUiState.Success
+                _ui.value = ForgotPasswordUiState.Success
             } catch (e: Exception) {
-                _ui.value = ForgotUiState.Error(
+                _ui.value = ForgotPasswordUiState.Error(
                     e.message ?: "No se pudo enviar el correo"
                 )
             }
@@ -49,5 +49,5 @@ class ForgotPasswordViewModel @Inject constructor(
     }
 
     /** Limpia error o success cuando el usuario ya lo vio */
-    fun clearStatus() { _ui.value = ForgotUiState.Idle }
+    fun clearStatus() { _ui.value = ForgotPasswordUiState.Idle }
 }

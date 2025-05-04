@@ -1,5 +1,6 @@
 package com.app.tibibalance.ui.screens.auth
 
+import SignUpUiState
 import androidx.credentials.GetCredentialRequest             // ✅ Jetpack (no min-api 34)
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -94,10 +95,17 @@ class SignUpViewModel @Inject constructor(
             return
         }
 
+
+
         viewModelScope.launch {
             try {
                 _ui.value = SignUpUiState.Loading
-                repo.signUpEmail(email, password)
+                repo.signUpEmail(
+                    email      = email,
+                    pass       = password,
+                    userName   = userName,
+                    birthDate  = birthDate!!
+                )
 
                 _ui.value = SignUpUiState.Success(email)
 
@@ -134,13 +142,12 @@ class SignUpViewModel @Inject constructor(
     fun finishGoogleSignUp(idToken: String) = viewModelScope.launch {
         try {
             _ui.value = SignUpUiState.Loading
-            repo.signInGoogle(idToken)
-            _ui.value = SignUpUiState.Idle               // navegación la maneja la pantalla
+            repo.signInGoogle(idToken)              // la cuenta ya está verificada
+            _ui.value = SignUpUiState.GoogleSuccess // ⬅️ dispara navegación a Home
         } catch (e: Exception) {
             _ui.value = SignUpUiState.Error(e.message ?: "Google error")
         }
     }
-
     /* --- helpers --- */
     fun consumeError()  { if (_ui.value is SignUpUiState.Error)   _ui.value = SignUpUiState.Idle }
     fun dismissSuccess(){ if (_ui.value is SignUpUiState.Success) _ui.value = SignUpUiState.Idle }

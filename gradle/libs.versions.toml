@@ -42,6 +42,7 @@ hilt-navigation       = { group = "androidx.hilt",                 name = "hilt-
 firebase-bom          = { group = "com.google.firebase",           name = "firebase-bom",               version.ref = "firebase-bom" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx",    name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
+accompanist-navanim = { group = "com.google.accompanist", name  = "accompanist-navigation-animation", version = "0.34.0" }
 
 [bundles]
 compose = [

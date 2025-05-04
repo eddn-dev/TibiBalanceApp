@@ -39,15 +39,3 @@ fun ProfileContainer(
         )
     }
 }
-
-/*
-@Preview
-@Composable
-fun ProfilePreview() {
-    ProfileContainer(
-        imageResId = R.drawable.imagenprueba,
-        size = 80.dp,
-        contentDescription = "Foto de perfil"
-    )
-}
-*/
