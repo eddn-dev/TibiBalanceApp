@@ -1,4 +1,12 @@
-// ui/screens/auth/SignInScreen.kt
+/*
+ * ui/screens/auth/SignInScreen.kt
+ *
+ * Versión completa con:
+ *   • Dialogo ModalInfoDialog para LOADING y ERROR (sin snackbars de ViewModel)
+ *   • Snackbar únicamente para errores locales de Google One-Tap
+ *   • Manejo de errores por-campo en los inputs
+ */
+
 package com.app.tibibalance.ui.screens.auth
 
 import android.app.Activity
@@ -6,13 +14,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,9 +34,12 @@ import com.app.tibibalance.ui.navigation.Screen
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import com.app.tibibalance.ui.components.DialogButton
 
 private const val WEB_CLIENT_ID =
-    "467927540157-tvu0re0msga2o01tsj9t1r1o6kqvek3j.apps.googleusercontent.com"   // <-- tu client-id web
+    "467927540157-tvu0re0msga2o01tsj9t1r1o6kqvek3j.apps.googleusercontent.com"
 
 @Composable
 fun SignInScreen(
@@ -36,9 +50,9 @@ fun SignInScreen(
     var email by remember { mutableStateOf("") }
     var pass  by remember { mutableStateOf("") }
 
-    /* ---------- state UI global ---------- */
+    /* ---------- estado global ---------- */
     val uiState  by vm.ui.collectAsState()
-    val snackbar = remember { SnackbarHostState() }
+    val snackbar = remember { SnackbarHostState() }          // sólo Google-OneTap
     val scope    = rememberCoroutineScope()
 
     /* ---------- Credential Manager ---------- */
@@ -46,57 +60,63 @@ fun SignInScreen(
     val activity = ctx as Activity
     val cm       = remember(activity) { CredentialManager.create(activity) }
 
-    /* Snackbar para errores “genéricos” */
+    /* ───── Navegar cuando el login termina ───── */
     LaunchedEffect(uiState) {
-        if (uiState is SignInUiState.Error) {
-            snackbar.showSnackbar((uiState as SignInUiState.Error).message)
-            vm.consumeError()
-        }
-    }
-
-    /* ─── Navegar cuando el login termina ─── */
-    LaunchedEffect(uiState) {
-        val success = uiState as? SignInUiState.Success ?: return@LaunchedEffect
-
-        if (success.verified) {
-            // e-mail verificado → Home
-            nav.navigate(Screen.Home.route) {
-                popUpTo(Screen.Launch.route) { inclusive = true }  // limpias back-stack
-            }
-        } else {
-            // aún falta verificar correo
-            nav.navigate(Screen.VerifyEmail.route) {
-                popUpTo(Screen.Launch.route) { inclusive = false }
+        (uiState as? SignInUiState.Success)?.let { success ->
+            if (success.verified) {
+                nav.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Launch.route) { inclusive = true }
+                }
+            } else {
+                nav.navigate(Screen.VerifyEmail.route) {
+                    popUpTo(Screen.Launch.route) { inclusive = false }
+                }
             }
         }
     }
 
-
-    /* ---------- diálogo spinner ---------- */
-    ModalInfoDialog(
-        loading  = uiState is SignInUiState.Loading,
-        message  = null,
-        onAccept = {}
-    )
-
-    /* ---------- función Google One-Tap ---------- */
+    /* ---------- One-Tap helper ---------- */
     fun launchGoogleSignIn() = scope.launch {
         val request: GetCredentialRequest = vm.buildGoogleRequest(WEB_CLIENT_ID)
 
         try {
             val response = cm.getCredential(activity, request)
             val idToken  = GoogleIdTokenCredential
-                .createFrom(response.credential.data)
-                .idToken                       // String
+                .createFrom(response.credential.data).idToken
 
             if (idToken.isBlank()) {
                 snackbar.showSnackbar("Token vacío, intenta de nuevo"); return@launch
             }
             vm.finishGoogleSignIn(idToken)
         } catch (e: Exception) {
-            snackbar.showSnackbar("Google sign-in cancelado o falló: ${e.message}")
+            snackbar.showSnackbar("Google cancelado o falló: ${e.message}")
         }
     }
+
+    /* ---------- dialogo modal ---------- */
+    val isLoading  = uiState is SignInUiState.Loading
+    val isError    = uiState is SignInUiState.Error
+    val showDialog = isLoading || isError
+
+    ModalInfoDialog(
+        visible = showDialog,
+        loading = isLoading,
+
+        icon    = if (isError) Icons.Default.Error else null,
+        iconColor   = MaterialTheme.colorScheme.error,
+        iconBgColor = MaterialTheme.colorScheme.errorContainer,
+        title   = if (isError) "Error" else null,
+        message = (uiState as? SignInUiState.Error)?.message,
+
+        primaryButton = if (isError)
+            DialogButton("Aceptar") { vm.consumeError() } else null,
+
+        dismissOnBack         = !isLoading,
+        dismissOnClickOutside = !isLoading
+    )
+
+    /* ---------- errores de campo ---------- */
+    val fieldErr = uiState as? SignInUiState.FieldError
 
     /* ---------- UI ---------- */
     val gradient = Brush.verticalGradient(
@@ -135,9 +155,6 @@ fun SignInScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            /* ----- formulario ----- */
-            val fieldErr = uiState as? SignInUiState.FieldError
-
             FormContainer {
                 InputEmail(
                     value          = email,
@@ -145,7 +162,6 @@ fun SignInScreen(
                     isError        = fieldErr?.emailError != null,
                     supportingText = fieldErr?.emailError
                 )
-
                 InputPassword(
                     value          = pass,
                     onValueChange  = { pass = it; vm.consumeError() },

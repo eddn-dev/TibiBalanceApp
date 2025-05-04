@@ -13,14 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** Estado de la UI */
-sealed interface ForgotUiState {
-    data object Idle                     : ForgotUiState
-    data object Loading                  : ForgotUiState
-    data object Success                  : ForgotUiState      // e-mail enviado
-    data class Error(val message: String): ForgotUiState
-}
-
 @HiltViewModel
 class ForgotPasswordViewModel @Inject constructor(
     private val repo: AuthRepository

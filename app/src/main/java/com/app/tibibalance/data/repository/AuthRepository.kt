@@ -13,5 +13,6 @@ interface AuthRepository {
     suspend fun signUpEmail(email: String, pass: String): Unit
     suspend fun signInGoogle(idToken: String): Unit
     suspend fun syncVerification(): Boolean
+
     fun signOut()
 }

@@ -23,10 +23,9 @@ class SignInViewModel @Inject constructor(
     private val _ui = MutableStateFlow<SignInUiState>(SignInUiState.Idle)
     val ui: StateFlow<SignInUiState> = _ui
 
-    /* ───── Inicio sesión e-mail ───── */
     fun signIn(email: String, pass: String) = viewModelScope.launch {
-        if (email.isBlank() || !email.contains("@") ||
-            pass.length < 6) {
+        /* ---- validación local ---- */
+        if (email.isBlank() || !email.contains("@") || pass.length < 6) {
             _ui.value = SignInUiState.FieldError(
                 emailError = if (!email.contains("@")) "Correo inválido" else null,
                 passError  = if (pass.length < 6) "≥ 6 caracteres" else null
@@ -36,13 +35,40 @@ class SignInViewModel @Inject constructor(
 
         try {
             _ui.value = SignInUiState.Loading
-            repo.signIn(email.trim(), pass)
+            repo.signIn(email.trim(), pass)          // <-- llamada al backend
             val verified = repo.syncVerification()
-            _ui.value = SignInUiState.Success(verified)
+            _ui.value = SignInUiState.Success(verified)   // ← éxito
         } catch (e: Exception) {
-            _ui.value = SignInUiState.Error(
-                e.message ?: "Credenciales incorrectas"
-            )
+            when (e) {
+
+                // Cuenta borrada o nunca creada
+                is FirebaseAuthInvalidUserException ->
+                    _ui.value = SignInUiState.FieldError(
+                        emailError = "La cuenta no existe o está deshabilitada"
+                    )
+
+                is FirebaseAuthInvalidCredentialsException -> when (e.errorCode) {
+
+                    "ERROR_INVALID_EMAIL"  -> _ui.value =
+                        SignInUiState.FieldError(emailError = "Correo mal formado")
+
+                    "ERROR_INVALID_LOGIN_CREDENTIALS",
+                    "ERROR_INVALID_CREDENTIAL" -> _ui.value =
+                        SignInUiState.FieldError(
+                            emailError = "Revisa correo o contraseña",
+                            passError  = ""
+                        )
+
+                    else -> _ui.value =
+                        SignInUiState.Error("Credenciales inválidas (${e.errorCode})")
+                }
+
+                is FirebaseNetworkException ->
+                    _ui.value = SignInUiState.Error("Sin conexión. Intenta de nuevo")
+
+                else ->
+                    _ui.value = SignInUiState.Error(e.message ?: "Error desconocido")
+            }
         }
     }
 

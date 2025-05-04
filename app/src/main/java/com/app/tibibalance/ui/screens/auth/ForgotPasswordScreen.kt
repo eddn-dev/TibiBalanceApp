@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,19 +40,36 @@ fun ForgotPasswordScreen(
         }
     }
 
-    /* ---- Diálogo modal (loading / success) ---- */
+    /* ---------- ModalInfoDialog ---------- */
+
+    val dialogVisible = uiState is ForgotUiState.Loading ||
+            uiState is ForgotUiState.Success
+
     ModalInfoDialog(
-        loading  = uiState is ForgotUiState.Loading,
-        message  = if (uiState is ForgotUiState.Success)
-            "Hemos enviado un enlace a tu correo."
+        visible = dialogVisible,
+
+        /* fase SPINNER */
+        loading = uiState is ForgotUiState.Loading,
+
+        /* fase ÉXITO */
+        icon    = if (uiState is ForgotUiState.Success) Icons.Default.Check else null,
+        message = if (uiState is ForgotUiState.Success)
+            "Hemos enviado un enlace para restablecer tu contraseña.\nRevisa tu correo."
         else null,
-        onAccept = {
-            vm.clearStatus()
-            // Opcional: regresar al SignIn
-            nav.navigate(Screen.SignIn.route) {
-                popUpTo(Screen.Forgot.route) { inclusive = true }
+
+        /* botón “Aceptar” sólo en éxito */
+        primaryButton = if (uiState is ForgotUiState.Success)
+            DialogButton("Aceptar") {
+                vm.clearStatus()
+                nav.navigate(Screen.SignIn.route) {
+                    popUpTo(Screen.Forgot.route) { inclusive = true }
+                }
             }
-        }
+        else null,
+
+        /* bloqueo de back/click-outside mientras carga */
+        dismissOnBack         = uiState !is ForgotUiState.Loading,
+        dismissOnClickOutside = uiState !is ForgotUiState.Loading
     )
 
     /* ---- Fondo degradado ---- */
