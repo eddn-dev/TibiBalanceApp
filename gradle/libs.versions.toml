@@ -12,8 +12,9 @@ credential-manager    = "1.5.0"
 googleid              = "1.1.1"
 play-services-auth    = "21.3.0"
 kotlinx-serialization = "1.7.3"
-room                   = "2.7.1"          # 23-Abr-25 release :contentReference[oaicite:4]{index=4}
-coil                   = "3.1.0"
+room                  = "2.7.1"          # 23-Abr-25 release :contentReference[oaicite:4]{index=4}
+coil                  = "3.1.0"
+kotlinx-datetime      = "0.6.2"
 
 [plugins]
 android-application   = { id = "com.android.application",            version.ref = "agp" }
@@ -51,6 +52,8 @@ room-compiler          = { group = "androidx.room", name = "room-compiler",    v
 # --- Coil 3 ---
 coil-compose           = { group = "io.coil-kt.coil3", name = "coil-compose",  version.ref = "coil" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version = "3.1.0" }
+
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 [bundles]
 compose = [
