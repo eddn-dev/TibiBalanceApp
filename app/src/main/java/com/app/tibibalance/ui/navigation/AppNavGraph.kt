@@ -25,6 +25,6 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable(Screen.Forgot.route)  { ForgotPasswordScreen(navController) }
         composable(Screen.Recover.route) { RecoverPasswordScreen(navController) }
         composable(Screen.VerifyEmail.route) { VerifyEmailScreen(navController) }
-        // composable(Screen.Forgot.route) { ForgotPasswordScreen(navController) }
+        composable(Screen.Forgot.route) { ForgotPasswordScreen(navController) }
     }
 }

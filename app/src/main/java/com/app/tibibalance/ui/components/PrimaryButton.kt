@@ -43,7 +43,7 @@ fun PrimaryButton(
         modifier = modifier.height(50.dp),           // alto consistente
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = container,
+            containerColor = Color(0xFF3EA8FE),
             contentColor   = contentColor,
             disabledContainerColor = container.copy(alpha = 0.4f),
             disabledContentColor   = contentColor.copy(alpha = 0.4f)
