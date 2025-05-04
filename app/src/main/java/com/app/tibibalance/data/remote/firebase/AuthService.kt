@@ -24,5 +24,5 @@ interface AuthService {
     suspend fun signInGoogle(idToken: String): FirebaseUser
 
     /* ─── Cerrar sesión ─────────────────────────────────────── */
-    fun signOut()
+    suspend fun signOut()
 }

@@ -50,6 +50,13 @@ class VerifyEmailViewModel @Inject constructor(
         }
     }
 
-    fun signOut() = repo.signOut()
-    fun clear()   { _ui.value = VerifyEmailUiState.Idle }
+    fun signOut() = viewModelScope.launch {          // recomendado por Google :contentReference[oaicite:1]{index=1}
+        repo.signOut()
+        _ui.value = VerifyEmailUiState.SignedOut
+    }
+
+    fun clear() {
+        if (_ui.value !is VerifyEmailUiState.Loading)
+            _ui.value = VerifyEmailUiState.Idle
+    }
 }

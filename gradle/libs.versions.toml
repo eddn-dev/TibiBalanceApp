@@ -12,6 +12,8 @@ credential-manager    = "1.5.0"
 googleid              = "1.1.1"
 play-services-auth    = "21.3.0"
 kotlinx-serialization = "1.7.3"
+room                   = "2.7.1"          # 23-Abr-25 release :contentReference[oaicite:4]{index=4}
+coil                   = "3.1.0"
 
 [plugins]
 android-application   = { id = "com.android.application",            version.ref = "agp" }
@@ -42,7 +44,13 @@ hilt-navigation       = { group = "androidx.hilt",                 name = "hilt-
 firebase-bom          = { group = "com.google.firebase",           name = "firebase-bom",               version.ref = "firebase-bom" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx",    name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-accompanist-navanim = { group = "com.google.accompanist", name  = "accompanist-navigation-animation", version = "0.34.0" }
+room-runtime           = { group = "androidx.room", name = "room-runtime",     version.ref = "room" }
+room-ktx               = { group = "androidx.room", name = "room-ktx",         version.ref = "room" }
+room-compiler          = { group = "androidx.room", name = "room-compiler",    version.ref = "room" }
+
+# --- Coil 3 ---
+coil-compose           = { group = "io.coil-kt.coil3", name = "coil-compose",  version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version = "3.1.0" }
 
 [bundles]
 compose = [

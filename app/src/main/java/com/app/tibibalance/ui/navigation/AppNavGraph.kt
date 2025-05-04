@@ -2,6 +2,7 @@
 package com.app.tibibalance.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,8 +24,8 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable(Screen.VerifyEmail.route) { VerifyEmailScreen(navController) }
         composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
         composable(Screen.Recover.route)     { RecoverPasswordScreen(navController) }
-
-        composable(Screen.Main.route)        { MainScreen() }
+        composable(Screen.Main.route)        { MainScreen(navController) }
     }
 }
+
 

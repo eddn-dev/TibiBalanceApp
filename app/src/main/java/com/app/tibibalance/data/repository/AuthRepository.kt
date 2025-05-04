@@ -19,5 +19,5 @@ interface AuthRepository {
         userName: String,
         birthDate: LocalDate
     )
-    fun signOut()
+    suspend fun signOut()
 }

@@ -2,12 +2,15 @@
 package com.app.tibibalance.data.repository
 
 import com.app.tibibalance.data.remote.firebase.AuthService
+import com.app.tibibalance.di.IoDispatcher
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class FirebaseAuthRepository @Inject constructor(
     private val service: AuthService,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    @IoDispatcher private val io: CoroutineDispatcher
 ) : AuthRepository {
 
     override val isLoggedIn: Flow<Boolean> = service.authState
@@ -44,7 +48,7 @@ class FirebaseAuthRepository @Inject constructor(
     override suspend fun resetPass(email: String) =
         service.sendPasswordReset(email)
 
-    override fun signOut() = service.signOut()
+    override suspend fun signOut() = withContext(io) { service.signOut() }
 
     /* ------------ Helper privado ----------------------- */
     private suspend fun createProfileIfAbsent(
@@ -92,5 +96,4 @@ class FirebaseAuthRepository @Inject constructor(
         val user = service.signUpAndVerify(email, pass)
         createProfileIfAbsent(user, userName, birthDate)
     }
-
 }

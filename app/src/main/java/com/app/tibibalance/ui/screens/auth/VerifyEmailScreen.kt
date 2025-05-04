@@ -1,3 +1,4 @@
+/* ui/screens/auth/VerifyEmailScreen.kt */
 package com.app.tibibalance.ui.screens.auth
 
 import androidx.compose.foundation.background
@@ -7,7 +8,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -19,26 +23,35 @@ import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.navigation.Screen
-import kotlinx.coroutines.launch
 
 @Composable
 fun VerifyEmailScreen(
     nav: NavController,
-    vm : VerifyEmailViewModel = hiltViewModel()
+    vm: VerifyEmailViewModel = hiltViewModel()
 ) {
+    /* ---------- State ---------- */
     val uiState by vm.ui.collectAsState()
-    val scope   = rememberCoroutineScope()
 
-    /* ---------- Dialog decisions ---------- */
+    /* ---------- React to side-effects ---------- */
+    LaunchedEffect(uiState) {
+        if (uiState is VerifyEmailUiState.SignedOut) {
+            nav.navigate(Screen.Launch.route) {
+                popUpTo(Screen.Launch.route) { inclusive = true }
+            }
+            vm.clear()           // vuelve a Idle
+        }
+    }
+
+    /* ---------- Dialog flags ---------- */
     val loading  = uiState is VerifyEmailUiState.Loading
     val success  = uiState as? VerifyEmailUiState.Success
     val error    = uiState as? VerifyEmailUiState.Error
     val showDialog = loading || success != null || error != null
 
     ModalInfoDialog(
-        visible = showDialog,
-        loading = loading,
-        icon    = when {
+        visible   = showDialog,
+        loading   = loading,
+        icon      = when {
             success != null -> Icons.Default.Check
             error   != null -> Icons.Default.Error
             else            -> null
@@ -68,14 +81,14 @@ fun VerifyEmailScreen(
                     }
                 }
             }
-            error != null -> DialogButton("Aceptar") { vm.clear() }
-            else -> null
+            error != null   -> DialogButton("Aceptar") { vm.clear() }
+            else            -> null
         },
         dismissOnBack         = !loading,
         dismissOnClickOutside = !loading
     )
 
-    /* ---------- fondo ---------- */
+    /* ---------- Background ---------- */
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
@@ -86,6 +99,7 @@ fun VerifyEmailScreen(
             .background(gradient)
     ) {
 
+        /* ---------- Header ---------- */
         Header(
             title          = "Verificar correo",
             showBackButton = false,
@@ -96,6 +110,7 @@ fun VerifyEmailScreen(
                 .align(Alignment.TopCenter)
         )
 
+        /* ---------- Content ---------- */
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,6 +119,7 @@ fun VerifyEmailScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
+            /* Texto principal */
             Text(
                 "¡Revisa tu correo!",
                 style     = MaterialTheme.typography.headlineSmall,
@@ -112,6 +128,7 @@ fun VerifyEmailScreen(
 
             Spacer(Modifier.height(8.dp))
 
+            /* Ilustración */
             ImageContainer(
                 resId = R.drawable.messageemailimage,
                 contentDescription = "Email enviado",
@@ -120,6 +137,7 @@ fun VerifyEmailScreen(
 
             Spacer(Modifier.height(8.dp))
 
+            /* Subtítulo */
             Text(
                 "Se ha enviado a tu correo un enlace\npara verificar tu cuenta",
                 style     = MaterialTheme.typography.bodyMedium,
@@ -128,9 +146,10 @@ fun VerifyEmailScreen(
 
             Spacer(Modifier.height(30.dp))
 
+            /* Botón: reenviar */
             PrimaryButton(
                 text = "Reenviar correo",
-                onClick = { vm.resend() },
+                onClick = vm::resend,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
@@ -138,10 +157,11 @@ fun VerifyEmailScreen(
 
             Spacer(Modifier.height(15.dp))
 
+            /* Botón: ya verificado */
             PrimaryButton(
                 text      = "Ya lo verifiqué",
                 container = Color(0xFF3EA8FE),
-                onClick   = { vm.verify() },
+                onClick   = vm::verify,
                 modifier  = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
@@ -149,14 +169,10 @@ fun VerifyEmailScreen(
 
             Spacer(Modifier.height(20.dp))
 
+            /* Enlace: cerrar sesión */
             TextButtonLink(
                 text = "Cerrar sesión",
-                onClick = {
-                    vm.signOut()
-                    nav.navigate(Screen.Launch.route) {
-                        popUpTo(Screen.Launch.route) { inclusive = true }
-                    }
-                }
+                onClick = vm::signOut
             )
         }
     }

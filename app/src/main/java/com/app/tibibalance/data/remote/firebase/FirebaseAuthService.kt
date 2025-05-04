@@ -60,5 +60,5 @@ class FirebaseAuthService @Inject constructor(
     }
 
     /* ───────── Sign-out ───────── */
-    override fun signOut() = auth.signOut()
+    override suspend fun signOut() = withContext(io) { auth.signOut() }
 }
