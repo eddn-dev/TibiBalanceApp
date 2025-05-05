@@ -30,7 +30,7 @@ fun DangerButton(
     Button(
         onClick = onClick,
         enabled = realEnabled,
-        modifier = modifier.height(50.dp),
+        modifier = modifier.height(40.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor          = container,
