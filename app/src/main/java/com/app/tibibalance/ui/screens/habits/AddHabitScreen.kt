@@ -59,12 +59,12 @@ fun AddHabitScreen(
             // Salud
             Subtitle(text = "Salud")
             SuggestionRow(R.drawable.iconwaterimage, "Beber 2 litros de agua al día") { /*…*/ }
-            SuggestionRow(R.drawable.iconsleepimage, "Dormir al menos \n 7 horas")      { /*…*/ }
+            SuggestionRow(R.drawable.iconsleepimage, "Dormir mínimo \n 7 horas")      { /*…*/ }
 
             // Productividad
             Subtitle(text = "Productividad")
             SuggestionRow(R.drawable.iconbookimage, "Leer 20 páginas de un libro")    { /*…*/ }
-            SuggestionRow(R.drawable.iconbookimage, "Tender la cama cada mañana")      { /*…*/ }
+            SuggestionRow(R.drawable.iconsunimage, "Tender la cama cada mañana")      { /*…*/ }
 
             // Bienestar
             Subtitle(text = "Bienestar")
