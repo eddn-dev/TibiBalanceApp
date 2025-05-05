@@ -19,6 +19,7 @@ import com.app.tibibalance.ui.components.bottomItems
 import com.app.tibibalance.ui.navigation.Screen
 import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.*
+import com.app.tibibalance.ui.screens.habits.ShowHabitsScreen   // ← nuevo
 import kotlinx.coroutines.launch
 
 @Composable
@@ -94,7 +95,7 @@ fun MainScreen(
             when (routes[page]) {
                 Screen.Home.route     -> HomeScreen()
                 Screen.Emotions.route -> Centered("Emociones")
-                Screen.Habits.route   -> Centered("Hábitos")
+                Screen.Habits.route   -> ShowHabitsScreen()
                 Screen.Profile.route  -> Centered("Perfil")
                 Screen.Settings.route -> SettingsTab(mainVm, rootNav)
             }
