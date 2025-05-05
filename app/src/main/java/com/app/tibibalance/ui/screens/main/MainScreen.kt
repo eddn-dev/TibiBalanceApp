@@ -107,10 +107,10 @@ fun MainScreen(
 @Composable
 private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     val vm: SettingsViewModel = hiltViewModel()
-    val uiState by vm.ui.collectAsState()   // ← sigue siendo SettingsUiState
+    val uiState by vm.ui.collectAsState()
 
     SettingsScreen(
-        state          = uiState,           // 👈  nombre correcto + sin toUi()
+        state          = uiState,
         onNavigateUp   = rootNav::navigateUp,
         onEditPersonal = { /* TODO */ },
         onDevices      = { /* TODO */ },
@@ -121,8 +121,6 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     )
 }
 
-
-/* placeholder simple */
 @Composable private fun Centered(txt: String) = Box(
     Modifier.fillMaxSize(), Alignment.Center
 ) { androidx.compose.material3.Text(txt, fontSize = 32.sp) }
