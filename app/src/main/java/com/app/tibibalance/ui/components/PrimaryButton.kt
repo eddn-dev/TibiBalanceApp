@@ -40,7 +40,7 @@ fun PrimaryButton(
     Button(
         onClick = onClick,
         enabled = realEnabled,
-        modifier = modifier.height(50.dp),           // alto consistente
+        modifier = modifier.height(40.dp),           // alto consistente
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF3EA8FE),
