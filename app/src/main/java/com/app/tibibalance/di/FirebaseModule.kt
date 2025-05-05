@@ -1,3 +1,4 @@
+/* di/FirebaseModule.kt */
 package com.app.tibibalance.di
 
 import android.content.Context
@@ -23,7 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-/* ------------ Qualifier para IO Dispatcher ------------ */
+/* ───────── Qualifier para Dispatcher IO ───────── */
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class IoDispatcher
@@ -41,27 +42,12 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore {
-        val cache = MemoryCacheSettings
-            .newBuilder()
-            .build()
-
+        val cache = MemoryCacheSettings.newBuilder().build()
         val settings = FirebaseFirestoreSettings.Builder()
-            .setLocalCacheSettings(cache)      // API recomendada (reemplaza setPersistenceEnabled)
+            .setLocalCacheSettings(cache)
             .build()
-
         return Firebase.firestore.apply { firestoreSettings = settings }
     }
-
-    /* -------- Room -------- */
-    @Provides
-    @Singleton
-    fun provideAppDb(@ApplicationContext ctx: Context): AppDb =
-        Room.databaseBuilder(ctx, AppDb::class.java, "local.db")
-            .fallbackToDestructiveMigration()
-            .build()
-
-    @Provides
-    fun provideProfileDao(db: AppDb): ProfileDao = db.profileDao()
 
     /* -------- Remote Service -------- */
     @Provides
@@ -76,7 +62,7 @@ object FirebaseModule {
     @Singleton
     fun provideProfileRepository(
         svc : ProfileService,
-        dao : ProfileDao,
+        dao : ProfileDao,              // ← lo provee DatabaseModule
         auth: FirebaseAuth,
         @IoDispatcher io: CoroutineDispatcher
     ): ProfileRepository = FirebaseProfileRepository(svc, dao, auth, io)

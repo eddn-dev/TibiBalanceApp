@@ -1,6 +1,8 @@
-package com.app.tibibalance.data.local.model
+package com.app.tibibalance.domain.model
 
-/** Duración de una sesión (o infinito si ambos valores son null). */
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Session(
     val value: Int? = null,          // 10, 5…
     val unit : SessionUnit? = null   // MINUTES | HOURS

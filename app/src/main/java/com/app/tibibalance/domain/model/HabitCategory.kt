@@ -1,4 +1,4 @@
-package com.app.tibibalance.data.local.model
+package com.app.tibibalance.domain.model
 
 enum class HabitCategory {
     WELLBEING,

@@ -3,21 +3,22 @@ package com.app.tibibalance.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.app.tibibalance.domain.model.UserProfile
+import androidx.room.TypeConverters
+import com.app.tibibalance.data.local.converter.HabitConverter
+import com.app.tibibalance.data.local.entity.HabitEntity
+import com.app.tibibalance.data.local.entity.UserProfileEntity   // ← conviértelo en @Entity
 
-/**
- * Central Room database for the app.
- *
- * – Lists every @Entity you want to persist.
- * – Exposes each DAO the rest of the code needs.
- */
 @Database(
-    entities = [UserProfile::class],   // ① one table for now
-    version  = 1,                     // ② bump when you change schema
-    exportSchema = false              // ③ disable auto-export (dev only)
+    entities = [
+        UserProfileEntity::class,   // ahora SÍ es @Entity
+        HabitEntity::class          // nueva tabla de hábitos
+    ],
+    version = 2,                    // bump: se añadió tabla
+    exportSchema = true             // recomendable en producción
 )
+@TypeConverters(HabitConverter::class)
 abstract class AppDb : RoomDatabase() {
 
-    /** Primary accessor for profile data */
     abstract fun profileDao(): ProfileDao
+    abstract fun habitDao()   : HabitDao
 }

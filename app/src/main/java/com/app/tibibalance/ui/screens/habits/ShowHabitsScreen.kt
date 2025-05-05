@@ -1,6 +1,7 @@
 // ui/screens/habits/ShowHabitsScreen.kt
 package com.app.tibibalance.ui.screens.habits
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,16 +19,33 @@ import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @Composable
-fun ShowHabitsScreen() {
-    // gradiente idéntico al HomeScreen
+fun ShowHabitsScreen(
+    vm: ShowHabitsViewModel = hiltViewModel()
+) {
+    val uiState by vm.ui.collectAsState()
+    val context = LocalContext.current
+    val scope   = rememberCoroutineScope()
+
+    /* ------------ escucha one-shot events ------------ */
+    LaunchedEffect(Unit) {
+        vm.events.collect { ev ->
+            when (ev) {
+                HabitsEvent.AddClicked -> {
+                    /* aquí abrirás el modal de creación más adelante */
+                    Toast.makeText(context, "Abrir modal (pendiente)", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    /* ------------ fondo degradado ------------ */
     val gradient = Brush.verticalGradient(
-        listOf(
-            Color(0xFF3EA8FE).copy(alpha = .25f),
-            Color.White
-        )
+        listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
 
     Box(
@@ -35,83 +53,18 @@ fun ShowHabitsScreen() {
             .fillMaxSize()
             .background(gradient)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // título con fondo redondeado 15dp y color #85C3DE
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color(0xFF85C3DE),
-                        shape = RoundedCornerShape(15.dp)
-                    )
-                    .padding(vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Title(
-                    text      = "Mis hábitos",
-                    modifier  = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            }
+        when (uiState) {
+            HabitsUiState.Loading -> Centered("Cargando…")
+            is HabitsUiState.Error -> Centered((uiState as HabitsUiState.Error).msg)
 
-            // sección Salud
-            Subtitle(text = "Salud")
-            HabitItem(
-                iconRes         = R.drawable.iconwaterimage,
-                label           = "Beber 2 litros \nde agua al día",
-                checked         = remember { mutableStateOf(false) }.value,
-                onCheckedChange = {}, // conecta tu lógica
-                onEdit          = {}
+            HabitsUiState.Empty -> EmptyState(onAdd = vm::onAddClicked)
+
+            is HabitsUiState.Loaded -> HabitList(
+                habits = (uiState as HabitsUiState.Loaded).data,
+                onCheck = { /* TODO: update repo */ } as (HabitUi, Boolean) -> Unit,
+                onEdit  = { /* TODO: editor */ },
+                onAdd   = vm::onAddClicked
             )
-            HabitItem(
-                iconRes         = R.drawable.iconsleepimage,
-                label           = "Dormir mínimo 7 horas",
-                checked         = remember { mutableStateOf(false) }.value,
-                onCheckedChange = {},
-                onEdit          = {}
-            )
-
-            // sección Productividad
-            Subtitle(text = "Productividad")
-            HabitItem(
-                iconRes         = R.drawable.iconbookimage,
-                label           = "Leer 20 páginas \n de un libro",
-                checked         = remember { mutableStateOf(false) }.value,
-                onCheckedChange = {},
-                onEdit          = {}
-            )
-
-            // sección Bienestar
-            Subtitle(text = "Bienestar")
-            HabitItem(
-                iconRes         = R.drawable.iconmeditationimage,
-                label           = "Meditar 5 minutos \nal despertar",
-                checked         = remember { mutableStateOf(false) }.value,
-                onCheckedChange = {},
-                onEdit          = {}
-            )
-
-            // botón "+" centrado
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                RoundedIconButton(
-                    onClick            = { /* añadir hábito */ },
-                    icon               = Icons.Default.Add,
-                    contentDescription = "Agregar hábito",
-                    backgroundColor    = Color(0xFF3EA8FE),
-                    iconTint           = Color.White
-                )
-            }
-
-            Spacer(modifier = Modifier.height(2.dp))
         }
     }
 }

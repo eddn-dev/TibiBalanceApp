@@ -1,6 +1,8 @@
-package com.app.tibibalance.data.local.model
+package com.app.tibibalance.domain.model
 
-/** Preferencias de la notificación asociada al hábito. */
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class NotifConfig(
     val message  : String,
     val mode     : NotifMode,

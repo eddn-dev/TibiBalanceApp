@@ -1,6 +1,8 @@
-package com.app.tibibalance.data.local.model
+package com.app.tibibalance.domain.model
 
-/** Periodo límite de un hábito (o infinito si ambos valores son null). */
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Period(
     val value: Int? = null,
     val unit : PeriodUnit? = null    // WEEKS | MONTHS | YEARS
