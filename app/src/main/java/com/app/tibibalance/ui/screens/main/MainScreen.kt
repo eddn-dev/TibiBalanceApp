@@ -19,6 +19,7 @@ import com.app.tibibalance.ui.components.bottomItems
 import com.app.tibibalance.ui.navigation.Screen
 import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.*
+import com.app.tibibalance.ui.screens.habits.ShowHabitsScreen   // ← nuevo
 import kotlinx.coroutines.launch
 
 @Composable
@@ -94,7 +95,7 @@ fun MainScreen(
             when (routes[page]) {
                 Screen.Home.route     -> HomeScreen()
                 Screen.Emotions.route -> Centered("Emociones")
-                Screen.Habits.route   -> Centered("Hábitos")
+                Screen.Habits.route   -> ShowHabitsScreen()
                 Screen.Profile.route  -> Centered("Perfil")
                 Screen.Settings.route -> SettingsTab(mainVm, rootNav)
             }
@@ -106,10 +107,10 @@ fun MainScreen(
 @Composable
 private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     val vm: SettingsViewModel = hiltViewModel()
-    val uiState by vm.ui.collectAsState()   // ← sigue siendo SettingsUiState
+    val uiState by vm.ui.collectAsState()
 
     SettingsScreen(
-        state          = uiState,           // 👈  nombre correcto + sin toUi()
+        state          = uiState,
         onNavigateUp   = rootNav::navigateUp,
         onEditPersonal = { /* TODO */ },
         onDevices      = { /* TODO */ },
@@ -120,8 +121,6 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     )
 }
 
-
-/* placeholder simple */
 @Composable private fun Centered(txt: String) = Box(
     Modifier.fillMaxSize(), Alignment.Center
 ) { androidx.compose.material3.Text(txt, fontSize = 32.sp) }
