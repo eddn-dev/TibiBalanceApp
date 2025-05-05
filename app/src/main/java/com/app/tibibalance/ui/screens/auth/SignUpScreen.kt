@@ -66,19 +66,30 @@ fun SignUpScreen(
     val cm       = remember(activity) { CredentialManager.create(activity) }
 
     /* -------- One-Tap -------- */
+    /* dentro de SignUpScreen.kt, justo donde declaras los helpers */
     fun launchGoogleSignIn() = scope.launch {
         try {
-            val response = cm.getCredential(activity, vm.buildGoogleRequest(WEB_CLIENT_ID))
-            val idToken  = GoogleIdTokenCredential
-                .createFrom(response.credential.data).idToken
-            if (idToken.isBlank()) {
-                snackbar.showSnackbar("Token vacío, intenta de nuevo"); return@launch
+            // 1. Mostrar el selector de cuentas (One-Tap)
+            val result  = cm.getCredential(activity, vm.buildGoogleRequest(WEB_CLIENT_ID))
+            val idToken = GoogleIdTokenCredential
+                .createFrom(result.credential.data)
+                .idToken
+
+            // 2. Validaciones básicas del token
+            if (idToken.isNullOrBlank()) {
+                vm.reportGoogleError("Token vacío, intenta de nuevo")
+                return@launch
             }
+
+            // 3. Finalizar registro / inicio con el ViewModel
             vm.finishGoogleSignUp(idToken)
+
         } catch (e: Exception) {
-            snackbar.showSnackbar("Google cancelado o falló: ${e.message}")
+            // 4. Cualquier excepción (código 10, cancelado, etc.)
+            vm.reportGoogleError("Google cancelado o falló: ${e.message}")
         }
     }
+
 
     /* -------- navegación según estado -------- */
     LaunchedEffect(uiState) {

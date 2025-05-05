@@ -21,6 +21,11 @@ class SignUpViewModel @Inject constructor(
     private val repo: AuthRepository
 ) : ViewModel() {
 
+    /* SignUpViewModel.kt */
+    fun reportGoogleError(msg: String) {
+        _ui.value = SignUpUiState.Error(msg)
+    }
+
     private val _ui = MutableStateFlow<SignUpUiState>(SignUpUiState.Idle)
     val ui: StateFlow<SignUpUiState> = _ui
 
