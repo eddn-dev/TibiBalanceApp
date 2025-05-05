@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "467927540157-ak5crbu2hj79vbk329b5jlo2alp2cd0s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.tibibalance",
+            "certificate_hash": "54a4b459dff5bef79ca07e7b384b641eba459626"
+          }
+        },
+        {
+          "client_id": "467927540157-q3gdbste41ga255p54fni4gg80o4mkji.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.tibibalance",
+            "certificate_hash": "4c80750ac4baa573f17dba032ac1339b925f3bde"
+          }
+        },
+        {
           "client_id": "467927540157-sg6o96ab0117plqm2dmhd1lrpc9eu9cr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
