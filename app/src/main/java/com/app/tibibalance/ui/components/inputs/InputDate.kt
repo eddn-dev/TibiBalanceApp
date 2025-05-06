@@ -1,5 +1,5 @@
 /* ui/components/InputDate.kt */
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.inputs
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

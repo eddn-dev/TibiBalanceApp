@@ -1,4 +1,4 @@
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.containers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.app.tibibalance.ui.components.ProgressBar
 
 @Composable
 fun AchievementContainer(

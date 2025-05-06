@@ -20,6 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
+import com.app.tibibalance.ui.components.inputs.InputText
+import com.app.tibibalance.ui.components.texts.Subtitle
 
 @Composable
 fun EditProfileScreen(
@@ -90,12 +93,12 @@ fun EditProfileScreen(
 
             Subtitle(text = "Correo electrónico:")
             InputText(
-                value           = "norasoto5@gmail.com",
-                onValueChange   = { /* no editable */ },
-                modifier        = Modifier
+                value = "norasoto5@gmail.com",
+                onValueChange = { /* no editable */ },
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = (-4).dp),   // si aún quieres un “tirón” hacia arriba
-                supportingText  = "ℹ\uFE0F El correo electrónico no es editable"
+                supportingText = "ℹ\uFE0F El correo electrónico no es editable"
             )
 
             Spacer(Modifier.height(5.dp))

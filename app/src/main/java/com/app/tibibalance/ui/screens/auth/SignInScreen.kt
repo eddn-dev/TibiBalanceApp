@@ -33,12 +33,15 @@ import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.navigation.Screen
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import com.app.tibibalance.ui.components.DialogButton
+import com.app.tibibalance.ui.components.buttons.GoogleSignButton
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.inputs.InputEmail
+import com.app.tibibalance.ui.components.inputs.InputPassword
 
 private const val WEB_CLIENT_ID =
     "467927540157-tvu0re0msga2o01tsj9t1r1o6kqvek3j.apps.googleusercontent.com"
@@ -160,18 +163,18 @@ fun SignInScreen(
 
             FormContainer {
                 InputEmail(
-                    value          = email,
-                    onValueChange  = { email = it; vm.consumeError() },
-                    label          = "Correo electrónico",          // ⬅️  NUEVO
-                    isError        = fieldErr?.emailError != null,
+                    value = email,
+                    onValueChange = { email = it; vm.consumeError() },
+                    label = "Correo electrónico",          // ⬅️  NUEVO
+                    isError = fieldErr?.emailError != null,
                     supportingText = fieldErr?.emailError
                 )
 
                 InputPassword(
-                    value          = pass,
-                    onValueChange  = { pass = it; vm.consumeError() },
-                    label          = "Contraseña",                  // ⬅️  NUEVO
-                    isError        = fieldErr?.passError != null,
+                    value = pass,
+                    onValueChange = { pass = it; vm.consumeError() },
+                    label = "Contraseña",                  // ⬅️  NUEVO
+                    isError = fieldErr?.passError != null,
                     supportingText = fieldErr?.passError
                 )
             }
@@ -186,7 +189,7 @@ fun SignInScreen(
             Spacer(Modifier.height(24.dp))
 
             PrimaryButton(
-                text    = stringResource(R.string.btn_sign_in),
+                text = stringResource(R.string.btn_sign_in),
                 enabled = uiState !is SignInUiState.Loading,
                 onClick = { vm.signIn(email, pass) }
             )

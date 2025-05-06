@@ -10,29 +10,43 @@ fun DocumentSnapshot.toHabitTemplate(): HabitTemplate? {
             id            = id,
             name          = getString("name") ?: return null,
             description   = getString("description") ?: "",
-            category      = getString("category") ?: "Salud",
-            icon          = getString("icon") ?: "ic_default_habit",
+            /* ① conversión String → enum usando el helper del enum */
+            category      = HabitCategory.fromRaw(getString("category") ?: ""),
 
+            icon          = getString("icon") ?: "FitnessCenter",
+
+            // ── Sesión ──
             sessionQty    = getLong("sessionQty")?.toInt(),
-            sessionUnit   = getString("sessionUnit")?.let { SessionUnit.valueOf(it) } ?: SessionUnit.INDEFINIDO,
+            sessionUnit   = getString("sessionUnit")
+                ?.let { runCatching { SessionUnit.valueOf(it) }.getOrNull() }
+                ?: SessionUnit.INDEFINIDO,
 
-            repeatPattern = getString("repeatPattern")?.let { RepeatPattern.valueOf(it) } ?: RepeatPattern.INDEFINIDO,
+            // ── Repetición ──
+            repeatPattern = getString("repeatPattern")
+                ?.let { runCatching { RepeatPattern.valueOf(it) }.getOrNull() }
+                ?: RepeatPattern.INDEFINIDO,
 
+            // ── Periodo total ──
             periodQty     = getLong("periodQty")?.toInt(),
-            periodUnit    = getString("periodUnit")?.let { PeriodUnit.valueOf(it) } ?: PeriodUnit.INDEFINIDO,
+            periodUnit    = getString("periodUnit")
+                ?.let { runCatching { PeriodUnit.valueOf(it) }.getOrNull() }
+                ?: PeriodUnit.INDEFINIDO,
 
+            // ── Notificación ──
             notifCfg      = NotifConfig(
-                mode           = getString("notif.mode")?.let { NotifMode.valueOf(it) } ?: NotifMode.SILENT,
+                mode           = getString("notif.mode")
+                    ?.let { runCatching { NotifMode.valueOf(it) }.getOrNull() }
+                    ?: NotifMode.SILENT,
                 message        = getString("notif.message") ?: "",
                 timesOfDay     = get("notif.timesOfDay") as? List<String> ?: emptyList(),
                 daysOfWeek     = (get("notif.daysOfWeek") as? List<Long>)?.map(Long::toInt) ?: emptyList(),
                 advanceMinutes = (getLong("notif.advanceMinutes") ?: 0L).toInt(),
-                vibrate        = getBoolean("notif.vibrate") ?: true
+                vibrate        = getBoolean("notif.vibrate") != false
             ),
 
             scheduled     = getBoolean("scheduled") ?: false
         )
     } catch (e: Exception) {
-        null                // devuelve null si algún enum no coincide
+        null   // si falla algún enum devuelve null y se ignora el documento
     }
 }

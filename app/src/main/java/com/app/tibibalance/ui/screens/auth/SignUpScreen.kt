@@ -33,6 +33,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.GoogleSignButton
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.inputs.InputDate
+import com.app.tibibalance.ui.components.inputs.InputEmail
+import com.app.tibibalance.ui.components.inputs.InputPassword
+import com.app.tibibalance.ui.components.inputs.InputText
 import com.app.tibibalance.ui.navigation.Screen
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
@@ -204,44 +210,44 @@ fun SignUpScreen(
             /* formulario */
             FormContainer {
                 InputText(
-                    value          = username,
-                    onValueChange  = { username = it; vm.consumeFieldError() },
-                    placeholder    = "Nombre de usuario*",
-                    isError        = fieldErr?.userNameError != null,
+                    value = username,
+                    onValueChange = { username = it; vm.consumeFieldError() },
+                    placeholder = "Nombre de usuario*",
+                    isError = fieldErr?.userNameError != null,
                     supportingText = fieldErr?.userNameError
                 )
 
                 /* fecha: la función no cambió */
                 InputDate(
-                    value          = birthDate?.format(formatter) ?: "",
-                    onClick        = { openDatePicker(); vm.consumeFieldError() },
-                    isError        = fieldErr?.birthDateError != null,
+                    value = birthDate?.format(formatter) ?: "",
+                    onClick = { openDatePicker(); vm.consumeFieldError() },
+                    isError = fieldErr?.birthDateError != null,
                     supportingText = fieldErr?.birthDateError
                 )
 
                 /* ⬇⬇⬇  las tres llamadas siguientes cambian `placeholder` → `label`  ⬇⬇⬇ */
 
                 InputEmail(
-                    value          = email,
-                    onValueChange  = { email = it; vm.consumeFieldError() },
-                    label          = "Correo*",                 // ⬅️  NUEVO
-                    isError        = fieldErr?.emailError != null,
+                    value = email,
+                    onValueChange = { email = it; vm.consumeFieldError() },
+                    label = "Correo*",                 // ⬅️  NUEVO
+                    isError = fieldErr?.emailError != null,
                     supportingText = fieldErr?.emailError
                 )
 
                 InputPassword(
-                    value          = pass1,
-                    onValueChange  = { pass1 = it; vm.consumeFieldError() },
-                    label          = "Contraseña*",             // ⬅️  NUEVO
-                    isError        = fieldErr?.pass1Error != null,
+                    value = pass1,
+                    onValueChange = { pass1 = it; vm.consumeFieldError() },
+                    label = "Contraseña*",             // ⬅️  NUEVO
+                    isError = fieldErr?.pass1Error != null,
                     supportingText = fieldErr?.pass1Error
                 )
 
                 InputPassword(
-                    value          = pass2,
-                    onValueChange  = { pass2 = it; vm.consumeFieldError() },
-                    label          = "Confirmar contraseña*",   // ⬅️  NUEVO
-                    isError        = fieldErr?.pass2Error != null,
+                    value = pass2,
+                    onValueChange = { pass2 = it; vm.consumeFieldError() },
+                    label = "Confirmar contraseña*",   // ⬅️  NUEVO
+                    isError = fieldErr?.pass2Error != null,
                     supportingText = fieldErr?.pass2Error
                 )
             }
@@ -250,15 +256,15 @@ fun SignUpScreen(
 
             /* botón Registrar */
             PrimaryButton(
-                text    = stringResource(R.string.btn_sign_up),
+                text = stringResource(R.string.btn_sign_up),
                 enabled = !isLoading,
                 onClick = {
                     vm.signUp(
-                        userName  = username,
+                        userName = username,
                         birthDate = birthDate,
-                        email     = email,
-                        password  = pass1,
-                        confirm   = pass2
+                        email = email,
+                        password = pass1,
+                        confirm = pass2
                     )
                     scope.launch {
                         try {
@@ -266,7 +272,8 @@ fun SignUpScreen(
                                 activity,
                                 CreatePasswordRequest(id = username, password = pass1)
                             )
-                        } catch (_: Exception) { }
+                        } catch (_: Exception) {
+                        }
                     }
                 }
             )

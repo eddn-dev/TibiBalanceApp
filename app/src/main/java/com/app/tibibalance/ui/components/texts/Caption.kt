@@ -1,12 +1,9 @@
-// file: ui/components/Description.kt
-package com.app.tibibalance.ui.components
+// file: ui/components/Caption.kt
+package com.app.tibibalance.ui.components.texts
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -14,14 +11,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Description(
+fun Caption(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip
@@ -31,9 +27,9 @@ fun Description(
         modifier = modifier,
         color = color,
         style = TextStyle(
-            fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp
+            fontFamily = FontFamily.Default,  // Roboto por defecto
+            fontWeight = FontWeight.Light,
+            fontSize = 12.sp
         ),
         textAlign = textAlign,
         maxLines = maxLines,

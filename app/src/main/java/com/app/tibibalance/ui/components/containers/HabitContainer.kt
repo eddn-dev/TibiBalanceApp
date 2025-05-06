@@ -1,4 +1,4 @@
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.containers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

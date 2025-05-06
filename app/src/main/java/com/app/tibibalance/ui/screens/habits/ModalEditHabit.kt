@@ -16,6 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
+import com.app.tibibalance.ui.components.inputs.InputSelect
+import com.app.tibibalance.ui.components.inputs.InputText
+import com.app.tibibalance.ui.components.texts.Title
 
 @Composable
 fun ModalEditHbit(
@@ -52,8 +57,8 @@ fun ModalEditHbit(
         ) {
             // Título
             Title(
-                text      = "Editar hábito",
-                modifier  = Modifier.fillMaxWidth(),
+                text = "Editar hábito",
+                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
 
@@ -69,29 +74,29 @@ fun ModalEditHbit(
             // Campos editables
             Text("Nombre:*", style = MaterialTheme.typography.bodyMedium)
             InputText(
-                value         = name,
+                value = name,
                 onValueChange = { name = it },
-                modifier      = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
             Text("Descripción:", style = MaterialTheme.typography.bodyMedium)
             InputText(
-                value         = desc,
+                value = desc,
                 onValueChange = { desc = it },
-                modifier      = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
             Text("Frecuencia:*", style = MaterialTheme.typography.bodyMedium)
             InputSelect(
-                options         = listOf("Diario","Semanal","Mensual"),
-                selectedOption  = freq,
+                options = listOf("Diario", "Semanal", "Mensual"),
+                selectedOption = freq,
                 onOptionSelected = { freq = it }
             )
 
             Text("Categoría:*", style = MaterialTheme.typography.bodyMedium)
             InputSelect(
-                options         = listOf("Salud","Productividad","Bienestar"),
-                selectedOption  = cat,
+                options = listOf("Salud", "Productividad", "Bienestar"),
+                selectedOption = cat,
                 onOptionSelected = { cat = it }
             )
 
@@ -127,13 +132,13 @@ fun ModalEditHbit(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 PrimaryButton(
-                    text    = "Guardar",
+                    text = "Guardar",
                     onClick = { onSave(name, desc, freq, cat, notify) },
                     modifier = Modifier.weight(1f)
                 )
                 SecondaryButton(
-                    text     = "Cancelar",
-                    onClick  = onDismissRequest,
+                    text = "Cancelar",
+                    onClick = onDismissRequest,
                     modifier = Modifier.weight(1f)
                 )
             }

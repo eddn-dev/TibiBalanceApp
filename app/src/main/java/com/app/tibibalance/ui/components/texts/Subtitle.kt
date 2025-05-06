@@ -1,5 +1,5 @@
-// file: ui/components/Caption.kt
-package com.app.tibibalance.ui.components
+// file: ui/components/Subtitle.kt
+package com.app.tibibalance.ui.components.texts
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -18,10 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Caption(
+fun Subtitle(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+    color: Color = MaterialTheme.colorScheme.onBackground,
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip
@@ -31,12 +31,28 @@ fun Caption(
         modifier = modifier,
         color = color,
         style = TextStyle(
-            fontFamily = FontFamily.Default,  // Roboto por defecto
-            fontWeight = FontWeight.Light,
-            fontSize = 12.sp
+            fontFamily = FontFamily.Default,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp
         ),
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = overflow
+    )
+}
+
+@Preview(
+    showBackground = true,
+    widthDp = 320,
+    heightDp = 25
+)
+@Composable
+fun SubtitlePreview() {
+    Subtitle(
+        text = "Esta semana",
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(Alignment.CenterVertically),
+        textAlign = TextAlign.Center
     )
 }

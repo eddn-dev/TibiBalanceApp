@@ -17,7 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.ImageContainer
-import com.app.tibibalance.ui.components.PrimaryButton
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.navigation.Screen
 
 @Composable

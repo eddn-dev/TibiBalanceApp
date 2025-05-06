@@ -1,4 +1,4 @@
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.app.tibibalance.ui.navigation.Screen

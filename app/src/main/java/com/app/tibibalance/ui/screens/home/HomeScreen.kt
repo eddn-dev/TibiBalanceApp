@@ -15,6 +15,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
+import com.app.tibibalance.ui.components.containers.AchievementContainer
+import com.app.tibibalance.ui.components.containers.HabitContainer
+import com.app.tibibalance.ui.components.texts.Description
+import com.app.tibibalance.ui.components.texts.Title
 
 @Composable
 fun HomeScreen() {
@@ -45,13 +50,13 @@ fun HomeScreen() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Title(
-                    text      = "Resumen de Hoy",
-                    modifier  = Modifier.weight(1f),
+                    text = "Resumen de Hoy",
+                    modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Start
                 )
                 SecondaryButton(
-                    text     = "Historial",
-                    onClick  = { /* TODO */ },
+                    text = "Historial",
+                    onClick = { /* TODO */ },
                     modifier = Modifier
                         .width(120.dp)
                         .height(40.dp)
@@ -72,10 +77,10 @@ fun HomeScreen() {
                                 modifier = Modifier.size(40.dp)
                             )
                         },
-                        title       = "5,230",
+                        title = "5,230",
                         description = "Pasos",
-                        percent     = 65,
-                        modifier    = Modifier.weight(1f)
+                        percent = 65,
+                        modifier = Modifier.weight(1f)
                     )
                     AchievementContainer(
                         icon = {
@@ -85,10 +90,10 @@ fun HomeScreen() {
                                 modifier = Modifier.size(40.dp)
                             )
                         },
-                        title       = "35",
+                        title = "35",
                         description = "min de ejercicio",
-                        percent     = 70,
-                        modifier    = Modifier.weight(1f)
+                        percent = 70,
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Row(
@@ -103,10 +108,10 @@ fun HomeScreen() {
                                 modifier = Modifier.size(40.dp)
                             )
                         },
-                        title       = "450",
+                        title = "450",
                         description = "Kcal quemadas",
-                        percent     = 55,
-                        modifier    = Modifier.weight(1f)
+                        percent = 55,
+                        modifier = Modifier.weight(1f)
                     )
                     AchievementContainer(
                         icon = {
@@ -116,10 +121,10 @@ fun HomeScreen() {
                                 modifier = Modifier.size(40.dp)
                             )
                         },
-                        title       = "78",
+                        title = "78",
                         description = "bpm",
-                        percent     = 78,
-                        modifier    = Modifier.weight(1f)
+                        percent = 78,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
@@ -159,8 +164,8 @@ fun HomeScreen() {
                         )
                     }
                     Description(
-                        text      = "5,230 / 8,000",
-                        modifier  = Modifier.fillMaxWidth(),
+                        text = "5,230 / 8,000",
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -177,9 +182,9 @@ fun HomeScreen() {
                             modifier = Modifier.size(32.dp)
                         )
                     },
-                    text     = "Caminata rápida • 20 min • 10 a.m.",
+                    text = "Caminata rápida • 20 min • 10 a.m.",
                     modifier = Modifier.fillMaxWidth(),
-                    onClick  = { /* … */ }
+                    onClick = { /* … */ }
                 )
                 HabitContainer(
                     icon = {
@@ -189,9 +194,9 @@ fun HomeScreen() {
                             modifier = Modifier.size(32.dp)
                         )
                     },
-                    text     = "Yoga • 30 min • 7:30 a.m.",
+                    text = "Yoga • 30 min • 7:30 a.m.",
                     modifier = Modifier.fillMaxWidth(),
-                    onClick  = { /* … */ }
+                    onClick = { /* … */ }
                 )
             }
         }

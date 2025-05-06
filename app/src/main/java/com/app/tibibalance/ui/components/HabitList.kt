@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.LocalDrink
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -30,6 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tibibalance.ui.components.texts.Description
+import com.app.tibibalance.ui.components.texts.Subtitle
+import com.app.tibibalance.ui.components.texts.Title
 import com.app.tibibalance.ui.screens.habits.HabitUi
 
 @Composable
@@ -120,7 +122,7 @@ internal fun EmptyState(onAdd: () -> Unit) = Column(
     )
 
     Description(
-        text      = "¡Aún no tienes hábitos!\nPulsa el + para crear tu primer hábito.",
+        text = "¡Aún no tienes hábitos!\nPulsa el + para crear tu primer hábito.",
         textAlign = TextAlign.Center
     )
 
@@ -142,7 +144,7 @@ private fun HeaderBox(text: String) = Box(
         .padding(vertical = 8.dp),
     contentAlignment = Alignment.Center
 ) {
-    Title(text, Modifier.fillMaxWidth(), textAlign =  TextAlign.Center)
+    Title(text, Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
 }
 
 @Composable

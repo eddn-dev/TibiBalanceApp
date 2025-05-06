@@ -1,4 +1,4 @@
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.buttons
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.height

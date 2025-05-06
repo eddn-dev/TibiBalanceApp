@@ -2,30 +2,38 @@
 package com.app.tibibalance.domain.model
 
 data class HabitForm(
-    val name         : String        = "",
-    val desc         : String        = "",
-    val category     : String        = "Salud",
+    val name         : String         = "",
+    val desc         : String         = "",
 
-    val sessionQty   : Int?          = null,
-    val sessionUnit  : SessionUnit   = SessionUnit.INDEFINIDO,
+    /* ① ahora es el enum, no String */
+    val category     : HabitCategory  = HabitCategory.SALUD,
 
-    val repeatPattern: RepeatPattern = RepeatPattern.INDEFINIDO,
+    val icon         : String         = "FitnessCenter",
 
-    val periodQty    : Int?          = null,
-    val periodUnit   : PeriodUnit    = PeriodUnit.INDEFINIDO,
+    // ── Sesión ──
+    val sessionQty   : Int?           = null,
+    val sessionUnit  : SessionUnit    = SessionUnit.INDEFINIDO,
 
-    val notify       : Boolean       = false
+    // ── Frecuencia ──
+    val repeatPattern: RepeatPattern  = RepeatPattern.INDEFINIDO,
+
+    // ── Periodo total ──
+    val periodQty    : Int?           = null,
+    val periodUnit   : PeriodUnit     = PeriodUnit.INDEFINIDO,
+
+    val notify       : Boolean        = false
 ) {
-    /** Rellena el formulario a partir de una plantilla de Firestore. */
+    /** Prefill desde plantilla remota */
     fun prefillFromTemplate(t: HabitTemplate) = copy(
         name          = t.name,
         desc          = t.description,
-        category      = t.category,
+        category      = t.category,         // ya es HabitCategory
+        icon          = t.icon,
         sessionQty    = t.sessionQty,
         sessionUnit   = t.sessionUnit,
         repeatPattern = t.repeatPattern,
         periodQty     = t.periodQty,
         periodUnit    = t.periodUnit,
-        notify        = t.notifCfg.mode != NotifMode.SILENT   // ← cambio clave
+        notify        = t.notifCfg.mode != NotifMode.SILENT
     )
 }

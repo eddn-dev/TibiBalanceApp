@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.domain.model.*
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.inputs.InputText
+import com.app.tibibalance.ui.components.texts.Title
 import com.app.tibibalance.ui.screens.habits.Day
 import com.app.tibibalance.ui.screens.habits.NotifyType
 
@@ -38,8 +40,8 @@ fun NotificationStep(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = 8.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Title(title, Modifier.fillMaxWidth())
 
@@ -49,22 +51,22 @@ fun NotificationStep(
             ImageContainer(R.drawable.iconclockimage, "Hora", Modifier.size(24.dp))
             Spacer(Modifier.width(8.dp))
             InputText(
-                value         = cfg.timesOfDay.firstOrNull().orEmpty(),
+                value = cfg.timesOfDay.firstOrNull().orEmpty(),
                 onValueChange = { hhmm ->
                     cfg = cfg.copy(timesOfDay = if (hhmm.isBlank()) emptyList() else listOf(hhmm))
                 },
-                placeholder   = "08:00",
-                modifier      = Modifier.width(100.dp)
+                placeholder = "08:00",
+                modifier = Modifier.width(100.dp)
             )
         }
 
         /* ---------- Mensaje ---------- */
         Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)
         InputText(
-            value         = cfg.message,
+            value = cfg.message,
             onValueChange = { cfg = cfg.copy(message = it) },
-            placeholder   = "¡Hora de hacer ejercicio!",
-            modifier      = Modifier.fillMaxWidth()
+            placeholder = "¡Hora de hacer ejercicio!",
+            modifier = Modifier.fillMaxWidth()
         )
 
         /* ---------- Días de la semana ---------- */
@@ -97,13 +99,13 @@ fun NotificationStep(
         Text("Avisar con antelación (min):", style = MaterialTheme.typography.bodyMedium)
         Row(verticalAlignment = Alignment.CenterVertically) {
             InputText(
-                value         = cfg.advanceMinutes.toString(),
+                value = cfg.advanceMinutes.toString(),
                 onValueChange = { txt ->
                     val v = txt.toIntOrNull() ?: 0
                     cfg = cfg.copy(advanceMinutes = v.coerceAtLeast(0))
                 },
-                placeholder   = "0",
-                modifier      = Modifier.width(80.dp)
+                placeholder = "0",
+                modifier = Modifier.width(80.dp)
             )
             Spacer(Modifier.width(4.dp))
             Text("minutos antes", style = MaterialTheme.typography.bodySmall)

@@ -4,16 +4,18 @@ package com.app.tibibalance.ui.wizard.step
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.app.tibibalance.R
 import com.app.tibibalance.domain.model.HabitTemplate
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.inputs.iconByName
+import com.app.tibibalance.ui.components.texts.Subtitle
+import com.app.tibibalance.ui.components.texts.Title
 
 @Composable
 fun SuggestionStep(
@@ -21,30 +23,37 @@ fun SuggestionStep(
     onSuggestion: (HabitTemplate) -> Unit
 ) {
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(horizontal = 12.dp, vertical = 20.dp)      // 👈  un poco más de aire
     ) {
         Title(
-            "Hábitos sugeridos",
-            Modifier.fillMaxWidth(),
+            text      = "Hábitos sugeridos",
+            modifier  = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),                       // separación título-lista
             textAlign = TextAlign.Center
         )
 
+        /* Agrupamos por el enum → usamos la propiedad `display` */
         templates
-            .groupBy { it.category }
+            .groupBy { it.category }                            // key = HabitCategory
             .forEach { (cat, list) ->
-                Subtitle(cat.replaceFirstChar(Char::uppercase))
-                list.forEach { tpl ->
-                    /* ⬇️  ajustamos el callback */
-                    SuggestionRow(tpl) { onSuggestion(tpl) }
+                Subtitle(
+                    text     = cat.display,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp) // espacio entre filas
+                ) {
+                    list.forEach { tpl ->
+                        SuggestionRow(tpl) { onSuggestion(tpl) }
+                    }
                 }
+                Spacer(Modifier.height(8.dp))                   // aire entre categorías
             }
-
     }
-        // 🚫 Sin botones aquí: la acción global va en la barra inferior
 }
-
 
 /* ——— Fila reutilizable ——— */
 @Composable
@@ -53,12 +62,13 @@ private fun SuggestionRow(
     onAdd: () -> Unit
 ) = SettingItem(
     leadingIcon = {
-        ImageContainer(
-            resId              = mapIcon(tpl.icon),
-            contentDescription = tpl.name
+        Icon(
+            painter            = rememberVectorPainter(iconByName(tpl.icon)),
+            contentDescription = tpl.name,
+            modifier           = Modifier.size(32.dp)
         )
     },
-    text     = tpl.name,
+    text = tpl.name,
     trailing = {
         RoundedIconButton(
             onClick            = onAdd,
@@ -70,13 +80,3 @@ private fun SuggestionRow(
     },
     onClick = onAdd
 )
-
-/* Mapea nombre Material Icon → drawable local */
-private fun mapIcon(material: String) = when (material) {
-    "LocalDrink"       -> R.drawable.iconwaterimage
-    "Book"             -> R.drawable.iconbookimage
-    "Bedtime"          -> R.drawable.iconsleepimage
-    "WbSunny"          -> R.drawable.iconsunimage
-    "SelfImprovement"  -> R.drawable.iconmeditationimage
-    else               -> R.drawable.iconwaterimage
-}

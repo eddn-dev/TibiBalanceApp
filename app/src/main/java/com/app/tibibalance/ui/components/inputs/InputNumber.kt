@@ -1,4 +1,4 @@
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.inputs
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable

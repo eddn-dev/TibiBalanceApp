@@ -36,7 +36,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
 
 /** Botón descriptor para no llenar el parámetro con 3 argumentos sueltos  */
 data class DialogButton(
@@ -176,8 +176,8 @@ private fun InfoContent(
             }
             primaryButton?.let {
                 PrimaryButton(
-                    text     = it.text,
-                    onClick  = it.onClick,
+                    text = it.text,
+                    onClick = it.onClick,
                     modifier = Modifier.weight(1f)
                 )
             }

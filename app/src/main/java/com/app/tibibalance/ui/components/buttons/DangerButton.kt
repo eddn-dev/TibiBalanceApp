@@ -1,5 +1,5 @@
 // ui/components/DangerButton.kt
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.buttons
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

@@ -14,6 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
+import com.app.tibibalance.ui.components.inputs.InputText
+import com.app.tibibalance.ui.components.texts.Subtitle
 
 @Composable
 fun ViewProfileScreen() {
@@ -49,9 +52,9 @@ fun ViewProfileScreen() {
                 // Fecha de nacimiento
                 Subtitle(text = "Fecha de nacimiento:")
                 InputText(
-                    value         = "29/07/2004",
+                    value = "29/07/2004",
                     onValueChange = {},
-                    modifier      = Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
                 )
@@ -60,9 +63,9 @@ fun ViewProfileScreen() {
                 // Correo electrónico
                 Subtitle(text = "Correo electrónico:")
                 InputText(
-                    value         = "norasoto5@gmail.com",
+                    value = "norasoto5@gmail.com",
                     onValueChange = {},
-                    modifier      = Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
                 )
@@ -74,13 +77,13 @@ fun ViewProfileScreen() {
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     SecondaryButton(
-                        text     = "Editar perfil",
-                        onClick  = { /* TODO */ },
+                        text = "Editar perfil",
+                        onClick = { /* TODO */ },
                         modifier = Modifier.weight(1f)
                     )
                     SecondaryButton(
-                        text     = "Cerrar sesión",
-                        onClick  = { /* TODO */ },
+                        text = "Cerrar sesión",
+                        onClick = { /* TODO */ },
                         modifier = Modifier
                             .width(150.dp)
                     )

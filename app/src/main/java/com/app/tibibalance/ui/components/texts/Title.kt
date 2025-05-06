@@ -1,5 +1,5 @@
 // file: ui/components/Title.kt
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.texts
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme

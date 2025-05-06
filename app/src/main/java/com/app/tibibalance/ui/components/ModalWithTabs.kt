@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties // Necesario para ModalContainer
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.texts.Description
+import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.coroutines.launch
 
 
@@ -132,7 +134,10 @@ fun ModalWithTabsPreview() {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier=Modifier.fillMaxWidth()) {
                         Title(text = "Contenido Semanal", textAlign = TextAlign.Center)
                         Spacer(modifier = Modifier.height(10.dp))
-                        Description(text = "Aquí va la información semanal.", textAlign = TextAlign.Center)
+                        Description(
+                            text = "Aquí va la información semanal.",
+                            textAlign = TextAlign.Center
+                        )
                         Spacer(modifier = Modifier.height(20.dp))
                         PrimaryButton(text = "Ver Semana", onClick = {})
                     }
@@ -143,12 +148,15 @@ fun ModalWithTabsPreview() {
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             var checked by remember { mutableStateOf(true) }
-                            Description(text="Activar Resumen:")
+                            Description(text = "Activar Resumen:")
                             Spacer(modifier=Modifier.width(8.dp))
                             SwitchToggle(checked = checked, onCheckedChange = {checked = it})
                         }
                         Spacer(modifier = Modifier.height(10.dp))
-                        Description(text = "Resumen detallado del mes.", textAlign = TextAlign.Center)
+                        Description(
+                            text = "Resumen detallado del mes.",
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
                 // Puedes añadir más pestañas aquí si lo necesitas

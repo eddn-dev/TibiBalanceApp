@@ -12,7 +12,7 @@ data class HabitTemplate(
     val id            : String        = "",
     val name          : String        = "",
     val description   : String        = "",
-    val category      : String        = "Salud",
+    val category    : HabitCategory = HabitCategory.SALUD,
     val icon          : String        = "ic_default_habit",
 
     // --- Sesión ---

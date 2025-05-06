@@ -1,31 +1,38 @@
-// ui/screens/habits/AddHabitUi.kt
+/* ui/wizard/AddHabitUi.kt */
 package com.app.tibibalance.ui.wizard
 
-import com.app.tibibalance.ui.screens.habits.Day
-import com.app.tibibalance.ui.screens.habits.NotifyType
+import com.app.tibibalance.domain.model.HabitForm
+import com.app.tibibalance.domain.model.HabitTemplate
+import com.app.tibibalance.domain.model.NotifConfig
 
-/** Pasos del wizard */
+/** Flujo de pantalla */
 sealed interface AddHabitUiState {
-    object Suggestions                       : AddHabitUiState
-    data class CustomDetails(                // datos que va rellenando el usuario
-        val name       : String = "",
-        val desc       : String = "",
-        val freq       : String = "Diario",
-        val category   : String = "Salud",
-        val notify     : Boolean = false
+    /** Paso 0: plantilla sugerida o “crear en blanco” */
+    data class Suggestions(
+        /** formulario en curso (vacío o ya modificado) */
+        val draft : HabitForm = HabitForm()
     ) : AddHabitUiState
-    data class NotificationConfig(           // sólo si notify = true
-        val details    : CustomDetails,
-        val cfg        : NotificationCfg = NotificationCfg()
+
+    /** Paso 1: formulario de detalles */
+    data class Details(
+        val form       : HabitForm,
+        val errors     : List<String> = emptyList(), // mensajes de validación
+        val canProceed : Boolean = errors.isEmpty()
     ) : AddHabitUiState
+
+    /** Paso 2: configurador de notificaciones */
+    data class Notification(
+        val form  : HabitForm,
+        val cfg   : NotifConfig
+    ) : AddHabitUiState
+
+    /** Diálogo emergente para confirmar pérdida de avance */
+    data class ConfirmDiscard(
+        val pendingTemplate: HabitTemplate,
+        val previous       : AddHabitUiState          // ← NUEVO
+    ) : AddHabitUiState
+
+    /** Estado terminal tras guardar (spinner / mensaje) */
+    object Saving : AddHabitUiState
 }
 
-/** Estructura auxiliar para la 3.ª pantalla */
-data class NotificationCfg(
-    val time        : String = "",
-    val message     : String = "",
-    val days        : Set<Day> = emptySet(),
-    val repeatValue : String = "",
-    val repeatUnit  : String = "",
-    val types       : Set<NotifyType> = emptySet()
-)

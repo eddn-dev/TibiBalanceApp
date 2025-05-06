@@ -33,7 +33,7 @@ fun PagerIndicator(
     pageCount    : Int,
     activeColor  : Color = MaterialTheme.colorScheme.primary,
     inactiveColor: Color = MaterialTheme.colorScheme.outline,
-    activeSize   : Dp   = 12.dp,
+    activeSize   : Dp   = 8.dp,
     inactiveSize : Dp   = 8.dp,
     spacing      : Dp   = 8.dp,
     modifier     : Modifier = Modifier

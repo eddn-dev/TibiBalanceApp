@@ -22,6 +22,8 @@ import coil3.request.crossfade
 import com.app.tibibalance.R
 import com.app.tibibalance.domain.model.UserProfile
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.DangerButton
+import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.coroutines.launch
 
 @Composable
@@ -135,7 +137,7 @@ private fun ReadyContent(
 
         /* Danger zone */
         FormContainer(backgroundColor = Color(0xFFFFEAEA), contentPadding = PaddingValues(20.dp)) {
-            DangerButton("Cerrar sesión",  onSignOut)
+            DangerButton("Cerrar sesión", onSignOut)
             Spacer(Modifier.height(12.dp))
             DangerButton("Eliminar cuenta", onDelete)
         }

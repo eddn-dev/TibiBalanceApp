@@ -14,8 +14,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import com.app.tibibalance.ui.components.BottomNavBar
-import com.app.tibibalance.ui.components.bottomItems
+import com.app.tibibalance.ui.components.navigation.BottomNavBar
+import com.app.tibibalance.ui.components.navigation.bottomItems
 import com.app.tibibalance.ui.navigation.Screen
 import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.*

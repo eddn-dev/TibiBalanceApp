@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.containers.HabitContainer
+import com.app.tibibalance.ui.components.texts.Subtitle
+import com.app.tibibalance.ui.components.texts.Title
 
 @Composable
 fun EmotionalCalentarScreen(

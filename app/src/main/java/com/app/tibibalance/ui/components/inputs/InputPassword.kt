@@ -1,5 +1,5 @@
 /* ui/components/InputPassword.kt */
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.inputs
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape

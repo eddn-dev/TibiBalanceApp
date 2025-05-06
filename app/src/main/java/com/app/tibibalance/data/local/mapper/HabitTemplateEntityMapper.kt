@@ -4,12 +4,13 @@ package com.app.tibibalance.data.local.mapper
 import com.app.tibibalance.data.local.entity.HabitTemplateEntity
 import com.app.tibibalance.domain.model.*
 
-/* ---------- Dominio ➜ Entity ---------- */
+/* ───────────── Dominio ➜ Entity ───────────── */
 fun HabitTemplate.toEntity() = HabitTemplateEntity(
     id              = id,
     name            = name,
     description     = description,
-    category        = category,
+    /* ① almacenamos el enum como String  */
+    category        = category.name,          // <<<<<<
     icon            = icon,
 
     sessionQty      = sessionQty,
@@ -29,12 +30,13 @@ fun HabitTemplate.toEntity() = HabitTemplateEntity(
     scheduled       = scheduled
 )
 
-/* ---------- Entity ➜ Dominio ---------- */
+/* ───────────── Entity ➜ Dominio ───────────── */
 fun HabitTemplateEntity.toDomain() = HabitTemplate(
     id            = id,
     name          = name,
     description   = description,
-    category      = category,
+    /* ② convertimos de String → enum con utilidad de respaldo  */
+    category      = HabitCategory.fromRaw(category),  // <<<<<<
     icon          = icon,
 
     sessionQty    = sessionQty,

@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.navigation.Screen
 
 @Composable
@@ -159,10 +160,10 @@ fun VerifyEmailScreen(
 
             /* Botón: ya verificado */
             PrimaryButton(
-                text      = "Ya lo verifiqué",
+                text = "Ya lo verifiqué",
                 container = Color(0xFF3EA8FE),
-                onClick   = vm::verify,
-                modifier  = Modifier
+                onClick = vm::verify,
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
             )

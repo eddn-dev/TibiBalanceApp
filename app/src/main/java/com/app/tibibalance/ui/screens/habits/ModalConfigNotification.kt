@@ -17,6 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
+import com.app.tibibalance.ui.components.inputs.InputText
+import com.app.tibibalance.ui.components.texts.Title
 
 enum class Day { L, M, MI, J, V, S, D }
 enum class NotifyType { SILENT, SOUND, VIBRATE, EMERGENT }
@@ -61,8 +65,8 @@ fun ModalConfigNotification(
         ) {
             // Título
             Title(
-                text      = title,
-                modifier  = Modifier.fillMaxWidth(),
+                text = title,
+                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
 
@@ -76,20 +80,20 @@ fun ModalConfigNotification(
                 )
                 Spacer(Modifier.width(8.dp))
                 InputText(
-                    value         = time,
+                    value = time,
                     onValueChange = { time = it },
-                    placeholder   = "08:00 a.m.",
-                    modifier      = Modifier.width(100.dp)
+                    placeholder = "08:00 a.m.",
+                    modifier = Modifier.width(100.dp)
                 )
             }
 
             // Mensaje
             Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)
             InputText(
-                value         = message,
+                value = message,
                 onValueChange = { message = it },
-                placeholder   = "¡Hora de hacer ejercicio!",
-                modifier      = Modifier.fillMaxWidth()
+                placeholder = "¡Hora de hacer ejercicio!",
+                modifier = Modifier.fillMaxWidth()
             )
 
             // Días (dos columnas igualmente espaciadas)
@@ -119,17 +123,17 @@ fun ModalConfigNotification(
             Text("Repetir cada", style = MaterialTheme.typography.bodyMedium)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 InputText(
-                    value         = repeatValue,
+                    value = repeatValue,
                     onValueChange = { repeatValue = it },
-                    placeholder   = "5",
-                    modifier      = Modifier.width(60.dp)
+                    placeholder = "5",
+                    modifier = Modifier.width(60.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 InputText(
-                    value         = repeatUnit,
+                    value = repeatUnit,
                     onValueChange = { repeatUnit = it },
-                    placeholder   = "minutos",
-                    modifier      = Modifier.width(100.dp)
+                    placeholder = "minutos",
+                    modifier = Modifier.width(100.dp)
                 )
             }
 
@@ -180,13 +184,13 @@ fun ModalConfigNotification(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 PrimaryButton(
-                    text    = "Guardar",
+                    text = "Guardar",
                     onClick = { onSave(time, message, days, repeatValue, repeatUnit, types) },
                     modifier = Modifier.weight(1f)
                 )
                 SecondaryButton(
-                    text     = "Cancelar",
-                    onClick  = onDismissRequest,
+                    text = "Cancelar",
+                    onClick = onDismissRequest,
                     modifier = Modifier.weight(1f)
                 )
             }

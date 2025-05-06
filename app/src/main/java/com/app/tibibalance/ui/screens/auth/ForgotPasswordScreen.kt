@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
@@ -19,8 +18,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.inputs.InputEmail
+import com.app.tibibalance.ui.components.texts.Description
 import com.app.tibibalance.ui.navigation.Screen
-import kotlinx.coroutines.launch
 
 @Composable
 fun ForgotPasswordScreen(
@@ -107,16 +108,16 @@ fun ForgotPasswordScreen(
 
             FormContainer {
                 InputEmail(
-                    value         = vm.email,
+                    value = vm.email,
                     onValueChange = vm::onEmailChange,
-                    label         = "Correo electrónico"   //  ⬅️  antes era placeholder
+                    label = "Correo electrónico"   //  ⬅️  antes era placeholder
                 )
             }
 
             Spacer(Modifier.height(32.dp))
 
             PrimaryButton(
-                text    = "Enviar",
+                text = "Enviar",
                 enabled = uiState !is ForgotPasswordUiState.Loading,
                 onClick = vm::sendResetLink,
                 modifier = Modifier.fillMaxWidth()

@@ -5,7 +5,8 @@ package com.app.tibibalance.ui.wizard
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.*
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,45 +16,43 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.tibibalance.data.repository.HabitTemplateRepository
 import com.app.tibibalance.domain.model.HabitTemplate
-import com.app.tibibalance.domain.model.NotifConfig          // ← nuevo import
 import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.wizard.step.HabitDetailsStep
-import com.app.tibibalance.ui.wizard.step.NotificationStep    // asegúrate de que use NotifConfig
+import com.app.tibibalance.ui.wizard.step.NotificationStep
 import com.app.tibibalance.ui.wizard.step.SuggestionStep
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.launch
 
-/*─────────────────────────   M O D A L   ─────────────────────────*/
 @Composable
 fun AddHabitModal(
     onDismissRequest: () -> Unit,
     vm: AddHabitViewModel = hiltViewModel()
 ) {
-    /* ---------- estado global del wizard ---------- */
-    val st    by vm.wizard.collectAsState()
-    val scope = rememberCoroutineScope()
+    val ui by vm.ui.collectAsState()
 
-    /* ---------- estado del pager interno ---------- */
-    val pager = rememberPagerState(initialPage = st.step, pageCount = { 3 })
-    LaunchedEffect(st.step) { pager.animateScrollToPage(st.step) }
+    /* página actual ↔︎ estado */
+    val page = when (ui) {
+        is AddHabitUiState.Suggestions  -> 0
+        is AddHabitUiState.Details      -> 1
+        is AddHabitUiState.Notification -> 2
+        else                            -> 0
+    }
+    val pager = rememberPagerState(initialPage = page, pageCount = { 3 })
+    LaunchedEffect(page) { pager.animateScrollToPage(page) }
 
-    /* alto máximo = 85 % de la pantalla */
-    val maxHeight = LocalConfiguration.current.screenHeightDp.dp * .85f
-
-    /* -----------------------   D I A L O G   ---------------------- */
+    val maxH = LocalConfiguration.current.screenHeightDp.dp * .85f
     ModalContainer(
-        onDismissRequest   = { vm.cancel(); onDismissRequest() },
-        modifier           = Modifier.heightIn(max = maxHeight),
+        onDismissRequest   = { vm.finish(); onDismissRequest() },
+        modifier           = Modifier.heightIn(max = maxH),
         closeButtonEnabled = true
     ) {
-
-        /* ---------- layout base del wizard ---------- */
         Column(Modifier.fillMaxSize()) {
 
-            /* ---------- CONTENIDO / PÁGINAS ---------- */
+            /* -------- páginas -------- */
             HorizontalPager(
                 state             = pager,
                 userScrollEnabled = false,
@@ -61,69 +60,66 @@ fun AddHabitModal(
                     .weight(1f)
                     .fillMaxWidth(),
                 pageSize          = PageSize.Fill
-            ) { page ->
-                when (page) {
-                    /* Paso 0 ─ Plantillas sugeridas */
+            ) { idx ->
+                when (idx) {
                     0 -> SuggestionStep(
                         templates    = rememberTemplates(),
                         onSuggestion = vm::pickTemplate
                     )
-
-                    /* Paso 1 ─ Detalles */
-                    1 -> HabitDetailsStep(
-                        initial      = st.form,
-                        onFormChange = vm::updateForm,
-                        onBack       = vm::back
-                    )
-
-                    /* Paso 2 ─ Notificación */
-                    2 -> NotificationStep(
-                        title       = st.form.name.ifBlank { "Notificación" },
-                        initialCfg  = st.notif,     // ← NotifConfig
-                        onCfgChange = vm::updateNotif,
-                        onBack      = vm::back
-                    )
+                    1 -> (ui as? AddHabitUiState.Details)?.let { st ->
+                        HabitDetailsStep(
+                            initial      = st.form,
+                            errors       = st.errors,
+                            onFormChange = vm::updateForm,
+                            onBack       = vm::back
+                        )
+                    }
+                    2 -> (ui as? AddHabitUiState.Notification)?.let { st ->
+                        NotificationStep(
+                            title       = st.form.name.ifBlank { "Notificación" },
+                            initialCfg  = st.cfg,
+                            onCfgChange = vm::updateNotif,
+                            onBack      = vm::back
+                        )
+                    }
                 }
             }
 
             Spacer(Modifier.height(4.dp))
 
-            /* ---------- BARRA DE ACCIONES ---------- */
+            /* -------- barra inferior -------- */
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                /* botón ATRÁS */
-                if (st.step > 0)
+                if (page > 0)
                     SecondaryButton("Atrás", onClick = vm::back)
 
                 Spacer(Modifier.width(8.dp))
 
-                /* botón principal contextual */
-                when (st.step) {
-                    0 -> PrimaryButton(
-                        text    = "Crear mi propio hábito",
+                when (val st = ui) {
+                    is AddHabitUiState.Suggestions -> PrimaryButton(
+                        text = "Crear mi propio hábito",
                         onClick = vm::startBlankForm
                     )
 
-                    1 -> PrimaryButton(
-                        text    = if (st.form.notify) "Siguiente" else "Guardar",
-                        onClick = { vm.nextFromForm(st.form) }
+                    is AddHabitUiState.Details -> PrimaryButton(
+                        text = if (st.form.notify) "Siguiente" else "Guardar",
+                        enabled = st.canProceed,
+                        onClick = vm::nextFromDetails
                     )
 
-                    2 -> PrimaryButton(
-                        text    = "Guardar",
-                        onClick = {
-                            vm.finish(st.form, st.notif)   // ← NotifConfig
-                            onDismissRequest()
-                        }
+                    is AddHabitUiState.Notification -> PrimaryButton(
+                        text = "Guardar",
+                        onClick = vm::finish
                     )
+
+                    else -> Unit
                 }
             }
 
-            /* ---------- INDICADOR ---------- */
             PagerIndicator(
                 pagerState = pager,
                 pageCount  = 3,
@@ -133,22 +129,32 @@ fun AddHabitModal(
             )
         }
     }
+
+    /* -------- diálogos auxiliares -------- */
+    when (val st = ui) {
+        is AddHabitUiState.ConfirmDiscard -> ModalInfoDialog(
+            visible = true,
+            icon    = Icons.Default.Warning,
+            title   = "Reemplazar el formulario",
+            message = "Perderás los datos ingresados. ¿Continuar?",
+            primaryButton   = DialogButton("Sí")  { vm.confirmDiscard(true) },
+            secondaryButton = DialogButton("No")  { vm.confirmDiscard(false) }
+        )
+        is AddHabitUiState.Saving -> ModalInfoDialog(visible = true, loading = true)
+        else -> Unit
+    }
 }
 
-/*──────── helper: plantillas cacheadas en Room (Flow → Compose) ───────*/
+/* -- helper Room→Compose -- */
 @Composable
 private fun rememberTemplates(): List<HabitTemplate> {
-    val repo = EntryPointAccessors
-        .fromApplication(
-            LocalContext.current.applicationContext,
-            TemplateRepoEntryPoint::class.java
-        )
-        .templateRepo()
+    val repo = EntryPointAccessors.fromApplication(
+        LocalContext.current.applicationContext,
+        TemplateRepoEntryPoint::class.java
+    ).templateRepo()
     return repo.templates.collectAsState(initial = emptyList()).value
 }
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface TemplateRepoEntryPoint {
-    fun templateRepo(): HabitTemplateRepository
-}
+interface TemplateRepoEntryPoint { fun templateRepo(): HabitTemplateRepository }
