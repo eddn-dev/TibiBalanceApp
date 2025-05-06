@@ -1,11 +1,10 @@
 // src/main/java/com/app/tibibalance/ui/screens/ViewProfileScreen.kt
-package com.app.tibibalance.ui.screens
+package com.app.tibibalance.ui.screens.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +17,6 @@ import com.app.tibibalance.ui.components.*
 
 @Composable
 fun ViewProfileScreen() {
-    // mismo degradado que HomeScreen
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
@@ -35,7 +33,7 @@ fun ViewProfileScreen() {
                 .padding(horizontal = 16.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(10.dp))
 
             FormContainer {
                 ProfileContainer(
@@ -43,7 +41,7 @@ fun ViewProfileScreen() {
                     size               = 110.dp,
                     contentDescription = "Foto de perfil"
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(2.dp))
 
                 Subtitle(text = "Nora Soto")
 
@@ -58,7 +56,7 @@ fun ViewProfileScreen() {
                         .padding(top = 8.dp)
                 )
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(10.dp))
                 // Correo electrónico
                 Subtitle(text = "Correo electrónico:")
                 InputText(
@@ -69,7 +67,7 @@ fun ViewProfileScreen() {
                         .padding(top = 8.dp)
                 )
 
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(22.dp))
                 // Botones
                 Row(
                     modifier              = Modifier.fillMaxWidth(),

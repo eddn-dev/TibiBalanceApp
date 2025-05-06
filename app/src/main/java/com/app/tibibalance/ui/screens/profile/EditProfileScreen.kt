@@ -1,143 +1,175 @@
-package com.app.tibibalance.ui.screens
-/*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
+package com.app.tibibalance.ui.screens.profile
+
+import android.app.DatePickerDialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.height
-
-
-
 
 @Composable
-fun FeatureEditProfileScreen() {
-    // Contenido de la pantalla
-    Box(modifier = Modifier.fillMaxSize()) {
-        GradientBackgroundScreen {
-            // Contenido de la pantalla
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 80.dp)
-                ) {
-                    ProfileContainer(
-                        imageResId = R.drawable.imagenprueba,
-                        size = 110.dp,
-                        contentDescription = "Foto de perfil"
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 190.dp)
-                ) {
-                    // Este es otro botón? Falta el componente? <- - - - - - - - alargar componente
-                    SecondaryButton(
-                        modifier = Modifier
-                            .width(150.dp) // Cambia aquí el ancho
-                            .height(50.dp) // Y aquí el alto si quieres,
-                            .padding(top = 10.dp),
-                        text = "Cambiar Foto",
-                        onClick = { } //Cambiar Foto de perfil
-                    )
-                }
-                Column(
-                    modifier = Modifier.padding(top = 270.dp)
-                ) {
-                    Subtitle(
-                        text = "Nombre de usuario:"
-                    )
-                    InputText(
-                        value = "nora soto", //Colocar el nombre del usuario desde Firebase
-                        onValueChange = { },
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    //Falta icono de editar (lapiz)
+fun EditProfileScreen(
+    onChangePhoto: () -> Unit = {},
+    onSave: () -> Unit = {},
+    onCancel: () -> Unit = {}
+) {
+    // Estado de la fecha
+    var date by remember { mutableStateOf("01/05/2025") }
+    val context = LocalContext.current
 
-                    Subtitle(
-                        text = "Correo electrónico:",
-                        modifier = Modifier.padding(top = 20.dp)
-                    )
-                    /*var email by remember { mutableStateOf("") } //Este input tiene el formato de registro
-                    InputEmail(
-                        value = email,
-                        onValueChange = { email = it }
-                    )*/
-                    InputText(
-                        value = "norasoto5@gmail.com", //Colocar el nombre del usuario desde Firebase
-                        onValueChange = { },
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                    Caption(
-                        text = "El correo electrónico no es editable"
-                    )
-
-                    Subtitle(
-                        text = "Fecha de nacimiento:",
-                        modifier = Modifier.padding(top = 20.dp)
-                    )
-                    var date by remember { mutableStateOf("01/05/2025") }
-                    InputDate(selectedDate = date, onDateSelected = { date = it })
-                    //Falta icono de editar (lapiz)
-
-                    Subtitle(
-                        text = "Contraseña:",
-                        modifier = Modifier.padding(top = 20.dp)
-                    )
-                    InputText(
-                        value = "********", //Colocar contraseña encriptada desde Firebase
-                        onValueChange = { },
-                        modifier = Modifier
-                            .padding(top = 10.dp)
-                    )
-                    //Falta icono de editar (lapiz)
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Row(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .padding(top = 50.dp), // Padding externo (alrededor de toda la fila)
-
-                            horizontalArrangement = Arrangement.spacedBy(30.dp), // Espacio entre los elementos de la fila
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            SecondaryButton(
-                                text = "Guardar",
-                                onClick = {} //Mostrar mensaje de confirmacion o warning (si no se hicieron cambios)
-                            )
-
-                            SecondaryButton(
-                                text = "Cancelar",
-                                onClick = {} //Mostrar mensaje de alerta
-                            )
-                        }
-                    }
-                    //Agregar navbar
-                }
-            }
-        }
-        Header(
-            title = "Editar Información Personal",
-            // Si se ingresa a esta pantalla desde los ajustes, el boton de regreso onBackClick lleva a ajustes, no a Visualizar perfil *
-            showBackButton = true,
-            onBackClick = { }, //Redireccionar a Visualizar perfil
-            profileImage = null
+    // DatePickerDialog externo
+    val datePicker = remember {
+        DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                date = "%02d/%02d/%04d".format(day, month + 1, year)
+            },
+            2025, 4, 1
         )
     }
-}*/
+
+    // Fondo degradado
+    val gradient = Brush.verticalGradient(
+        listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(gradient)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(1.dp))
+
+            ProfileContainer(
+                imageResId = R.drawable.imagenprueba,
+                size = 110.dp,
+                contentDescription = "Foto de perfil"
+            )
+
+            Spacer(Modifier.height(5.dp))
+
+            SecondaryButton(
+                text = "Cambiar Foto",
+                onClick = onChangePhoto,
+                modifier = Modifier
+                    .width(150.dp)
+                    .height(40.dp)
+            )
+
+            Spacer(Modifier.height(6.dp))
+
+            Subtitle(text = "Nombre de usuario:")
+            InputText(
+                value = "nora soto",
+                onValueChange = { /* TODO */ },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(2.dp))
+
+            Subtitle(text = "Correo electrónico:")
+            InputText(
+                value           = "norasoto5@gmail.com",
+                onValueChange   = { /* no editable */ },
+                modifier        = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = (-4).dp),   // si aún quieres un “tirón” hacia arriba
+                supportingText  = "ℹ\uFE0F El correo electrónico no es editable"
+            )
+
+            Spacer(Modifier.height(5.dp))
+
+            Subtitle(text = "Fecha de nacimiento:")
+            // ─── reemplazamos aquí InputDate ─────────────────────────────
+            OutlinedTextField(
+                value = date,
+                onValueChange = { /* read-only */ },
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { datePicker.show() },
+                label = { Text("Fecha de nacimiento") },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = "Seleccionar fecha",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    // textColors: usa onSurface cuando esté disabled
+                    focusedTextColor       = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor     = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTextColor      = MaterialTheme.colorScheme.onSurface,
+                    errorTextColor         = MaterialTheme.colorScheme.error,
+                    // containerColors
+                    focusedContainerColor   = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor  = MaterialTheme.colorScheme.surface,
+                    errorContainerColor     = MaterialTheme.colorScheme.surface,
+                    // borderColors
+                    focusedBorderColor      = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
+                    disabledBorderColor     = MaterialTheme.colorScheme.outline,
+                    errorBorderColor        = MaterialTheme.colorScheme.error
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(Modifier.height(5.dp))
+
+            Subtitle(text = "Contraseña:")
+            InputText(
+                value = "********",
+                onValueChange = { /* TODO */ },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                SecondaryButton(
+                    text = "Guardar",
+                    onClick = onSave,
+                    modifier = Modifier.weight(1f)
+                )
+                SecondaryButton(
+                    text = "Cancelar",
+                    onClick = onCancel,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(40.dp)
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+fun PreviewFeatureEditProfileScreen() {
+    EditProfileScreen()
+}
