@@ -1,28 +1,23 @@
 /* di/FirebaseModule.kt */
 package com.app.tibibalance.di
 
-import android.content.Context
-import androidx.room.Room
-import com.app.tibibalance.data.local.AppDb
-import com.app.tibibalance.data.local.ProfileDao
+import com.app.tibibalance.data.local.dao.ProfileDao
 import com.app.tibibalance.data.remote.firebase.ProfileService
 import com.app.tibibalance.data.repository.FirebaseProfileRepository
 import com.app.tibibalance.data.repository.ProfileRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.MemoryCacheSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MemoryCacheSettings
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 /* ───────── Qualifier para Dispatcher IO ───────── */
 @Qualifier

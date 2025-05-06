@@ -9,16 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip // Necesario para clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.font.FontWeight // Para negrita opcional
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog // Importación clave
 import androidx.compose.ui.window.DialogProperties
-import kotlinx.coroutines.launch
 
 /**
  * Contenedor base para modales, con un ancho fijo de 320.dp.
@@ -52,8 +47,7 @@ fun ModalContainer(
         properties = properties
     ) {
         Card(
-            // Se aplica width(320.dp) para el ancho fijo
-            modifier = modifier.width(320.dp),
+            modifier = modifier.width(400.dp),
             shape = shape,
             colors = CardDefaults.cardColors(
                 containerColor = containerColor,

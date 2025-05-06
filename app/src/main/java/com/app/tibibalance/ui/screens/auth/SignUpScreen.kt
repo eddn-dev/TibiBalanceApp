@@ -204,37 +204,44 @@ fun SignUpScreen(
             /* formulario */
             FormContainer {
                 InputText(
-                    value = username,
-                    onValueChange = { username = it; vm.consumeFieldError() },
-                    placeholder = "Nombre de usuario*",
-                    isError = fieldErr?.userNameError != null,
+                    value          = username,
+                    onValueChange  = { username = it; vm.consumeFieldError() },
+                    placeholder    = "Nombre de usuario*",
+                    isError        = fieldErr?.userNameError != null,
                     supportingText = fieldErr?.userNameError
                 )
+
+                /* fecha: la función no cambió */
                 InputDate(
-                    value   = birthDate?.format(formatter) ?: "",
-                    onClick = { openDatePicker(); vm.consumeFieldError() },
-                    isError = fieldErr?.birthDateError != null,
+                    value          = birthDate?.format(formatter) ?: "",
+                    onClick        = { openDatePicker(); vm.consumeFieldError() },
+                    isError        = fieldErr?.birthDateError != null,
                     supportingText = fieldErr?.birthDateError
                 )
+
+                /* ⬇⬇⬇  las tres llamadas siguientes cambian `placeholder` → `label`  ⬇⬇⬇ */
+
                 InputEmail(
-                    value = email,
-                    onValueChange = { email = it; vm.consumeFieldError() },
-                    placeholder = "Correo*",
-                    isError = fieldErr?.emailError != null,
+                    value          = email,
+                    onValueChange  = { email = it; vm.consumeFieldError() },
+                    label          = "Correo*",                 // ⬅️  NUEVO
+                    isError        = fieldErr?.emailError != null,
                     supportingText = fieldErr?.emailError
                 )
+
                 InputPassword(
-                    value = pass1,
-                    onValueChange = { pass1 = it; vm.consumeFieldError() },
-                    placeholder = "Contraseña*",
-                    isError = fieldErr?.pass1Error != null,
+                    value          = pass1,
+                    onValueChange  = { pass1 = it; vm.consumeFieldError() },
+                    label          = "Contraseña*",             // ⬅️  NUEVO
+                    isError        = fieldErr?.pass1Error != null,
                     supportingText = fieldErr?.pass1Error
                 )
+
                 InputPassword(
-                    value = pass2,
-                    onValueChange = { pass2 = it; vm.consumeFieldError() },
-                    placeholder = "Confirmar contraseña*",
-                    isError = fieldErr?.pass2Error != null,
+                    value          = pass2,
+                    onValueChange  = { pass2 = it; vm.consumeFieldError() },
+                    label          = "Confirmar contraseña*",   // ⬅️  NUEVO
+                    isError        = fieldErr?.pass2Error != null,
                     supportingText = fieldErr?.pass2Error
                 )
             }

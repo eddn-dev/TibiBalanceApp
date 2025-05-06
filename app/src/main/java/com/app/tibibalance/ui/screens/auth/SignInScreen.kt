@@ -12,6 +12,8 @@ package com.app.tibibalance.ui.screens.auth
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -132,9 +134,10 @@ fun SignInScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 100.dp, start = 24.dp, end = 24.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(top = 80.dp, start = 24.dp, end = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        )  {
 
             ImageContainer(
                 resId = R.drawable.ic_login_image,
@@ -159,12 +162,15 @@ fun SignInScreen(
                 InputEmail(
                     value          = email,
                     onValueChange  = { email = it; vm.consumeError() },
+                    label          = "Correo electrónico",          // ⬅️  NUEVO
                     isError        = fieldErr?.emailError != null,
                     supportingText = fieldErr?.emailError
                 )
+
                 InputPassword(
                     value          = pass,
                     onValueChange  = { pass = it; vm.consumeError() },
+                    label          = "Contraseña",                  // ⬅️  NUEVO
                     isError        = fieldErr?.passError != null,
                     supportingText = fieldErr?.passError
                 )
@@ -205,6 +211,7 @@ fun SignInScreen(
                     underline = false
                 )
             }
+            Spacer(Modifier.height(24.dp))
         }
 
         Header(

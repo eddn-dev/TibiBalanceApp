@@ -1,5 +1,5 @@
 /* data/local/ProfileDao.kt */
-package com.app.tibibalance.data.local
+package com.app.tibibalance.data.local.dao
 
 import androidx.room.*
 import com.app.tibibalance.data.local.entity.UserProfileEntity

@@ -2,7 +2,7 @@
 package com.app.tibibalance.data.repository
 
 import android.net.Uri
-import com.app.tibibalance.data.local.ProfileDao
+import com.app.tibibalance.data.local.dao.ProfileDao
 import com.app.tibibalance.data.local.entity.UserProfileEntity
 import com.app.tibibalance.data.local.mapper.toDomain
 import com.app.tibibalance.data.local.mapper.toEntity

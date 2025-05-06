@@ -1,101 +1,79 @@
-// ui/components/InputPassword.kt
+/* ui/components/InputPassword.kt */
 package com.app.tibibalance.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun InputPassword(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    placeholder: String = "Contraseña",
-    isError: Boolean = false,
-    supportingText: String? = null
+    value          : String,
+    onValueChange  : (String) -> Unit,
+    modifier       : Modifier = Modifier,
+    label          : String   = "Contraseña",
+    isError        : Boolean  = false,
+    supportingText : String?  = null,
+    maxChars       : Int?     = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Password,
+        imeAction    = ImeAction.Done
+    )
 ) {
     var visible by remember { mutableStateOf(false) }
 
-    Column(modifier.fillMaxWidth()) {
+    /* —— misma paleta que InputEmail / InputText —— */
+    val colors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor   = MaterialTheme.colorScheme.surface,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+        disabledContainerColor  = MaterialTheme.colorScheme.surface,
+        focusedBorderColor      = if (isError)
+            MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor    = if (isError)
+            MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+        errorBorderColor        = MaterialTheme.colorScheme.error,
+        focusedLabelColor       = if (isError)
+            MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+        unfocusedLabelColor     = if (isError)
+            MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+        errorLabelColor         = MaterialTheme.colorScheme.error
+    )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-        ) {
-            /* Campo de texto */
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                singleLine = true,
-                visualTransformation = if (visible)
-                    VisualTransformation.None else PasswordVisualTransformation(),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                textStyle = TextStyle(
-                    color = if (isError) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.onBackground,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 40.dp)   // deja sitio al icono
-            ) { inner ->
-                Box(Modifier.fillMaxSize(), Alignment.CenterStart) {
-                    AnimatedPlaceholder(value.isEmpty(), placeholder, isError)
-                    inner()
-                }
+    OutlinedTextField(
+        value            = value,
+        onValueChange    = { onValueChange( if (maxChars != null) it.take(maxChars) else it ) },
+        modifier         = modifier.fillMaxWidth(),
+        label            = { Text(label) },
+        singleLine       = true,
+        isError          = isError,
+        visualTransformation = if (visible)
+            VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions  = keyboardOptions,
+        trailingIcon     = {
+            val icon = if (visible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+            val tint = if (isError)
+                MaterialTheme.colorScheme.error
+            else
+                MaterialTheme.colorScheme.onSurfaceVariant
+
+            IconButton(onClick = { visible = !visible }) {
+                Icon(icon, null, tint = tint)
             }
-
-            /* Icono ojo */
-            Icon(
-                imageVector = if (visible) Icons.Filled.VisibilityOff
-                else Icons.Filled.Visibility,
-                contentDescription = null,
-                tint = if (isError) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(24.dp)
-                    .padding(end = 8.dp)
-                    .clickable { visible = !visible }
-            )
-        }
-
-        FieldUnderline(isError)
-
-        supportingText?.let {
-            Text(
-                text = it,
-                color = if (isError) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 2.dp, start = 2.dp)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PasswordPreview() {
-    var pwd by remember { mutableStateOf("") }
-    InputPassword(value = pwd, onValueChange = { pwd = it })
+        },
+        supportingText   = {
+            when {
+                isError        && supportingText != null -> Text(supportingText)
+                maxChars != null                        -> Text("${value.length}/$maxChars")
+            }
+        },
+        shape  = RoundedCornerShape(12.dp),
+        colors = colors
+    )
 }

@@ -1,76 +1,64 @@
-// ui/components/InputEmail.kt
+/* ui/components/InputEmail.kt */
 package com.app.tibibalance.ui.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun InputEmail(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    placeholder: String = "Correo electrónico",
-    isError: Boolean = false,
-    supportingText: String? = null        // muestra debajo si no es nulo
+    value          : String,
+    onValueChange  : (String) -> Unit,
+    modifier       : Modifier = Modifier,
+    label          : String   = "Correo electrónico",
+    isError        : Boolean  = false,
+    supportingText : String?  = null,
+    maxChars       : Int?     = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Email,
+        imeAction    = ImeAction.Done
+    )
 ) {
-    Column(modifier.fillMaxWidth()) {
+    /* Colores compartidos con los otros inputs */
+    val colors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor   = MaterialTheme.colorScheme.surface,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+        disabledContainerColor  = MaterialTheme.colorScheme.surface,
+        focusedBorderColor      = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor    = MaterialTheme.colorScheme.outline
+    )
 
-        /* Campo */
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                singleLine = true,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                textStyle = TextStyle(
-                    color = if (isError) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.onBackground,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) { inner ->
-                Box(Modifier.fillMaxSize(), Alignment.CenterStart) {
-                    AnimatedPlaceholder(value.isEmpty(), placeholder, isError)
-                    inner()
-                }
+    OutlinedTextField(
+        value          = value,
+        onValueChange  = { onValueChange(if (maxChars != null) it.take(maxChars) else it) },
+        modifier       = modifier.fillMaxWidth(),
+        label          = { Text(label) },
+        singleLine     = true,
+        isError        = isError,
+        keyboardOptions = keyboardOptions,
+        supportingText = {
+            when {
+                isError        && supportingText != null -> Text(supportingText)
+                maxChars != null                        -> Text("${value.length}/$maxChars")
             }
-        }
-
-        FieldUnderline(isError)
-
-        /* Mensaje de apoyo / error */
-        supportingText?.let {
-            Text(
-                text = it,
-                color = if (isError) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 2.dp, start = 2.dp)
-            )
-        }
-    }
+        },
+        shape  = RoundedCornerShape(12.dp),
+        colors = colors
+    )
 }
 
+/* ——— Preview opcional ——— */
 @Preview(showBackground = true)
 @Composable
-private fun EmailPreview() {
-    var text by remember { mutableStateOf("") }
+private fun InputEmailPreview() {
+    var text = remember { "" }
     InputEmail(value = text, onValueChange = { text = it })
 }

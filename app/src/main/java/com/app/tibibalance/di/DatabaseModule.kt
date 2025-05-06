@@ -4,8 +4,9 @@ package com.app.tibibalance.di
 import android.content.Context
 import androidx.room.Room
 import com.app.tibibalance.data.local.AppDb
-import com.app.tibibalance.data.local.HabitDao
-import com.app.tibibalance.data.local.ProfileDao
+import com.app.tibibalance.data.local.dao.HabitDao
+import com.app.tibibalance.data.local.dao.HabitTemplateDao
+import com.app.tibibalance.data.local.dao.ProfileDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,16 +18,17 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    @Provides
-    @Singleton
+    /* ---------- instancia única de Room ---------- */
+    @Provides @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): AppDb =
         Room.databaseBuilder(ctx, AppDb::class.java, "tibibalance.db")
-            .fallbackToDestructiveMigration()
-            .build()
+            .fallbackToDestructiveMigration()   // uso escolar, sin rutas de migración
+            .build()                            // Hilt gestiona el singleton
 
-    @Provides
-    fun provideProfileDao(db: AppDb): ProfileDao = db.profileDao()
+    /* ---------- DAOs existentes ---------- */
+    @Provides fun provideProfileDao      (db: AppDb): ProfileDao       = db.profileDao()
+    @Provides fun provideHabitDao        (db: AppDb): HabitDao         = db.habitDao()
 
-    @Provides
-    fun provideHabitDao(db: AppDb): HabitDao = db.habitDao()
+    /* ---------- nuevo DAO para plantillas ---------- */
+    @Provides fun provideHabitTemplateDao(db: AppDb): HabitTemplateDao = db.habitTemplateDao()
 }

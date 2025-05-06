@@ -107,9 +107,9 @@ fun ForgotPasswordScreen(
 
             FormContainer {
                 InputEmail(
-                    value = vm.email,
+                    value         = vm.email,
                     onValueChange = vm::onEmailChange,
-                    placeholder = "Correo electrónico"
+                    label         = "Correo electrónico"   //  ⬅️  antes era placeholder
                 )
             }
 

@@ -1,6 +1,6 @@
 package com.app.tibibalance.data.repository
 
-import com.app.tibibalance.data.local.HabitDao
+import com.app.tibibalance.data.local.dao.HabitDao
 import com.app.tibibalance.data.local.entity.HabitEntity
 import com.app.tibibalance.data.local.mapper.toDomain
 import com.app.tibibalance.data.local.mapper.toEntity

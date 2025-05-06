@@ -1,5 +1,5 @@
 // app/build.gradle.kts
-@Suppress("DSL_SCOPE_VIOLATION") // habilita 'libs.' accessors del catálogo
+@Suppress("DSL_SCOPE_VIOLATION")      // habilita 'libs.' accessors del catálogo
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -12,18 +12,16 @@ plugins {
 }
 
 android {
-    namespace = "com.app.tibibalance"
-    compileSdk = 35
-
+    namespace   = "com.app.tibibalance"
+    compileSdk  = 35            // OK: Android 15 Preview (ajusta a 34 si tu CI usa solo estables)
     defaultConfig {
-        applicationId = "com.app.tibibalance"
-        minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        applicationId         = "com.app.tibibalance"
+        minSdk                = 26
+        targetSdk             = 35
+        versionCode           = 1
+        versionName           = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,53 +31,53 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-
-    buildFeatures { compose = true }
+    buildFeatures  { compose = true }
 }
 
 dependencies {
 
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
-    implementation(libs.bundles.compose)                 // Material-3, Nav, Icons, Activity
+    implementation(libs.bundles.compose)            // Material-3, Nav, Icons, Activity
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation("androidx.compose.foundation:foundation")   // versión la pone tu compose-bom
 
+
+    /* ──────────────── Persistencia local (Room) ──────────────── */
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
 
-    /* ──────────────── Firebase ──────────────── */
-    implementation(platform(libs.firebase.bom))           // BOM v34.1.0
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation(libs.firebase.auth.ktx)                // ← FirebaseAuth & GoogleAuthProvider (KTX)
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    /* ──────────────── Firebase (BoM 33.13.0 definido en Toml) ──────────────── */
+    implementation(platform(libs.firebase.bom))      // ► controla versiones de todos los artefactos
+    implementation("com.google.firebase:firebase-analytics-ktx")   // Analytics
+    implementation(libs.firebase.auth.ktx)           // Auth (KTX)
+    implementation("com.google.firebase:firebase-firestore-ktx")   // Firestore (KTX)
 
     /* ──────────────── Inyección de dependencias (Hilt) ──────────────── */
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)                              // Hilt requiere KAPT, no KSP
+    kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation)
 
     /* ──────────────── Google Identity / Credential Manager ──────────────── */
-    implementation(libs.bundles.auth)                    // credential-core, GIS googleid, play-auth
+    implementation(libs.bundles.auth)               // credential-core, credentials-play, GIS
 
     /* ──────────────── KotlinX ──────────────── */
     implementation(libs.kotlinx.serialization.json)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
-    /* ──────────────── Core & tests ──────────────── */
+    /* ──────────────── Core & Tests ──────────────── */
     implementation("androidx.core:core-ktx:1.13.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation(libs.kotlinx.datetime)
 }
-
