@@ -20,7 +20,7 @@ class FirebaseProfileRepository @Inject constructor(
     private val remote : ProfileService,
     private val dao    : ProfileDao,
     private val auth   : FirebaseAuth,
-    @IoDispatcher private val io: CoroutineDispatcher
+    @param:IoDispatcher private val io: CoroutineDispatcher
 ) : ProfileRepository {
 
     /* ───────── flujo observable ───────── */

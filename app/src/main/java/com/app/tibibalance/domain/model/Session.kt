@@ -8,4 +8,4 @@ data class Session(
     val unit : SessionUnit? = null   // MINUTES | HOURS
 )
 
-enum class SessionUnit { MINUTES, HOURS }
+enum class SessionUnit { INDEFINIDO, MINUTOS, HORAS }

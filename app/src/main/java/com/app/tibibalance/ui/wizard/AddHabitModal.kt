@@ -15,9 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.tibibalance.data.repository.HabitTemplateRepository
 import com.app.tibibalance.domain.model.HabitTemplate
+import com.app.tibibalance.domain.model.NotifConfig          // ← nuevo import
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.wizard.step.HabitDetailsStep
-import com.app.tibibalance.ui.wizard.step.NotificationStep
+import com.app.tibibalance.ui.wizard.step.NotificationStep    // asegúrate de que use NotifConfig
 import com.app.tibibalance.ui.wizard.step.SuggestionStep
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -31,11 +32,11 @@ fun AddHabitModal(
     onDismissRequest: () -> Unit,
     vm: AddHabitViewModel = hiltViewModel()
 ) {
-    /* ------------------ estado global del wizard ------------------ */
+    /* ---------- estado global del wizard ---------- */
     val st    by vm.wizard.collectAsState()
     val scope = rememberCoroutineScope()
 
-    /* ------------------ estado del pager interno ------------------ */
+    /* ---------- estado del pager interno ---------- */
     val pager = rememberPagerState(initialPage = st.step, pageCount = { 3 })
     LaunchedEffect(st.step) { pager.animateScrollToPage(st.step) }
 
@@ -44,11 +45,12 @@ fun AddHabitModal(
 
     /* -----------------------   D I A L O G   ---------------------- */
     ModalContainer(
-        onDismissRequest = { vm.cancel(); onDismissRequest() },
-        modifier         = Modifier.heightIn(max = maxHeight),      // 🔒 evita “saltos”
-        closeButtonEnabled = true                                    // ‘X’ en la esquina
+        onDismissRequest   = { vm.cancel(); onDismissRequest() },
+        modifier           = Modifier.heightIn(max = maxHeight),
+        closeButtonEnabled = true
     ) {
-        /* -------- layout base del wizard -------- */
+
+        /* ---------- layout base del wizard ---------- */
         Column(Modifier.fillMaxSize()) {
 
             /* ---------- CONTENIDO / PÁGINAS ---------- */
@@ -56,12 +58,12 @@ fun AddHabitModal(
                 state             = pager,
                 userScrollEnabled = false,
                 modifier          = Modifier
-                    .weight(1f)                         // ocupa todo lo disponible
+                    .weight(1f)
                     .fillMaxWidth(),
                 pageSize          = PageSize.Fill
             ) { page ->
                 when (page) {
-                    /* Paso 0 ─ Sugerencias */
+                    /* Paso 0 ─ Plantillas sugeridas */
                     0 -> SuggestionStep(
                         templates    = rememberTemplates(),
                         onSuggestion = vm::pickTemplate
@@ -77,7 +79,7 @@ fun AddHabitModal(
                     /* Paso 2 ─ Notificación */
                     2 -> NotificationStep(
                         title       = st.form.name.ifBlank { "Notificación" },
-                        initialCfg  = st.notif,
+                        initialCfg  = st.notif,     // ← NotifConfig
                         onCfgChange = vm::updateNotif,
                         onBack      = vm::back
                     )
@@ -93,11 +95,13 @@ fun AddHabitModal(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                /* botón ATRÁS */
                 if (st.step > 0)
                     SecondaryButton("Atrás", onClick = vm::back)
 
                 Spacer(Modifier.width(8.dp))
 
+                /* botón principal contextual */
                 when (st.step) {
                     0 -> PrimaryButton(
                         text    = "Crear mi propio hábito",
@@ -112,7 +116,7 @@ fun AddHabitModal(
                     2 -> PrimaryButton(
                         text    = "Guardar",
                         onClick = {
-                            vm.finish(st.form, st.notif)
+                            vm.finish(st.form, st.notif)   // ← NotifConfig
                             onDismissRequest()
                         }
                     )

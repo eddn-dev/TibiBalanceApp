@@ -16,9 +16,10 @@ import kotlinx.coroutines.withContext
 
 /* data/remote/firebase/ProfileService.kt */
 class ProfileService @Inject constructor(
+
     private val fs: FirebaseFirestore,
     private val auth: FirebaseAuth,
-    @IoDispatcher private val io: CoroutineDispatcher
+    @param:IoDispatcher private val io: CoroutineDispatcher
 ) {
     private val doc get() = fs.collection("profiles").document(auth.currentUser!!.uid)
 

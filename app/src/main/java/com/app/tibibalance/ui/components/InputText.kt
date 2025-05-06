@@ -43,7 +43,7 @@ fun InputText(
         },
         modifier         = modifier
             .fillMaxWidth()
-            .heightIn(min = 40.dp),       // altura mínima reducida
+            .heightIn(min = 40.dp),
         label            = { Text(placeholder) },
         singleLine       = singleLine,
         maxLines         = if (singleLine) 1 else 4,

@@ -8,4 +8,4 @@ data class Period(
     val unit : PeriodUnit? = null    // WEEKS | MONTHS | YEARS
 )
 
-enum class PeriodUnit { WEEKS, MONTHS, YEARS }
+enum class PeriodUnit  { INDEFINIDO, DIAS, SEMANAS, MESES }

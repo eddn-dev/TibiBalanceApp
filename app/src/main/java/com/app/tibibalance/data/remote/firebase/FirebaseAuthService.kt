@@ -17,8 +17,9 @@ import com.app.tibibalance.di.IoDispatcher
 
 @Singleton
 class FirebaseAuthService @Inject constructor(
+
     private val auth: FirebaseAuth,
-    @IoDispatcher private val io: CoroutineDispatcher
+    @param:IoDispatcher private val io: CoroutineDispatcher
 ) : AuthService {
 
     /* ───────── Estado de sesión (reactivo) ───────── */

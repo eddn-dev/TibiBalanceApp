@@ -11,23 +11,27 @@ import com.app.tibibalance.data.local.dao.ProfileDao
 import com.app.tibibalance.data.local.entity.HabitEntity
 import com.app.tibibalance.data.local.entity.HabitTemplateEntity    // ← nueva entidad
 import com.app.tibibalance.data.local.entity.UserProfileEntity
+import com.app.tibibalance.data.local.mapper.NotifConverters
 
 @Database(
     entities = [
         UserProfileEntity::class,
         HabitEntity::class,
-        HabitTemplateEntity::class                                // ← añadida
+        HabitTemplateEntity::class
     ],
-    version = 3,            // bump: se añade tabla habit_templates
+    version = 3,
     exportSchema = true
 )
-@TypeConverters(HabitConverter::class)
+@TypeConverters(
+    HabitConverter::class,   // ➊ tu conversor anterior
+    NotifConverters::class   // ➋ el nuevo para listas <String>/<Int>
+)
 abstract class AppDb : RoomDatabase() {
 
     /* DAOs existentes */
     abstract fun profileDao()       : ProfileDao
     abstract fun habitDao()         : HabitDao
 
-    /* DAO para plantillas ----- */
+    /* Nuevo DAO */
     abstract fun habitTemplateDao() : HabitTemplateDao
 }
