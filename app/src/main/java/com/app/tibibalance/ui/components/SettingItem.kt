@@ -27,7 +27,7 @@ fun SettingItem(
 ) {
     Surface(
         color  = containerColor,
-        shape  = RoundedCornerShape(cornerRadius),   // ✅ radio en Dp
+        shape  = RoundedCornerShape(cornerRadius),
         shadowElevation = 1.dp,
         modifier = modifier
             .fillMaxWidth()
