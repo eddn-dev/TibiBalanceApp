@@ -60,7 +60,8 @@ fun PrimaryButton(
                 text = text,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
                 )
             )
         }

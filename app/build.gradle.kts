@@ -94,5 +94,13 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation(libs.kotlinx.datetime)
+
+    /* ──────────────── Lottie Animation ────────────────*/
+    implementation ("com.airbnb.android:lottie-compose:6.6.4")
 }
 
+allprojects {
+    repositories {
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/*") }
+    }
+}

@@ -11,14 +11,23 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.airbnb.lottie.LottieComposition
+import com.airbnb.lottie.compose.LottieAnimatable
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.app.tibibalance.R
+import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.components.ImageContainer
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.navigation.Screen
+import com.app.tibibalance.ui.screens.emotional.EmotionalCalentarScreen
+
 
 @Composable
 fun LaunchScreen(
@@ -40,7 +49,6 @@ fun LaunchScreen(
         }
     }
 
-    /* ── UI de bienvenida (idéntica salvo el LaunchedEffect) ── */
     val gradient = Brush.verticalGradient(
         listOf(
             MaterialTheme.colorScheme.primary.copy(alpha = .15f),
@@ -58,27 +66,34 @@ fun LaunchScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(inner)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            /* Ilustración */
             ImageContainer(
                 resId = R.drawable.launch,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(190.dp)
+                    .height(200.dp)
             )
 
-            /* Sub-título */
-            Text(
+            val composition by rememberLottieComposition(
+                spec = LottieCompositionSpec.RawRes(
+                    resId = R.raw.tibianimation
+                )
+            )
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier
+                    .size(150.dp)
+            )
+
+            Subtitle(
                 text = stringResource(R.string.launch_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                lineHeight = 18.sp,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 10.dp)
             )
 
             /* Botones */
