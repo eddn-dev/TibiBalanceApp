@@ -1,39 +1,44 @@
-/* domain/model/HabitForm.kt */
 package com.app.tibibalance.domain.model
 
+/** Modelo intermedio que la UI utiliza antes de persistir el `Habit`. */
 data class HabitForm(
-    val name         : String         = "",
-    val desc         : String         = "",
+    /* ─── Básicos ────────────────────────────────────────── */
+    val name        : String            = "",
+    val desc        : String            = "",
+    val category    : HabitCategory     = HabitCategory.SALUD,
+    val icon        : String            = "FitnessCenter",
 
-    /* ① ahora es el enum, no String */
-    val category     : HabitCategory  = HabitCategory.SALUD,
+    /* ─── Sesión ─────────────────────────────────────────── */
+    val sessionQty  : Int?              = null,                     // null si unit = INDEFINIDO
+    val sessionUnit : SessionUnit       = SessionUnit.INDEFINIDO,
 
-    val icon         : String         = "FitnessCenter",
+    /* ─── Repetición ─────────────────────────────────────── */
+    val repeatPreset: RepeatPreset      = RepeatPreset.INDEFINIDO,
+    val weekDays    : Set<Int>          = emptySet(),               // solo PERSONALIZADO
 
-    // ── Sesión ──
-    val sessionQty   : Int?           = null,
-    val sessionUnit  : SessionUnit    = SessionUnit.INDEFINIDO,
+    /* ─── Periodo total ──────────────────────────────────── */
+    val periodQty   : Int?              = null,
+    val periodUnit  : PeriodUnit        = PeriodUnit.INDEFINIDO,
 
-    // ── Frecuencia ──
-    val repeatPattern: RepeatPattern  = RepeatPattern.INDEFINIDO,
-
-    // ── Periodo total ──
-    val periodQty    : Int?           = null,
-    val periodUnit   : PeriodUnit     = PeriodUnit.INDEFINIDO,
-
-    val notify       : Boolean        = false
+    /* ─── Opciones extra ─────────────────────────────────── */
+    val notify      : Boolean           = false,                    // se ignora si repeat = INDEFINIDO
+    val challenge   : Boolean           = false                     // modo reto
 ) {
-    /** Prefill desde plantilla remota */
+
+    /** Crea un formulario precargado desde una plantilla remota/local. */
     fun prefillFromTemplate(t: HabitTemplate) = copy(
-        name          = t.name,
-        desc          = t.description,
-        category      = t.category,         // ya es HabitCategory
-        icon          = t.icon,
-        sessionQty    = t.sessionQty,
-        sessionUnit   = t.sessionUnit,
-        repeatPattern = t.repeatPattern,
-        periodQty     = t.periodQty,
-        periodUnit    = t.periodUnit,
-        notify        = t.notifCfg.mode != NotifMode.SILENT
+        name         = t.name,
+        desc         = t.description,
+        category     = t.category,
+        icon         = t.icon,
+        sessionQty   = t.sessionQty,
+        sessionUnit  = t.sessionUnit,
+        repeatPreset = t.repeatPreset,
+        weekDays     = if (t.repeatPreset == RepeatPreset.PERSONALIZADO)
+            t.notifCfg.weekDays.days
+        else emptySet(),
+        periodQty    = t.periodQty,
+        periodUnit   = t.periodUnit,
+        notify       = t.notifCfg.enabled
     )
 }

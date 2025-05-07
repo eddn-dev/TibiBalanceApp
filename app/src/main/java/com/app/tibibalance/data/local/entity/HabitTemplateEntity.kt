@@ -23,7 +23,7 @@ data class HabitTemplateEntity(
     val sessionUnit: SessionUnit,
 
     /* -------- Frecuencia y periodo -------- */
-    val repeatPattern: RepeatPattern,
+    val repeatPreset: RepeatPreset,
     val periodQty    : Int?,
     val periodUnit   : PeriodUnit,
 

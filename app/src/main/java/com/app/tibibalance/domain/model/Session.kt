@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Session(
-    val value: Int? = null,          // 10, 5…
-    val unit : SessionUnit? = null   // MINUTES | HOURS
+    val qty : Int?        = null,
+    val unit: SessionUnit = SessionUnit.INDEFINIDO
 )
 
 enum class SessionUnit { INDEFINIDO, MINUTOS, HORAS }

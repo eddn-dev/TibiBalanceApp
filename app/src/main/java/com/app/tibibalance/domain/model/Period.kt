@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Period(
-    val value: Int? = null,
-    val unit : PeriodUnit? = null    // WEEKS | MONTHS | YEARS
+    val qty : Int?        = null,
+    val unit: PeriodUnit  = PeriodUnit.INDEFINIDO
 )
 
 enum class PeriodUnit  { INDEFINIDO, DIAS, SEMANAS, MESES }

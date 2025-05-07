@@ -84,7 +84,7 @@ class FirebaseHabitRepository @Inject constructor(
 
     /* ---------- extensión ---------- */
     private fun FirebaseFirestore.userHabits(uid: String) =
-        collection("users").document(uid).collection("habits")
+        collection("profiles").document(uid).collection("habits")
 
     /* solo se muestran los cambios */
 

@@ -1,38 +1,22 @@
-/* ui/wizard/AddHabitUi.kt */
 package com.app.tibibalance.ui.wizard
 
-import com.app.tibibalance.domain.model.HabitForm
-import com.app.tibibalance.domain.model.HabitTemplate
-import com.app.tibibalance.domain.model.NotifConfig
+import com.app.tibibalance.domain.model.*
 
-/** Flujo de pantalla */
+/** Flujo de pantallas del wizard de creación de hábitos */
 sealed interface AddHabitUiState {
-    /** Paso 0: plantilla sugerida o “crear en blanco” */
-    data class Suggestions(
-        /** formulario en curso (vacío o ya modificado) */
-        val draft : HabitForm = HabitForm()
+    data class Suggestions(val draft: HabitForm = HabitForm()) : AddHabitUiState
+    data class BasicInfo  (val form: HabitForm, val errors: List<String> = emptyList()) : AddHabitUiState
+    /* -------- AddHabitUiState.kt ------------------------------- */
+    data class Tracking(
+        val form : HabitForm,
+        val errors : List<String> = emptyList(),
+        val draftNotif : NotifConfig? = null        // ⬅ nuevo
     ) : AddHabitUiState
-
-    /** Paso 1: formulario de detalles */
-    data class Details(
-        val form       : HabitForm,
-        val errors     : List<String> = emptyList(), // mensajes de validación
-        val canProceed : Boolean = errors.isEmpty()
-    ) : AddHabitUiState
-
-    /** Paso 2: configurador de notificaciones */
-    data class Notification(
-        val form  : HabitForm,
-        val cfg   : NotifConfig
-    ) : AddHabitUiState
-
-    /** Diálogo emergente para confirmar pérdida de avance */
-    data class ConfirmDiscard(
-        val pendingTemplate: HabitTemplate,
-        val previous       : AddHabitUiState          // ← NUEVO
-    ) : AddHabitUiState
-
-    /** Estado terminal tras guardar (spinner / mensaje) */
+    data class Notification(val form: HabitForm, val cfg: NotifConfig) : AddHabitUiState
+    data class ConfirmDiscard(val pendingTemplate: HabitTemplate, val previous: AddHabitUiState) : AddHabitUiState
     object Saving : AddHabitUiState
+    data class Saved(val title: String, val message: String) : AddHabitUiState
+    data class Error(val msg: String) : AddHabitUiState
+
 }
 

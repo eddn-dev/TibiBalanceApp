@@ -1,145 +1,186 @@
-/* ui/wizard/AddHabitViewModel.kt */
 package com.app.tibibalance.ui.wizard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.app.tibibalance.data.mapper.toHabit
+import com.app.tibibalance.data.repository.HabitRepository
+import com.app.tibibalance.di.IoDispatcher
 import com.app.tibibalance.domain.model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @HiltViewModel
-class AddHabitViewModel @Inject constructor() : ViewModel() {
+class AddHabitViewModel @Inject constructor(
+    private val habitRepo: HabitRepository,
+    @IoDispatcher private val io: CoroutineDispatcher
+) : ViewModel() {
 
-    /* ---------- UI-State ---------- */
-    private val _ui = MutableStateFlow<AddHabitUiState>(
-        AddHabitUiState.Suggestions()
-    )
+    /* ---- estado expuesto a la UI ---- */
+    private val _ui = MutableStateFlow<AddHabitUiState>(AddHabitUiState.Suggestions())
     val ui: StateFlow<AddHabitUiState> = _ui.asStateFlow()
 
-    /* ---------- Plantillas ---------- */
+    /* ─────────── Plantillas ─────────── */
     fun pickTemplate(tpl: HabitTemplate) = when (val st = _ui.value) {
         is AddHabitUiState.Suggestions ->
             if (st.draft.isModified()) askConfirmation(tpl) else applyTemplate(tpl)
-
-        is AddHabitUiState.Details,
+        is AddHabitUiState.BasicInfo,
+        is AddHabitUiState.Tracking,
         is AddHabitUiState.Notification -> askConfirmation(tpl)
+        else -> Unit
+    }
+
+    private fun applyTemplate(tpl: HabitTemplate): AddHabitUiState.BasicInfo {
+        val form = HabitForm().prefillFromTemplate(tpl)
+        return AddHabitUiState.BasicInfo(form, validateBasic(form)).also { _ui.value = it }
+    }
+
+    /* ─────────── Paso 0 ─────────── */
+    fun startBlankForm() {
+        val draft = (ui.value as? AddHabitUiState.Suggestions)?.draft ?: HabitForm()
+        _ui.value = AddHabitUiState.BasicInfo(draft, validateBasic(draft))
+    }
+
+    /* ─────────── Paso 1 (BasicInfo) ─────────── */
+    fun updateBasic(form: HabitForm) =
+        _ui.update { AddHabitUiState.BasicInfo(form, validateBasic(form)) }
+
+    fun nextFromBasic() {
+        val st = _ui.value as? AddHabitUiState.BasicInfo ?: return
+        if (st.errors.isEmpty())
+            _ui.value = AddHabitUiState.Tracking(st.form, validateTracking(st.form))
+    }
+
+    /* ─────────── Paso 2 (Tracking) ─────────── */
+    fun updateTracking(form: HabitForm) =
+        _ui.update {
+            when (it) {
+                is AddHabitUiState.Tracking ->
+                    it.copy(form = form, errors = validateTracking(form))
+                else -> it
+            }
+        }
+
+    fun nextFromTracking() {
+        val st = _ui.value as? AddHabitUiState.Tracking ?: return
+        if (st.errors.isNotEmpty()) return
+
+        if (!st.form.notify || st.form.repeatPreset == RepeatPreset.INDEFINIDO) {
+            saveAndClose(st.form, NotifConfig(enabled = false))
+        } else {
+            /* usa borrador anterior si existe; si no, inicializa */
+            val cfg = st.draftNotif ?: NotifConfig(
+                enabled   = true,
+                timesOfDay = listOf("08:00")
+            )
+            _ui.value = AddHabitUiState.Notification(st.form, cfg)
+        }
+    }
+
+    /* ─────────── Paso 3 (Notification) ─────────── */
+    fun updateNotif(cfg: NotifConfig) =
+        (_ui.value as? AddHabitUiState.Notification)?.let {
+            _ui.value = it.copy(cfg = cfg)
+        }
+
+    fun finish() = when (val st = _ui.value) {
+        is AddHabitUiState.Notification -> saveAndClose(st.form, st.cfg)
+        else -> Unit
+    }
+
+    /* ─────────── Navegación atrás ─────────── */
+    fun back() = when (val st = _ui.value) {
+        is AddHabitUiState.BasicInfo ->
+            _ui.value = AddHabitUiState.Suggestions(st.form)
+
+        is AddHabitUiState.Tracking ->
+            _ui.value = AddHabitUiState.BasicInfo(
+                form    = st.form,
+                errors  = validateBasic(st.form)
+            )
+
+        is AddHabitUiState.Notification ->
+            _ui.value = AddHabitUiState.Tracking(
+                form        = st.form,
+                errors      = validateTracking(st.form),
+                draftNotif  = st.cfg                       // ← guarda borrador
+            )
 
         else -> Unit
     }
 
+    /* ─────────── Guardado final (mock) ─────────── */
+    private fun saveAndClose(form: HabitForm, cfg: NotifConfig) {
+        viewModelScope.launch {
+            _ui.value = AddHabitUiState.Saving                 // spinner
+
+            try {
+                val habit = form.toHabit(cfg)                  // mapper you wrote
+                withContext(io) { habitRepo.addHabit(habit) }  // suspend -> Firestore
+
+                _ui.value = AddHabitUiState.Saved(             // small success sheet
+                    title   = "¡Hábito creado!",
+                    message = "Tu nuevo hábito se añadió correctamente."
+                )
+                delay(1_500)                                   // let user read it
+            } catch (e: Exception) {
+                Log.e("AddHabitVM", "Guardar hábito", e)
+                _ui.value = AddHabitUiState.Notification(form, cfg)
+            } finally {
+                _ui.value = AddHabitUiState.Suggestions()      // reset wizard
+            }
+        }
+    }
+
+
+
+    /* ─────────── Validaciones ─────────── */
+    private fun validateBasic(f: HabitForm) = buildList {
+        if (f.name.isBlank()) add("El nombre es obligatorio")
+    }
+
+    private fun validateTracking(f: HabitForm) = buildList {
+        if (f.sessionUnit != SessionUnit.INDEFINIDO &&
+            (f.sessionQty == null || f.sessionQty <= 0)
+        ) add("Indica la duración")
+
+        if (f.periodUnit != PeriodUnit.INDEFINIDO &&
+            (f.periodQty == null || f.periodQty <= 0)
+        ) add("Indica el periodo")
+
+        if (f.repeatPreset == RepeatPreset.PERSONALIZADO && f.weekDays.isEmpty())
+            add("Selecciona al menos un día")
+
+        if (f.repeatPreset == RepeatPreset.INDEFINIDO && f.notify)
+            add("Activa repetición para usar notificaciones")
+
+        if (f.challenge && f.repeatPreset == RepeatPreset.INDEFINIDO)
+            add("Modo reto requiere repetir el hábito")
+    }
+
+    /* ─────────── Helpers privados ─────────── */
+
     private fun askConfirmation(tpl: HabitTemplate) {
-        _ui.value = AddHabitUiState.ConfirmDiscard(
-            pendingTemplate = tpl,
-            previous        = _ui.value
-        )
+        _ui.value = AddHabitUiState.ConfirmDiscard(tpl, _ui.value)
     }
 
     fun confirmDiscard(accept: Boolean) {
-        val confirm = _ui.value as? AddHabitUiState.ConfirmDiscard ?: return
-        _ui.value = if (accept) applyTemplate(confirm.pendingTemplate)
-        else        confirm.previous
+        val dialog = _ui.value as? AddHabitUiState.ConfirmDiscard ?: return
+        _ui.value = if (accept) applyTemplate(dialog.pendingTemplate) else dialog.previous
     }
 
-    private fun applyTemplate(tpl: HabitTemplate): AddHabitUiState.Details {
-        val form = HabitForm().prefillFromTemplate(tpl)
-        val details = AddHabitUiState.Details(
-            form   = form,
-            errors = validate(form)
-        )
-        _ui.value = details
-        return details
-    }
-
-    /* ---------- Paso 0: iniciar formulario en blanco ---------- */
-    fun startBlankForm() {
-        val draft = (ui.value as? AddHabitUiState.Suggestions)?.draft ?: HabitForm()
-        _ui.value = AddHabitUiState.Details(
-            form   = draft,
-            errors = validate(draft)
-        )
-    }
-
-
-    /* ---------- Detalles ---------- */
-    fun updateForm(form: HabitForm) {
-        _ui.update {
-            AddHabitUiState.Details(
-                form   = form,
-                errors = validate(form)
-            )
-        }
-    }
-
-    fun nextFromDetails() {
-        val st = _ui.value as? AddHabitUiState.Details ?: return
-        if (st.errors.isNotEmpty()) return            // bloquea avance
-
-        if (st.form.notify) {
-            _ui.value = AddHabitUiState.Notification(
-                form = st.form,
-                cfg  = NotifConfig()
-            )
-        } else saveAndClose(st.form, NotifConfig())
-    }
-
-    /* ---------- Notificaciones ---------- */
-    fun updateNotif(cfg: NotifConfig) {
-        val st = _ui.value as? AddHabitUiState.Notification ?: return
-        _ui.value = st.copy(cfg = cfg)
-    }
-
-    fun finish() {
-        when (val st = _ui.value) {
-            is AddHabitUiState.Notification -> saveAndClose(st.form, st.cfg)
-            is AddHabitUiState.Details      -> saveAndClose(st.form, NotifConfig())
-            else -> Unit
-        }
-    }
-
-    /* ---------- Navegación atrás ---------- */
-    fun back() = when (val st = _ui.value) {
-        is AddHabitUiState.Details      -> _ui.value = AddHabitUiState.Suggestions(st.form)
-        is AddHabitUiState.Notification -> _ui.value = AddHabitUiState.Details(
-            form   = st.form,
-            errors = validate(st.form)
-        )
-        else -> Unit
-    }
-
-    /* ---------- Guardado ---------- */
-    private fun saveAndClose(form: HabitForm, cfg: NotifConfig) {
-        _ui.value = AddHabitUiState.Saving
-        // TODO: suspender → repositorio + notificaciones
-        _ui.value = AddHabitUiState.Suggestions()     // reset
-    }
-
-    /* ---------- Helpers ---------- */
-    /**
-     * Sólo el **nombre** (y opcionalmente la categoría) se consideran obligatorios.
-     * Los campos de duración, repetición y periodo se vuelven opcionales.
-     */
-    /* ui/wizard/AddHabitViewModel.kt */
-    private fun validate(f: HabitForm): List<String> = buildList {
-        if (f.name.isBlank()) add("El nombre es obligatorio")
-
-        // — Duración de la actividad —
-        if (f.sessionUnit != SessionUnit.INDEFINIDO &&
-            (f.sessionQty == null || f.sessionQty <= 0)
-        ) add("Indica la cantidad para la duración de la actividad")
-
-        // — Periodo del hábito —
-        if (f.periodUnit != PeriodUnit.INDEFINIDO &&
-            (f.periodQty == null || f.periodQty <= 0)
-        ) add("Indica la cantidad para el periodo del hábito")
-    }
-
-
+    /** ¿El usuario ya modificó algo? */
     private fun HabitForm.isModified() =
-        name.isNotBlank() || desc.isNotBlank() || notify ||
+        name.isNotBlank() || desc.isNotBlank() || notify || challenge ||
                 sessionUnit   != SessionUnit.INDEFINIDO ||
-                repeatPattern != RepeatPattern.INDEFINIDO ||
+                repeatPreset  != RepeatPreset.INDEFINIDO ||
                 periodUnit    != PeriodUnit.INDEFINIDO
 }

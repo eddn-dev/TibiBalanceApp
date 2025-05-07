@@ -7,46 +7,57 @@ import com.google.firebase.firestore.DocumentSnapshot
 fun DocumentSnapshot.toHabitTemplate(): HabitTemplate? {
     return try {
         HabitTemplate(
-            id            = id,
-            name          = getString("name") ?: return null,
-            description   = getString("description") ?: "",
-            /* ① conversión String → enum usando el helper del enum */
-            category      = HabitCategory.fromRaw(getString("category") ?: ""),
+            id          = id,
+            name        = getString("name") ?: return null,
+            description = getString("description") ?: "",
 
-            icon          = getString("icon") ?: "FitnessCenter",
+            /* ── Categoría ── */
+            category    = HabitCategory.fromRaw(getString("category") ?: ""),
 
-            // ── Sesión ──
-            sessionQty    = getLong("sessionQty")?.toInt(),
-            sessionUnit   = getString("sessionUnit")
+            icon        = getString("icon") ?: "FitnessCenter",
+
+            /* ── Sesión ── */
+            sessionQty  = getLong("sessionQty")?.toInt(),
+            sessionUnit = getString("sessionUnit")
                 ?.let { runCatching { SessionUnit.valueOf(it) }.getOrNull() }
                 ?: SessionUnit.INDEFINIDO,
 
-            // ── Repetición ──
-            repeatPattern = getString("repeatPattern")
-                ?.let { runCatching { RepeatPattern.valueOf(it) }.getOrNull() }
-                ?: RepeatPattern.INDEFINIDO,
+            /* ── Repetición ── */
+            repeatPreset = getString("repeatPreset")        // 👈 nombre nuevo
+                ?.let { runCatching { RepeatPreset.valueOf(it) }.getOrNull() }
+                ?: RepeatPreset.INDEFINIDO,
 
-            // ── Periodo total ──
-            periodQty     = getLong("periodQty")?.toInt(),
-            periodUnit    = getString("periodUnit")
+            /* ── Periodo total ── */
+            periodQty   = getLong("periodQty")?.toInt(),
+            periodUnit  = getString("periodUnit")
                 ?.let { runCatching { PeriodUnit.valueOf(it) }.getOrNull() }
                 ?: PeriodUnit.INDEFINIDO,
 
-            // ── Notificación ──
-            notifCfg      = NotifConfig(
-                mode           = getString("notif.mode")
+            /* ── Notificación ── */
+            notifCfg = NotifConfig(
+                enabled      = getBoolean("notif.enabled") ?: false,
+                mode         = getString("notif.mode")
                     ?.let { runCatching { NotifMode.valueOf(it) }.getOrNull() }
                     ?: NotifMode.SILENT,
-                message        = getString("notif.message") ?: "",
-                timesOfDay     = get("notif.timesOfDay") as? List<String> ?: emptyList(),
-                daysOfWeek     = (get("notif.daysOfWeek") as? List<Long>)?.map(Long::toInt) ?: emptyList(),
-                advanceMinutes = (getLong("notif.advanceMinutes") ?: 0L).toInt(),
-                vibrate        = getBoolean("notif.vibrate") != false
+                message      = getString("notif.message") ?: "",
+                timesOfDay   = get("notif.timesOfDay") as? List<String> ?: emptyList(),
+                weekDays     = ((get("notif.daysOfWeek") as? List<Long>)
+                    ?: get("notif.weekDays") as? List<Long>      // fallback por si existía con otro nombre
+                        )
+                    ?.map(Long::toInt)
+                    ?.toSet()
+                    ?.let(::WeekDays)
+                    ?: WeekDays.NONE,
+                advanceMin   = (getLong("notif.advanceMin")
+                    ?: getLong("notif.advanceMinutes")          // fallback nombre viejo
+                    ?: 0L
+                        ).toInt(),
+                vibrate      = getBoolean("notif.vibrate") != false
             ),
 
-            scheduled     = getBoolean("scheduled") ?: false
+            scheduled   = getBoolean("scheduled") ?: false
         )
     } catch (e: Exception) {
-        null   // si falla algún enum devuelve null y se ignora el documento
+        null      // Documento inválido: se ignora
     }
 }

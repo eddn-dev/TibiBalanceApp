@@ -5,13 +5,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.app.tibibalance.data.local.converter.HabitConverter
-import com.app.tibibalance.data.local.dao.HabitDao
-import com.app.tibibalance.data.local.dao.HabitTemplateDao          // ← nuevo DAO
-import com.app.tibibalance.data.local.dao.ProfileDao
-import com.app.tibibalance.data.local.entity.HabitEntity
-import com.app.tibibalance.data.local.entity.HabitTemplateEntity    // ← nueva entidad
-import com.app.tibibalance.data.local.entity.UserProfileEntity
-import com.app.tibibalance.data.local.mapper.NotifConverters
+import com.app.tibibalance.data.local.dao.*
+import com.app.tibibalance.data.local.entity.*
+import com.app.tibibalance.data.local.mapper.NotifConverters         // ← NUEVO
 
 @Database(
     entities = [
@@ -22,16 +18,17 @@ import com.app.tibibalance.data.local.mapper.NotifConverters
     version = 3,
     exportSchema = true
 )
+/* ──────────────────────────────────────────────────────────────
+ * Todos los convertidores “clásicos” se registran aquí con
+ * @TypeConverters, lo que le dice a Room que los instancie por
+ * reflexión (deben tener ctor vacío o ser object).
+ * ────────────────────────────────────────────────────────────── */
 @TypeConverters(
-    HabitConverter::class,   // ➊ tu conversor anterior
-    NotifConverters::class   // ➋ el nuevo para listas <String>/<Int>
+    HabitConverter::class,
+    NotifConverters::class
 )
 abstract class AppDb : RoomDatabase() {
-
-    /* DAOs existentes */
-    abstract fun profileDao()       : ProfileDao
-    abstract fun habitDao()         : HabitDao
-
-    /* Nuevo DAO */
-    abstract fun habitTemplateDao() : HabitTemplateDao
+    abstract fun profileDao()      : ProfileDao
+    abstract fun habitDao()        : HabitDao
+    abstract fun habitTemplateDao(): HabitTemplateDao
 }

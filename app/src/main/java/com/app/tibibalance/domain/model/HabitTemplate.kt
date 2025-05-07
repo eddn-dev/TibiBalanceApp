@@ -1,34 +1,35 @@
-// domain/model/HabitTemplate.kt
 package com.app.tibibalance.domain.model
 
 /**
- * Documento de la colección `habitTemplates` en Firestore.
+ * Documento `habitTemplates` en Firestore ⇄ modelo dominio.
  *
- * - Todas las unidades y patrones se expresan con enums para evitar “strings mágicos”.
- * - Los campos opcionales (`Int?`, `List<…>?`) pueden omitirse en el JSON si llevan `null` / vacío.
+ * ▸ Los enums evitan “strings mágicos”.
+ * ▸ Los campos opcionales (`Int?`, `Set<Int>`, etc.) pueden omitirse si son null / vacíos.
  */
-
 data class HabitTemplate(
-    val id            : String        = "",
-    val name          : String        = "",
-    val description   : String        = "",
-    val category    : HabitCategory = HabitCategory.SALUD,
-    val icon          : String        = "ic_default_habit",
 
-    // --- Sesión ---
-    val sessionQty    : Int?          = null,
-    val sessionUnit   : SessionUnit   = SessionUnit.INDEFINIDO,
+    /* ─── Identidad y aspecto ───────────────────────── */
+    val id          : String         = "",
+    val name        : String         = "",
+    val description : String         = "",
+    val category    : HabitCategory  = HabitCategory.SALUD,
+    val icon        : String         = "FitnessCenter",
 
-    // --- Frecuencia ---
-    val repeatPattern : RepeatPattern = RepeatPattern.INDEFINIDO,
+    /* ─── Sesión ────────────────────────────────────── */
+    val sessionQty  : Int?           = null,
+    val sessionUnit : SessionUnit    = SessionUnit.INDEFINIDO,
 
-    // --- Periodo total ---
-    val periodQty     : Int?          = null,
-    val periodUnit    : PeriodUnit    = PeriodUnit.INDEFINIDO,
+    /* ─── Repetición ────────────────────────────────── */
+    val repeatPreset: RepeatPreset   = RepeatPreset.INDEFINIDO,
+    val weekDays    : Set<Int>       = emptySet(),          // solo si repeatPreset = PERSONALIZADO
 
-    // --- Notificación avanzada ---
-    val notifCfg      : NotifConfig   = NotifConfig(),
+    /* ─── Periodo total ─────────────────────────────── */
+    val periodQty   : Int?           = null,
+    val periodUnit  : PeriodUnit     = PeriodUnit.INDEFINIDO,
 
-    val scheduled     : Boolean       = false
+    /* ─── Notificación avanzada ─────────────────────── */
+    val notifCfg    : NotifConfig    = NotifConfig(),       // incluye enabled = true/false
+
+    /* ─── Metadata ──────────────────────────────────── */
+    val scheduled   : Boolean        = false               // true → ya fue planificado por el scheduler
 )
-

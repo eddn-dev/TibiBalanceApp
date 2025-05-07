@@ -9,22 +9,22 @@ fun HabitTemplate.toEntity() = HabitTemplateEntity(
     id              = id,
     name            = name,
     description     = description,
-    /* ① almacenamos el enum como String  */
-    category        = category.name,          // <<<<<<
+    category        = category.name,
     icon            = icon,
 
     sessionQty      = sessionQty,
     sessionUnit     = sessionUnit,
 
-    repeatPattern   = repeatPattern,
+    repeatPreset    = repeatPreset,
     periodQty       = periodQty,
     periodUnit      = periodUnit,
 
     notifMode       = notifCfg.mode,
     notifMessage    = notifCfg.message,
     notifTimesOfDay = notifCfg.timesOfDay,
-    notifDaysOfWeek = notifCfg.daysOfWeek,
-    notifAdvanceMin = notifCfg.advanceMinutes,
+    /* ⬇⬇ convierte Set<Int> → List<Int> */
+    notifDaysOfWeek = notifCfg.weekDays.days.toList(),
+    notifAdvanceMin = notifCfg.advanceMin,
     notifVibrate    = notifCfg.vibrate,
 
     scheduled       = scheduled
@@ -35,24 +35,24 @@ fun HabitTemplateEntity.toDomain() = HabitTemplate(
     id            = id,
     name          = name,
     description   = description,
-    /* ② convertimos de String → enum con utilidad de respaldo  */
-    category      = HabitCategory.fromRaw(category),  // <<<<<<
+    category      = HabitCategory.fromRaw(category),
     icon          = icon,
 
     sessionQty    = sessionQty,
     sessionUnit   = sessionUnit,
 
-    repeatPattern = repeatPattern,
+    repeatPreset  = repeatPreset,
     periodQty     = periodQty,
     periodUnit    = periodUnit,
 
     notifCfg      = NotifConfig(
-        mode           = notifMode,
-        message        = notifMessage,
-        timesOfDay     = notifTimesOfDay,
-        daysOfWeek     = notifDaysOfWeek,
-        advanceMinutes = notifAdvanceMin,
-        vibrate        = notifVibrate
+        mode        = notifMode,
+        message     = notifMessage,
+        timesOfDay  = notifTimesOfDay,
+        /* ⬇⬇ convierte List<Int> → Set<Int> → WeekDays */
+        weekDays    = WeekDays(notifDaysOfWeek.toSet()),
+        advanceMin  = notifAdvanceMin,
+        vibrate     = notifVibrate
     ),
 
     scheduled     = scheduled
