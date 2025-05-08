@@ -1,3 +1,17 @@
+/**
+ * @file    GoogleSignButton.kt
+ * @ingroup ui_components
+ * @brief   Botón de inicio de sesión con Google.
+ *
+ * Representa un botón *outlined* con el logotipo de Google y una etiqueta
+ * configurable.  Se utiliza en los flujos de autenticación para invocar
+ * el inicio de sesión mediante Google Identity Services.
+ *
+ * @param text      Etiqueta que acompaña al icono (por defecto
+ *                  «Continuar con Google»).
+ * @param onClick   Lambda que se ejecuta al pulsar el botón.
+ * @param modifier  Modificador opcional para ajustar tamaño o posición.
+ */
 package com.app.tibibalance.ui.components.buttons
 
 import androidx.compose.foundation.BorderStroke
@@ -32,18 +46,14 @@ fun GoogleSignButton(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
-        ) { //Usar la imagen del logo de google. Debes tener una imagen con el nombre "ic_google_logo" en res/drawable
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_google_logo),
                 contentDescription = "Google logo",
-                modifier = Modifier
-                    .size(24.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = text,
-                color = Color.Black
-            )
+            Text(text = text, color = Color.Black)
         }
     }
 }
@@ -52,8 +62,6 @@ fun GoogleSignButton(
 @Composable
 fun GoogleSignButtonPreview() {
     MaterialTheme {
-        GoogleSignButton(
-            onClick = { }
-        )
+        GoogleSignButton(onClick = {})
     }
 }

@@ -1,3 +1,11 @@
+/**
+ * @file    CloseIconButton.kt
+ * @ingroup ui_components
+ * @brief   Botón de icono que cierra el diálogo o pantalla actual.
+ *
+ * @param onClick  Callback ejecutado al pulsar el botón.
+ * @param modifier Opcional para ajustar tamaño o padding desde la llamada.
+ */
 package com.app.tibibalance.ui.components.buttons
 
 import androidx.compose.foundation.layout.size
@@ -18,8 +26,7 @@ fun CloseIconButton(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = modifier
-            .size(32.dp)
+        modifier = modifier.size(32.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Close,
@@ -29,6 +36,7 @@ fun CloseIconButton(
     }
 }
 
+/** Vista previa aislada del componente. */
 @Preview(showBackground = true)
 @Composable
 fun CloseIconButtonPreview() {

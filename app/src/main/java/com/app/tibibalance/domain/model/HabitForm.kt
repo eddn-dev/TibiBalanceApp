@@ -1,31 +1,55 @@
+/**
+ * @file    HabitForm.kt
+ * @ingroup domain
+ * @brief   Formulario intermedio que la UI utiliza antes de persistir un {@link Habit}.
+ *
+ * El formulario encapsula todos los campos que el asistente de creación
+ * necesita — nombre, icono, patrón de repetición, periodo, etc.— y permite
+ * precargarse a partir de una {@link HabitTemplate}.
+ */
 package com.app.tibibalance.domain.model
 
-/** Modelo intermedio que la UI utiliza antes de persistir el `Habit`. */
+/**
+ * @brief Modelo de datos editable por la UI.
+ *
+ * @param name         Nombre del hábito.
+ * @param desc         Descripción opcional.
+ * @param category     Categoría lógica.
+ * @param icon         Nombre del icono Material.
+ * @param sessionQty   Cantidad por sesión; `null` si {@code sessionUnit == INDEFINIDO}.
+ * @param sessionUnit  Unidad de la sesión.
+ * @param repeatPreset Frecuencia sugerida o personalizada.
+ * @param weekDays     Días de la semana (1‥7) si la frecuencia es personalizada.
+ * @param periodQty    Límite de periodo; `null` si no aplica.
+ * @param periodUnit   Unidad del periodo.
+ * @param notify       `true` para activar notificaciones.
+ * @param challenge    `true` para modo reto (configuración inmutable).
+ */
 data class HabitForm(
-    /* ─── Básicos ────────────────────────────────────────── */
     val name        : String            = "",
     val desc        : String            = "",
     val category    : HabitCategory     = HabitCategory.SALUD,
     val icon        : String            = "FitnessCenter",
 
-    /* ─── Sesión ─────────────────────────────────────────── */
-    val sessionQty  : Int?              = null,                     // null si unit = INDEFINIDO
+    val sessionQty  : Int?              = null,
     val sessionUnit : SessionUnit       = SessionUnit.INDEFINIDO,
 
-    /* ─── Repetición ─────────────────────────────────────── */
     val repeatPreset: RepeatPreset      = RepeatPreset.INDEFINIDO,
-    val weekDays    : Set<Int>          = emptySet(),               // solo PERSONALIZADO
+    val weekDays    : Set<Int>          = emptySet(),
 
-    /* ─── Periodo total ──────────────────────────────────── */
     val periodQty   : Int?              = null,
     val periodUnit  : PeriodUnit        = PeriodUnit.INDEFINIDO,
 
-    /* ─── Opciones extra ─────────────────────────────────── */
-    val notify      : Boolean           = false,                    // se ignora si repeat = INDEFINIDO
-    val challenge   : Boolean           = false                     // modo reto
+    val notify      : Boolean           = false,
+    val challenge   : Boolean           = false
 ) {
 
-    /** Crea un formulario precargado desde una plantilla remota/local. */
+    /**
+     * @brief Genera una copia del formulario precargada con una plantilla.
+     *
+     * @param t Plantilla de la que se toman los valores por defecto.
+     * @return  Nuevo {@link HabitForm} con los campos completados.
+     */
     fun prefillFromTemplate(t: HabitTemplate) = copy(
         name         = t.name,
         desc         = t.description,

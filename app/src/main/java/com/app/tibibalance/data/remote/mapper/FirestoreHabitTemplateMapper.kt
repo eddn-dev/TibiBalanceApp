@@ -4,6 +4,31 @@ package com.app.tibibalance.data.remote.mapper
 import com.app.tibibalance.domain.model.*
 import com.google.firebase.firestore.DocumentSnapshot
 
+/**
+ * @file    FirestoreHabitTemplateMapper.kt
+ * @ingroup data_remote
+ * @brief   Conversión de [DocumentSnapshot] → [HabitTemplate].
+ *
+ * Esta función de extensión interpreta el documento de la colección
+ * **`habitTemplates`** y lo transforma en el modelo de dominio
+ * [HabitTemplate].
+ *
+ * - Los campos obligatorios (`name`, `category`) se validan; si faltan o
+ *   contiene valores inválidos, la función devuelve **`null`** para
+ *   indicar un documento inconsistente que debe ignorarse.
+ * - Se aplica *fallback* a nombres de campo anteriores para mantener
+ *   compatibilidad retroactiva (p.ej. `notif.daysOfWeek` → `notif.weekDays`).
+ * - Las enumeraciones (`SessionUnit`, `RepeatPreset`, …) se parsean de
+ *   forma segura con `runCatching { … }.getOrNull()`, evitando excepciones
+ *   en caso de valores desconocidos.
+ */
+
+/**
+ * @brief   Mapea un documento Firestore a [HabitTemplate].
+ *
+ * @receiver Documento Firestore recuperado de la colección `habitTemplates`.
+ * @return   Instancia de [HabitTemplate] o `null` si el documento es inválido.
+ */
 fun DocumentSnapshot.toHabitTemplate(): HabitTemplate? {
     return try {
         HabitTemplate(

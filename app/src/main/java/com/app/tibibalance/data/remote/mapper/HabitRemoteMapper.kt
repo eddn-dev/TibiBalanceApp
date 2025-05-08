@@ -9,10 +9,39 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
+/**
+ * @file    HabitFirestoreMapper.kt
+ * @ingroup data_remote
+ * @brief   Conversión entre el modelo de dominio [Habit] y la
+ *          representación compatible con **Firestore**.
+ *
+ * <h4>Flujo de conversión</h4>
+ * <ol>
+ *   <li><b>Dominio ➜ Firestore</b><br/>
+ *       Serializa el objeto a <em>JSON</em>, lo convierte recursivamente a
+ *       tipos soportados por Firestore (`String`, `Long`, `Double`, `Boolean`,
+ *       `Map`, `List`) y reemplaza los campos temporales
+ *       <code>Instant</code> por <code>epoch-ms</code>.</li>
+ *   <li><b>Firestore ➜ Dominio</b><br/>
+ *       Reconstruye un <code>JsonObject</code> a partir de los datos del
+ *       documento, lo deserializa al modelo base y restaura los
+ *       <code>Instant</code> con el valor <code>epoch-ms</code> leído.</li>
+ * </ol>
+ *
+ * El formato resultante mantiene compatibilidad *offline-first* y permite
+ * sincronización LWW (Last-Write-Wins) sin perder precisión en fechas.
+ */
+
 /* ------------------------------------------------------------------ */
 /*                       Dominio  →  Firestore                        */
 /* ------------------------------------------------------------------ */
 
+/**
+ * @brief   Convierte un [Habit] de dominio a un *Map* apto para Firestore.
+ *
+ * @receiver Instancia [Habit] que se va a subir.
+ * @return   Mapa `String → Any?` con sólo tipos soportados por Firestore.
+ */
 fun Habit.toFirestoreMap(): Map<String, Any?> {
     // 1) serializamos el modelo completo a JsonElement
     val json = Json.encodeToJsonElement(this)
@@ -27,10 +56,15 @@ fun Habit.toFirestoreMap(): Map<String, Any?> {
     } as Map<String, Any?>
 }
 
-/* ------------------------------------------------------------------ */
 /*                       Firestore  →  Dominio                        */
-/* ------------------------------------------------------------------ */
 
+/**
+ * @brief   Reconstruye un [Habit] a partir de un [DocumentSnapshot].
+ *
+ * @receiver Documento Firestore recuperado de la colección <code>habits</code>.
+ * @return   Modelo de dominio [Habit] con <code>createdAt</code> y
+ *           <code>nextTrigger</code> restaurados.
+ */
 fun DocumentSnapshot.toHabit(): Habit {
     /** Convierte recursivamente Any? de Firestore a JsonElement */
     fun Any?.toJsonElement(): JsonElement = when (this) {
@@ -71,18 +105,24 @@ fun DocumentSnapshot.toHabit(): Habit {
 /*                       Helpers de conversión                        */
 /* ------------------------------------------------------------------ */
 
-/** Convierte un JsonElement a un valor aceptado por Firestore:
- *  * JsonPrimitive → String / Long / Double / Boolean
- *  * JsonObject    → Map<String, Any?> (recursivo)
- *  * JsonArray     → List<Any?> (recursivo)                           */
+/**
+ * @brief   Convierte un [JsonElement] a un valor aceptado por Firestore.
+ *
+ * - `JsonPrimitive` → `String` / `Long` / `Double` / `Boolean`
+ * - `JsonObject`    → `Map<String, Any?>` (recursivo)
+ * - `JsonArray`     → `List<Any?>` (recursivo)
+ *
+ * @receiver Elemento JSON a transformar.
+ * @return   Objeto <code>Any?</code> compatible con Firestore.
+ */
 private fun JsonElement.toFirestoreAny(): Any? = when (this) {
     is JsonNull      -> null
     is JsonPrimitive -> when {
-        isString        -> content
+        isString              -> content
         booleanOrNull != null -> boolean
         longOrNull    != null -> long
         doubleOrNull  != null -> double
-        else                -> content
+        else                  -> content
     }
     is JsonObject    -> mapValues { (_, v) -> v.toFirestoreAny() }
     is JsonArray     -> map { it.toFirestoreAny() }

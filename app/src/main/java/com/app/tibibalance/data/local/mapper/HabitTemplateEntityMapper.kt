@@ -4,7 +4,29 @@ package com.app.tibibalance.data.local.mapper
 import com.app.tibibalance.data.local.entity.HabitTemplateEntity
 import com.app.tibibalance.domain.model.*
 
+/**
+ * @file    HabitTemplateEntityMapper.kt
+ * @ingroup data_local
+ * @brief   Funciones de mapeo entre [HabitTemplate] (dominio) y [HabitTemplateEntity] (Room).
+ *
+ * Estas extensiones encapsulan la conversión bidireccional:
+ * - **Dominio → Entity**: serializa enumeraciones y objetos anidados a tipos primitivos
+ *   aptos para la base de datos (p.ej. `HabitCategory` a `String`).
+ * - **Entity → Dominio**: reconstruye el modelo de dominio completo, incluyendo la
+ *   conversión de colecciones (`List<Int>` → `WeekDays`).
+ */
+
 /* ───────────── Dominio ➜ Entity ───────────── */
+
+/**
+ * @brief Convierte un [HabitTemplate] de dominio a [HabitTemplateEntity] para persistencia.
+ *
+ * - `category: HabitCategory` se mapea a su nombre (`String`).
+ * - `NotifConfig.weekDays (Set<Int>)` se transforma a `List<Int>` para Room.
+ *
+ * @receiver Instancia de [HabitTemplate] obtenida de la lógica de negocio.
+ * @return   Entidad [HabitTemplateEntity] lista para ser almacenada en la base local.
+ */
 fun HabitTemplate.toEntity() = HabitTemplateEntity(
     id              = id,
     name            = name,
@@ -31,6 +53,16 @@ fun HabitTemplate.toEntity() = HabitTemplateEntity(
 )
 
 /* ───────────── Entity ➜ Dominio ───────────── */
+
+/**
+ * @brief Convierte un [HabitTemplateEntity] recuperado de Room a su modelo de dominio [HabitTemplate].
+ *
+ * - `category` (String) se convierte en `HabitCategory` mediante `fromRaw`.
+ * - `notifDaysOfWeek` (List<Int>) se transforma a `WeekDays`.
+ *
+ * @receiver Entidad [HabitTemplateEntity] obtenida de la base de datos.
+ * @return   Modelo de dominio [HabitTemplate] listo para su uso en la capa de negocio.
+ */
 fun HabitTemplateEntity.toDomain() = HabitTemplate(
     id            = id,
     name          = name,

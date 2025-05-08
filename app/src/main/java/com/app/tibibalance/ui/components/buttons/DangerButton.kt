@@ -1,4 +1,20 @@
-// ui/components/DangerButton.kt
+/**
+ * @file    DangerButton.kt
+ * @ingroup ui_components
+ * @brief   Botón de acción destructiva (logout, eliminar, etc.).
+ *
+ * Visualmente replica el estilo de **PrimaryButton**, pero utiliza una
+ * paleta roja para indicar riesgo.  Permite estado de carga y
+ * deshabilitación.
+ *
+ * @param text         Etiqueta visible del botón.
+ * @param onClick      Lambda ejecutada al pulsar.
+ * @param modifier     Modificador para tamaño y posición.
+ * @param enabled      `false` desactiva la interacción.
+ * @param isLoading    `true` muestra un `CircularProgressIndicator`.
+ * @param container    Color de fondo en estado normal.
+ * @param contentColor Color del texto/ícono.
+ */
 package com.app.tibibalance.ui.components.buttons
 
 import androidx.compose.foundation.layout.*
@@ -11,32 +27,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/**
- * Botón “peligroso” para acciones destructivas (logout, delete…).
- * Estándar visual idéntico a PrimaryButton.
- */
 @Composable
 fun DangerButton(
-    text       : String,
-    onClick    : () -> Unit,
-    modifier   : Modifier = Modifier.fillMaxWidth(),
-    enabled    : Boolean  = true,
-    isLoading  : Boolean  = false,
-    container  : Color    = Color(0xFFFF3333),
-    contentColor: Color   = Color.White
+    text        : String,
+    onClick     : () -> Unit,
+    modifier    : Modifier = Modifier.fillMaxWidth(),
+    enabled     : Boolean  = true,
+    isLoading   : Boolean  = false,
+    container   : Color    = Color(0xFFFF3333),
+    contentColor: Color    = Color.White
 ) {
     val realEnabled = enabled && !isLoading
 
     Button(
-        onClick = onClick,
-        enabled = realEnabled,
+        onClick  = onClick,
+        enabled  = realEnabled,
         modifier = modifier.height(40.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor          = container,
-            contentColor            = contentColor,
-            disabledContainerColor  = container.copy(alpha = 0.40f),
-            disabledContentColor    = contentColor.copy(alpha = 0.40f)
+        shape    = RoundedCornerShape(12.dp),
+        colors   = ButtonDefaults.buttonColors(
+            containerColor         = container,
+            contentColor           = contentColor,
+            disabledContainerColor = container.copy(alpha = 0.40f),
+            disabledContentColor   = contentColor.copy(alpha = 0.40f)
         ),
         contentPadding = PaddingValues(horizontal = 24.dp)
     ) {

@@ -1,3 +1,20 @@
+/**
+ * @file    FirebaseHabitRepository.kt
+ * @ingroup data_repository
+ * @brief   Repositorio de hábitos basado en **Room + Firestore**.
+ *
+ * - **Fuente única de verdad local**: la tabla `habits` (Room) es la que
+ *   observa la UI.
+ * - **Sincronización bidireccional**:
+ *   1. Cambios locales (`addHabit`, `updateHabit`, `deleteHabit`) escriben
+ *      en Firestore y luego cachean en Room.
+ *   2. Un *snapshot listener* escucha la colección remota
+ *      `profiles/{uid}/habits` y refleja cualquier cambio entrante en Room.
+ *
+ * La política de resolución de conflictos es **Last-Write-Wins (LWW)**:
+ * Firestore sobrescribe y el listener actualiza la caché; los IDs son
+ * iguales en ambas fuentes para simplificar los `upsert`.
+ */
 package com.app.tibibalance.data.repository
 
 import com.app.tibibalance.data.local.dao.HabitDao
@@ -18,6 +35,16 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * @class   FirebaseHabitRepository
+ * @brief   Implementación de [HabitRepository] sincronizada con Firestore.
+ *
+ * @constructor Inyecta las dependencias mediante Hilt.
+ * @param db    Instancia de [FirebaseFirestore].
+ * @param dao   DAO local para la tabla `habits`.
+ * @param auth  SDK de autenticación; se usa para obtener el UID.
+ * @param io    *Dispatcher* de IO para tareas fuera del hilo principal.
+ */
 @Singleton
 class FirebaseHabitRepository @Inject constructor(
     private val db   : FirebaseFirestore,
@@ -26,13 +53,29 @@ class FirebaseHabitRepository @Inject constructor(
     @IoDispatcher private val io: CoroutineDispatcher
 ) : HabitRepository {
 
-    /* ---------- Flow público ---------- */
+    /* ─────────────── Flow público ─────────────── */
+
+    /**
+     * @copydoc HabitRepository.observeHabits
+     *
+     * Observa la tabla de Room, la convierte al modelo de dominio y emite
+     * sólo cuando hay cambios reales (`distinctUntilChanged()`).
+     */
     override fun observeHabits(): Flow<List<Habit>> =
         dao.observeAll()
             .map { it.map(HabitEntity::toDomain) }
             .distinctUntilChanged()
 
-    /* ---------- CRUD ---------- */
+    /* ─────────────── CRUD remoto / local ─────────────── */
+
+    /**
+     * @copydoc HabitRepository.addHabit
+     *
+     * - Genera un docId en Firestore.
+     * - Sube el mapa resultante (`merge`) y cachea el resultado en Room.
+     *
+     * @return El identificador asignado.
+     */
     override suspend fun addHabit(habit: Habit): String = withContext(io) {
         val uid = auth.uid ?: error("no session")
         val doc = db.userHabits(uid).document()
@@ -42,6 +85,9 @@ class FirebaseHabitRepository @Inject constructor(
         doc.id
     }
 
+    /**
+     * @copydoc HabitRepository.updateHabit
+     */
     override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
         val uid = auth.uid ?: return@withContext
         db.userHabits(uid).document(habit.id)
@@ -49,21 +95,30 @@ class FirebaseHabitRepository @Inject constructor(
         dao.upsert(habit.toEntity())
     }
 
+    /**
+     * @copydoc HabitRepository.deleteHabit
+     */
     override suspend fun deleteHabit(id: String): Unit = withContext(io) {
         val uid = auth.uid ?: return@withContext
         db.userHabits(uid).document(id).delete().await()
         dao.delete(id)
     }
 
-    /* ----------  Firestore → Room listener ---------- */
+    /* ───────── Snapshot listener Firestore → Room ───────── */
+
+    /** Función nula que se cambia por la devolución de `addSnapshotListener`. */
     private var stop: () -> Unit = {}
+
+    /** Ámbito dedicado a sincronización, ligado a un `SupervisorJob`. */
     private val scope = CoroutineScope(SupervisorJob() + io)
 
+    /** Se engancha al cambio de sesión para reconectar el listener. */
     init {
         auth.addAuthStateListener { fb -> scope.launch { reconnect(fb.uid) } }
         scope.launch { reconnect(auth.uid) }
     }
 
+    /** (Re)conecta el listener a la colección remota del usuario. */
     private suspend fun reconnect(uid: String?) {
         stop(); stop = {}
         if (uid == null) { dao.clear(); return }
@@ -82,16 +137,23 @@ class FirebaseHabitRepository @Inject constructor(
         }::remove
     }
 
-    /* ---------- extensión ---------- */
+    /* ─────────── Extensión conveniente ─────────── */
+
+    /** @return Referencia a `profiles/{uid}/habits`. */
     private fun FirebaseFirestore.userHabits(uid: String) =
         collection("profiles").document(uid).collection("habits")
 
-    /* solo se muestran los cambios */
+    /* ── Operación parcial (solo checkedToday) ── */
 
+    /**
+     * @copydoc HabitRepository.setCheckedToday
+     *
+     * Actualiza únicamente el campo `doneToday` en Firestore; el listener
+     * remolcará el cambio de vuelta a Room.
+     */
     override suspend fun setCheckedToday(id: String, checked: Boolean): Unit =
         withContext(io) {
             val uid = auth.uid ?: return@withContext
-            // Escribe solo en Firestore; el listener sincronizará Room
             db.userHabits(uid).document(id)
                 .update("doneToday", checked)    // usa el nombre de campo que tengas
                 .await()
