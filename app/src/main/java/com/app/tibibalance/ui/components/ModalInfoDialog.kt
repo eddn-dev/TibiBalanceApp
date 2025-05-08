@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.buttons.SecondaryButton
 
 /** Botón descriptor para no llenar el parámetro con 3 argumentos sueltos  */
 data class DialogButton(
@@ -169,10 +170,12 @@ private fun InfoContent(
         ) {
             /* secundario al inicio para estilo Material */
             secondaryButton?.let {
-                OutlinedButton(
+                SecondaryButton(
+                    text = it.text,
                     onClick = it.onClick,
                     modifier = Modifier.weight(1f)
-                ) { Text(it.text) }
+
+                )
             }
             primaryButton?.let {
                 PrimaryButton(
