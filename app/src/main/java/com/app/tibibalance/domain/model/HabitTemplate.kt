@@ -1,50 +1,74 @@
 /**
  * @file    HabitTemplate.kt
- * @ingroup domain
- * @brief   Modelo de dominio que representa una plantilla de hábito.
+ * @ingroup domain_model // Grupo específico para modelos de dominio
+ * @brief   Modelo de dominio que representa una plantilla predefinida para crear hábitos.
  *
- * Corresponde a los documentos de la colección **`habitTemplates`** en
- * Firestore y sirve como punto de partida para el asistente de creación
- * de hábitos.
+ * @details Esta data class define la estructura de una plantilla de hábito. Las plantillas
+ * se obtienen típicamente de una fuente remota (como la colección `habitTemplates`
+ * en Firestore) y se utilizan en la UI para ofrecer al usuario puntos de partida
+ * rápidos al crear un nuevo hábito personalizado ([Habit]).
  *
- * @property id            Identificador único del documento.
- * @property name          Nombre visible de la plantilla.
- * @property description   Descripción breve mostrada en la UI.
- * @property category      Categoría lógica (salud, productividad, etc.).
- * @property icon          Nombre del icono Material que la representa.
+ * Contiene valores preconfigurados para la mayoría de las propiedades de un hábito,
+ * incluyendo nombre, descripción, categoría, icono, configuración de sesión,
+ * frecuencia, periodo y notificaciones.
  *
- * @property sessionQty    Cantidad por sesión; `null` si no aplica.
- * @property sessionUnit   Unidad de la sesión.
- *
- * @property repeatPreset  Frecuencia sugerida.
- * @property weekDays      Días concretos (1‥7) si la frecuencia es personalizada.
- *
- * @property periodQty     Límite total del periodo; `null` si no aplica.
- * @property periodUnit    Unidad del periodo.
- *
- * @property notifCfg      Configuración avanzada de notificaciones.
- *
- * @property scheduled     `true` si la plantilla ya fue planificada por el scheduler.
+ * @see Habit Modelo de dominio del hábito final creado por el usuario.
+ * @see HabitForm Modelo intermedio usado en la UI para crear/editar, puede ser prellenado desde esta plantilla.
+ * @see com.app.tibibalance.data.repository.HabitTemplateRepository Repositorio que gestiona la obtención de estas plantillas.
+ * @see com.app.tibibalance.data.remote.mapper.FirestoreHabitTemplateMapper Mapper que convierte documentos de Firestore a este modelo.
  */
 package com.app.tibibalance.domain.model
 
+/**
+ * @brief Representa una plantilla predefinida para un [Habit].
+ * @details Contiene valores sugeridos para facilitar la creación de nuevos hábitos por parte del usuario.
+ * Proporciona valores por defecto para todas sus propiedades.
+ *
+ * @property id Identificador único de la plantilla (generalmente el `docId` de Firestore). Vacío por defecto.
+ * @property name Nombre sugerido para el hábito (e.g., "Leer 30 minutos"). Vacío por defecto.
+ * @property description Descripción breve que explica el propósito de la plantilla. Vacío por defecto.
+ * @property category La [HabitCategory] preseleccionada para esta plantilla. Por defecto [HabitCategory.SALUD].
+ * @property icon El nombre del icono Material sugerido para esta plantilla. Por defecto "FitnessCenter".
+ *
+ * @property sessionQty La cantidad numérica sugerida para la [Session] (e.g., 30 para "30 minutos"). `null` por defecto.
+ * @property sessionUnit La [SessionUnit] sugerida para la sesión. Por defecto [SessionUnit.INDEFINIDO].
+ *
+ * @property repeatPreset La frecuencia predefinida ([RepeatPreset]) sugerida. Por defecto [RepeatPreset.INDEFINIDO].
+ * @property weekDays **Nota:** Los días específicos de la semana para frecuencias personalizadas
+ * se encuentran dentro de `notifCfg.weekDays`. Este campo no existe directamente aquí.
+ *
+ * @property periodQty La cantidad numérica sugerida para el [Period] total del hábito. `null` por defecto.
+ * @property periodUnit La [PeriodUnit] sugerida para el periodo total. Por defecto [PeriodUnit.INDEFINIDO].
+ *
+ * @property notifCfg La configuración de notificación ([NotifConfig]) sugerida para esta plantilla.
+ * Incluye modo, mensaje, horas, días de la semana ([WeekDays]), antelación y vibración.
+ * Utiliza el constructor por defecto de [NotifConfig].
+ *
+ * @property scheduled Un flag booleano interno, posiblemente para indicar si esta plantilla
+ * requiere alguna acción de programación especial al ser seleccionada. `false` por defecto.
+ */
 data class HabitTemplate(
-    val id           : String        = "",
-    val name         : String        = "",
-    val description  : String        = "",
-    val category     : HabitCategory = HabitCategory.SALUD,
-    val icon         : String        = "FitnessCenter",
+    val id           : String        = "", // ID (e.g., Firestore docId)
+    val name         : String        = "", // Nombre de la plantilla
+    val description  : String        = "", // Descripción
+    val category     : HabitCategory = HabitCategory.SALUD, // Categoría por defecto
+    val icon         : String        = "FitnessCenter", // Icono por defecto
 
-    val sessionQty   : Int?          = null,
-    val sessionUnit  : SessionUnit   = SessionUnit.INDEFINIDO,
+    // Configuración de sesión sugerida
+    val sessionQty   : Int?          = null, // Cantidad (nullable)
+    val sessionUnit  : SessionUnit   = SessionUnit.INDEFINIDO, // Unidad por defecto
 
-    val repeatPreset : RepeatPreset  = RepeatPreset.INDEFINIDO,
-    val weekDays     : Set<Int>      = emptySet(),
+    // Configuración de repetición sugerida
+    val repeatPreset : RepeatPreset  = RepeatPreset.INDEFINIDO, // Frecuencia por defecto
+    // val weekDays     : Set<Int>      = emptySet(), // Este campo NO pertenece aquí, está en notifCfg
 
-    val periodQty    : Int?          = null,
-    val periodUnit   : PeriodUnit    = PeriodUnit.INDEFINIDO,
+    // Configuración de periodo sugerida
+    val periodQty    : Int?          = null, // Cantidad (nullable)
+    val periodUnit   : PeriodUnit    = PeriodUnit.INDEFINIDO, // Unidad por defecto
 
-    val notifCfg     : NotifConfig   = NotifConfig(),
+    // Configuración de notificación sugerida (objeto anidado)
+    val notifCfg     : NotifConfig   = NotifConfig(), // Usa defaults de NotifConfig
 
-    val scheduled    : Boolean       = false
+    // Flag misceláneo
+    val scheduled    : Boolean       = false // Default false
 )

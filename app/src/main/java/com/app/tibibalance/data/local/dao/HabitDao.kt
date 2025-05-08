@@ -1,13 +1,3 @@
-/* data/local/HabitDao.kt */
-package com.app.tibibalance.data.local.dao
-
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.app.tibibalance.data.local.entity.HabitEntity
-import kotlinx.coroutines.flow.Flow
-
 /**
  * @file    HabitDao.kt
  * @ingroup data_local
@@ -19,6 +9,20 @@ import kotlinx.coroutines.flow.Flow
  * [HabitEntity] para mantener la compatibilidad con el
  * esquema de Firestore y soportar la sincronización
  * _offline-first_ mediante **Last-Write-Wins (LWW)**.
+ */
+package com.app.tibibalance.data.local.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.app.tibibalance.data.local.entity.HabitEntity
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * @brief DAO (Data Access Object) para la entidad [HabitEntity].
+ * @details Define las operaciones CRUD y de observación para la tabla `habits` en Room,
+ * utilizando serialización JSON para el contenido del hábito.
  */
 @Dao
 interface HabitDao {
