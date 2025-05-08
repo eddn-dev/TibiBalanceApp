@@ -97,7 +97,7 @@ fun EditProfileScreen(
                 onValueChange = { /* no editable */ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = (-4).dp),   // si aún quieres un “tirón” hacia arriba
+                    .padding(bottom = 0.dp),   // si aún quieres un “tirón” hacia arriba
                 supportingText = "ℹ\uFE0F El correo electrónico no es editable"
             )
 

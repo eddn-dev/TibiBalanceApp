@@ -112,7 +112,7 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     SettingsScreen(
         state          = uiState,
         onNavigateUp   = rootNav::navigateUp,
-        onEditPersonal = { /* TODO */ },
+        onEditPersonal = { rootNav.navigate(Screen.EditProfile.route) },
         onDevices      = { /* TODO */ },
         onAchievements = { /* TODO */ },
         onSignOut      = mainVm::signOut,
