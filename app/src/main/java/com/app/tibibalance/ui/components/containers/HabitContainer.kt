@@ -1,3 +1,13 @@
+/**
+ * @file    HabitContainer.kt
+ * @ingroup ui_components
+ * @brief   Tarjeta clicable que representa un hábito en listas o grids.
+ *
+ * @param icon     Composable que muestra el icono del hábito.
+ * @param text     Nombre o descripción corta del hábito.
+ * @param modifier Modificador externo para tamaño, padding o margen.
+ * @param onClick  Callback invocado al pulsar la tarjeta.
+ */
 package com.app.tibibalance.ui.components.containers
 
 import androidx.compose.foundation.background
@@ -22,8 +32,8 @@ fun HabitContainer(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .background(color = Color(0xFFF5FBFD), shape = RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .background(Color(0xFFF5FBFD), shape = RoundedCornerShape(16.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
