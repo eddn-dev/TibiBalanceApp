@@ -160,86 +160,90 @@ import androidx.compose.foundation.lazy.LazyListScope
 
 @Composable
 fun FeatureRegisterScreen() {
-    GradientBackgroundScreen {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Header(
-                    title = "Registrarse",
-                    showBackButton = true,
-                    onBackClick = { },
-                    profileImage = null
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ImageContainer(
-                    imageResId = R.drawable.registro_logo,
-                    contentDescription = "Imagen registro",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(340.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            item {
-                FormContainer {
-                    var username by remember { mutableStateOf("") }
-                    InputText(value = username, onValueChange = { username = it })
-
-                    var date by remember { mutableStateOf("") }
-                    InputDate(selectedDate = date, onDateSelected = { date = it })
-
-                    var email by remember { mutableStateOf("") }
-                    InputEmail(value = email, onValueChange = { email = it })
-
-                    var pwd by remember { mutableStateOf("") }
-                    InputPassword(value = pwd, onValueChange = { pwd = it })
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            item {
-                PrimaryButton(
-                    text = "Registrarse",
-                    onClick = { },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
-
-                GoogleSignButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+    Box(modifier = Modifier.fillMaxSize()) {
+        GradientBackgroundScreen {
+            Box(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
                 ) {
-                    Description(
-                        text = "¿Ya tienes una cuenta? ",
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    TextButtonLink(
-                        text = "Iniciar Sesión",
-                        onClick = { }
-                    )
+                    item {
+                        Spacer(modifier = Modifier.height(35.dp)) // Deja espacio para el header superpuesto
+
+                        ImageContainer(
+                            imageResId = R.drawable.registro_logo,
+                            contentDescription = "Imagen registro",
+                            modifier = Modifier
+                                //.fillMaxWidth()
+                                .height(340.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+
+                    item {
+                        FormContainer {
+                            var nombredeususrio by remember { mutableStateOf("") }
+                            InputEmail(value = nombredeususrio, onValueChange = { nombredeususrio = it })
+                            //placeholder = "Nombre de Usuario*"
+
+                            var date by remember { mutableStateOf("Fecha de Nacimiento*") }
+                            InputDate(selectedDate = date, onDateSelected = { date = it })
+
+                            var email by remember { mutableStateOf("") }
+                            InputEmail(value = email, onValueChange = { email = it })
+
+                            var pwd by remember { mutableStateOf("") }
+                            InputPassword(value = pwd, onValueChange = { pwd = it })
+
+                            var confpwd by remember { mutableStateOf("") }
+                            InputPassword(value = confpwd, onValueChange = { confpwd = it })
+                        }
+
+                        Spacer(modifier = Modifier.height(5.dp))
+                    }
+
+                    item {
+                        PrimaryButton(
+                            text = "Registrarse",
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 5.dp)
+                        )
+
+                        GoogleSignButton(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 5.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Description(
+                                text = "¿Ya tienes una cuenta? ",
+                                textAlign = TextAlign.Center
+                            )
+                            //Spacer(modifier = Modifier.width(8.dp))
+                            TextButtonLink(
+                                text = "Iniciar Sesión",
+                                onClick = { }
+                            )
+                        }
+                    }
                 }
             }
         }
+
+        // Header superpuesto como en "Recuperar Contraseña"
+        Header(
+            title = "Registrarse",
+            showBackButton = true,
+            onBackClick = { },
+            profileImage = null
+        )
     }
 }

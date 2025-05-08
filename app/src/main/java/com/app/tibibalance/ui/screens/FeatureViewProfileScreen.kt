@@ -20,104 +20,83 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-
 @Composable
 fun FeatureViewProfileScreen() {
-    GradientBackgroundScreen {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Header(
-                title = "Visualizar Perfil",
-                showBackButton = true,
-                onBackClick = { },
-                profileImage = null
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-            FormContainer(
-                modifier = Modifier.padding(top = 16.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        GradientBackgroundScreen {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfileContainer(
-                    imageResId = R.drawable.imagenprueba,
-                    size = 110.dp,
-                    contentDescription = "Foto de perfil"
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Subtitle(text = "Nora Soto")
+                Spacer(modifier = Modifier.height(56.dp)) // Espacio para el header superpuesto
 
-                Spacer(modifier = Modifier.height(20.dp))
-                /*Subtitle(text = "Fecha de Nacimiento:")
-                InputDate(
-                    selectedDate = "29/07/2004",
-                    onDateSelected = {}, // Puedes desactivar esto si no quieres que sea editable
-                )*/
+                FormContainer(
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    ProfileContainer(
+                        imageResId = R.drawable.imagenprueba,
+                        size = 110.dp,
+                        contentDescription = "Foto de perfil"
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Subtitle(text = "Nora Soto")
 
-                Subtitle(
-                    text = "Fecha de nacimiento:",
-                    modifier = Modifier.padding(top=20.dp)
-                )
-                //Falta incono de calendario
-                InputText(
-                    value = "29/07/2004", //Colocar el nombre del usuario desde Firebase
-                    onValueChange = {  },
-                    modifier = Modifier.padding(top = 10.dp)
-                )
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                Subtitle(
-                    text = "Correo electrónico:",
-                    modifier = Modifier.padding(top=20.dp)
-                )
-                InputText(
-                    value = "norasoto5@gmail.com", //Colocar el nombre del usuario desde Firebase
-                    onValueChange = {  },
-                    modifier = Modifier.padding(top = 10.dp)
-                )
+                    Subtitle(
+                        text = "Fecha de nacimiento:",
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
+                    InputText(
+                        value = "29/07/2004",
+                        onValueChange = { },
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
 
-                Box(modifier = Modifier.fillMaxSize()){
-                    Row (
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top=50.dp), // Padding externo (alrededor de toda la fila)
+                    Subtitle(
+                        text = "Correo electrónico:",
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
+                    InputText(
+                        value = "norasoto5@gmail.com",
+                        onValueChange = { },
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
 
-                        horizontalArrangement = Arrangement.spacedBy(30.dp), // Espacio entre los elementos de la fila
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        SecondaryButton(
-                            text = "Editar perfil",
-                            onClick = {},
-                            backgroundColor = Color.White
-                        )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(top = 50.dp),
+                            horizontalArrangement = Arrangement.spacedBy(30.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            SecondaryButton(
+                                text = "Editar perfil",
+                                onClick = {},
+                                backgroundColor = Color.White
+                            )
 
-                        SecondaryButton(
-                            text = "Cerrar sesión",
-                            onClick = {},
-                            backgroundColor = Color.White
-                        )
-
+                            SecondaryButton(
+                                text = "Cerrar sesión",
+                                onClick = {},
+                                backgroundColor = Color.White
+                            )
+                        }
                     }
                 }
-
-                /*Row(
-                    horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SecondaryButton(
-                        text = "Editar perfil",
-                        onClick = { /* Navegar a FeatureEditProfileScreen */ },
-                        modifier = Modifier.weight(1f)
-                    )
-                    SecondaryButton(
-                        text = "Cerrar sesión",
-                        onClick = { /* Acción de logout */ },
-                        modifier = Modifier.weight(1f)
-                    )
-                }*/
             }
         }
+
+        // Header superpuesto
+        Header(
+            title = "Visualizar Perfil",
+            showBackButton = true,
+            onBackClick = { },
+            profileImage = null
+        )
     }
 }
+
