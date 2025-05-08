@@ -49,7 +49,7 @@ fun AddHabitModal(
 
     val maxH = LocalConfiguration.current.screenHeightDp.dp * .85f
     ModalContainer(
-        onDismissRequest   = { vm.finish(); onDismissRequest() },
+        onDismissRequest = onDismissRequest,
         modifier           = Modifier.heightIn(max = maxH),
         closeButtonEnabled = true
     ) {
@@ -126,12 +126,12 @@ fun AddHabitModal(
                         text     = if (st.form.notify && st.form.repeatPreset != RepeatPreset.INDEFINIDO)
                             "Siguiente" else "Guardar",
                         enabled  = st.errors.isEmpty(),
-                        onClick  = vm::nextFromTracking
+                        onClick  = { vm.nextFromTracking(onDismissRequest) }
                     )
 
                     is AddHabitUiState.Notification -> PrimaryButton(
                         text    = "Guardar",
-                        onClick = vm::finish
+                        onClick = { vm.finish(onDismissRequest) }
                     )
 
                     else -> Unit

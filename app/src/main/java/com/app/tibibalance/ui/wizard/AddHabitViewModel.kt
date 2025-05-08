@@ -69,21 +69,18 @@ class AddHabitViewModel @Inject constructor(
             }
         }
 
-    fun nextFromTracking() {
+    fun nextFromTracking(onFinish: () -> Unit) {
         val st = _ui.value as? AddHabitUiState.Tracking ?: return
         if (st.errors.isNotEmpty()) return
 
         if (!st.form.notify || st.form.repeatPreset == RepeatPreset.INDEFINIDO) {
-            saveAndClose(st.form, NotifConfig(enabled = false))
+            saveAndClose(st.form, NotifConfig(enabled = false), onFinish)
         } else {
-            /* usa borrador anterior si existe; si no, inicializa */
-            val cfg = st.draftNotif ?: NotifConfig(
-                enabled   = true,
-                timesOfDay = listOf("08:00")
-            )
+            val cfg = st.draftNotif ?: NotifConfig(enabled = true, timesOfDay = listOf("08:00"))
             _ui.value = AddHabitUiState.Notification(st.form, cfg)
         }
     }
+
 
     /* ─────────── Paso 3 (Notification) ─────────── */
     fun updateNotif(cfg: NotifConfig) =
@@ -91,10 +88,11 @@ class AddHabitViewModel @Inject constructor(
             _ui.value = it.copy(cfg = cfg)
         }
 
-    fun finish() = when (val st = _ui.value) {
-        is AddHabitUiState.Notification -> saveAndClose(st.form, st.cfg)
-        else -> Unit
+    fun finish(onFinish: () -> Unit) {
+        val st = _ui.value as? AddHabitUiState.Notification ?: return
+        saveAndClose(st.form, st.cfg, onFinish)
     }
+
 
     /* ─────────── Navegación atrás ─────────── */
     fun back() = when (val st = _ui.value) {
@@ -118,24 +116,25 @@ class AddHabitViewModel @Inject constructor(
     }
 
     /* ─────────── Guardado final (mock) ─────────── */
-    private fun saveAndClose(form: HabitForm, cfg: NotifConfig) {
+    private fun saveAndClose(form: HabitForm, cfg: NotifConfig, onFinish: () -> Unit) {
         viewModelScope.launch {
-            _ui.value = AddHabitUiState.Saving                 // spinner
+            _ui.value = AddHabitUiState.Saving
 
             try {
-                val habit = form.toHabit(cfg)                  // mapper you wrote
-                withContext(io) { habitRepo.addHabit(habit) }  // suspend -> Firestore
+                val habit = form.toHabit(cfg)
+                withContext(io) { habitRepo.addHabit(habit) }
 
-                _ui.value = AddHabitUiState.Saved(             // small success sheet
+                _ui.value = AddHabitUiState.Saved(
                     title   = "¡Hábito creado!",
                     message = "Tu nuevo hábito se añadió correctamente."
                 )
-                delay(1_500)                                   // let user read it
+
+                delay(1_500)
+                onFinish() // ← cierra el wizard
+
             } catch (e: Exception) {
                 Log.e("AddHabitVM", "Guardar hábito", e)
                 _ui.value = AddHabitUiState.Notification(form, cfg)
-            } finally {
-                _ui.value = AddHabitUiState.Suggestions()      // reset wizard
             }
         }
     }
