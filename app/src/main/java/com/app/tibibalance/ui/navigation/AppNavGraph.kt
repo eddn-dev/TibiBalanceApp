@@ -1,29 +1,3 @@
-/**
- * @file    AppNavGraph.kt
- * @ingroup ui_navigation // Grupo específico para componentes de navegación
- * @brief   Define el gráfico de navegación principal de la aplicación utilizando Jetpack Navigation Compose.
- *
- * @details Este archivo contiene el [Composable] `AppNavGraph`, que es el responsable
- * de configurar el [NavHost] central de la aplicación. Mapea las rutas definidas
- * en la clase sellada [Screen] a sus respectivos Composables de pantalla (e.g., [LaunchScreen],
- * [SignInScreen], [MainScreen]).
- *
- * Establece [Screen.Launch] como el destino inicial de la aplicación. Gestiona la
- * creación o recepción de un [NavHostController] para manejar las transiciones
- * entre pantallas.
- *
- * @see androidx.navigation.compose.NavHost El componente principal de Navigation Compose.
- * @see androidx.navigation.compose.composable Función para definir un destino en el grafo.
- * @see androidx.navigation.compose.rememberNavController Hook para crear/recordar el controlador de navegación.
- * @see androidx.navigation.NavHostController El controlador que gestiona la pila de navegación.
- * @see Screen Clase sellada que define todas las rutas de la aplicación.
- * @see LaunchScreen
- * @see SignInScreen
- * @see SignUpScreen
- * @see VerifyEmailScreen
- * @see ForgotPasswordScreen
- * @see MainScreen Pantallas a las que se puede navegar.
- */
 // ui/navigation/AppNavGraph.kt
 package com.app.tibibalance.ui.navigation
 
@@ -39,6 +13,7 @@ import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
 import com.app.tibibalance.ui.screens.habits.ConfigureNotificationScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
+import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
 
 /**
@@ -82,6 +57,11 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         //     DetailsScreen(navController, itemId)
         // }
 
+        //Direcciona a la pantalla de editar perfil
+        composable(Screen.EditProfile.route) {
+            EditProfileScreen(navController)
+        }
+        //Direcciona a la pantalla de norificaciones
         composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }
 
 
