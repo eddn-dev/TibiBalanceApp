@@ -74,4 +74,7 @@ sealed class Screen(val route: String) {
     // data object HabitDetail : Screen("habit_detail/{habitId}") {
     //     fun createRoute(habitId: String) = "habit_detail/$habitId"
     // }
+
+    /** @brief Pantalla para configurar notificaciones del usuario. de settings */
+    data object NotificationSettings : Screen("main/settings/notifications")
 }

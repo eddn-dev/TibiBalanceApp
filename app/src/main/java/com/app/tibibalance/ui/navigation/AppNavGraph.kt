@@ -37,6 +37,7 @@ import com.app.tibibalance.ui.screens.auth.ForgotPasswordScreen
 import com.app.tibibalance.ui.screens.auth.SignInScreen
 import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
+import com.app.tibibalance.ui.screens.habits.ConfigureNotificationScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
 
@@ -80,6 +81,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         //     val itemId = backStackEntry.arguments?.getString("itemId")
         //     DetailsScreen(navController, itemId)
         // }
+
+        composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }
+
+
     }
 }
 

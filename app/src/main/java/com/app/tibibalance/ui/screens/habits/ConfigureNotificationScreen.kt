@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.texts.Subtitle
+import com.app.tibibalance.ui.components. buttons.IconButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -21,7 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun ViewConfigureNotificationScreen() {
+fun ConfigureNotificationScreen(
+    onNavigateUp: () -> Unit = {}
+){
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
@@ -35,16 +38,19 @@ fun ViewConfigureNotificationScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(top = 80.dp, start = 24.dp, end = 24.dp),
+                .padding(top = 130.dp, start = 24.dp, end = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
+            //verticalArrangement = Arrangement.Center
         ) {
             Spacer(Modifier.height(10.dp))
 
-            FormContainer {
+            FormContainer{
+                Spacer(modifier = Modifier.height(15.dp))
 
                 /*******************************MSGS PERSONALIZADOS*******************************/
                 FormContainer(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    modifier = Modifier.padding(bottom = 15.dp)
                 ){
                     Row(
                         modifier              = Modifier.fillMaxWidth(),
@@ -52,7 +58,7 @@ fun ViewConfigureNotificationScreen() {
                     ) {
 
                         ImageContainer(
-                            resId = R.drawable.iconbookimage,
+                            resId = R.drawable.ic_msg_image,
                             contentDescription = null,
                             modifier = Modifier
                                 .width(38.dp)
@@ -77,7 +83,7 @@ fun ViewConfigureNotificationScreen() {
                 /*********************************************************************************/
 
 
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(8.dp))
 
                 FormContainer (
                     backgroundColor = Color(0xFFAED3E3)
@@ -89,13 +95,15 @@ fun ViewConfigureNotificationScreen() {
                     )
                 }
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(10.dp))
 
 
                 /*******************************NOTI BEBER 2LT DE AGUA*******************************/
                 FormContainer(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    modifier = Modifier.padding(bottom = 15.dp)
                 ){
+
                     Row(
                         modifier              = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -116,23 +124,35 @@ fun ViewConfigureNotificationScreen() {
                             Subtitle(text = "agua al día")
                         }
 
+                        Spacer(modifier = Modifier.weight(1f))
 
-                        var isEnabled by remember { mutableStateOf(false) }
-                        SwitchToggle(
-                            checked = isEnabled,
-                            onCheckedChange = { isEnabled = it }
+                        var isWaterNotificationOn by remember { mutableStateOf(true) }
+                        IconButton(
+                            resId = if (isWaterNotificationOn) R.drawable.iconbellswitch_on else R.drawable.iconbellswitch_off,
+                            contentDescription = if (isWaterNotificationOn) "Notificación activada" else "Notificación desactivada",
+                            onClick = { isWaterNotificationOn = !isWaterNotificationOn }
+                        )
+
+                        IconButton(
+                            resId = R.drawable.icon_edit_blue,// cambiar de imagen
+                            contentDescription = "Campana apagada",
+                            onClick = {
+                               // println("Icon button clicked")
+                            }
                         )
                     }
+
                 }
                 /************************************************************************************/
 
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(10.dp))
 
 
                 /*******************************NOTI DORMIR 7 HRS AL DIA*******************************/
                 FormContainer(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    modifier = Modifier.padding(bottom = 15.dp)
                 ){
                     Row(
                         modifier              = Modifier.fillMaxWidth(),
@@ -154,23 +174,35 @@ fun ViewConfigureNotificationScreen() {
                             Subtitle(text = "horas al día")
                         }
 
+                        Spacer(modifier = Modifier.weight(1f))
 
-                        var isEnabled by remember { mutableStateOf(false) }
-                        SwitchToggle(
-                            checked = isEnabled,
-                            onCheckedChange = { isEnabled = it }
+                        var isSleepNotificationOn by remember { mutableStateOf(true) }
+                        IconButton(
+                            resId = if (isSleepNotificationOn) R.drawable.iconbellswitch_on else R.drawable.iconbellswitch_off,
+                            contentDescription = if (isSleepNotificationOn) "Notificación activada" else "Notificación desactivada",
+                            onClick = { isSleepNotificationOn = !isSleepNotificationOn }
                         )
+
+                        IconButton(
+                            resId = R.drawable.icon_edit_blue,
+                            contentDescription = "Campana apagada",
+                            onClick = {
+                               // println("Icon button clicked")
+                            }
+                        )
+
                     }
                 }
                 /************************************************************************************/
 
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(10.dp))
 
 
                 /*******************************NOTI LEER 20 PAG AL DIA*******************************/
                 FormContainer(
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    modifier = Modifier.padding(bottom = 25.dp)
                 ){
                     Row(
                         modifier              = Modifier.fillMaxWidth(),
@@ -192,11 +224,22 @@ fun ViewConfigureNotificationScreen() {
                             Subtitle(text = "de un libro")
                         }
 
+                        Spacer(modifier = Modifier.weight(1f))
 
-                        var isEnabled by remember { mutableStateOf(false) }
-                        SwitchToggle(
-                            checked = isEnabled,
-                            onCheckedChange = { isEnabled = it }
+                        var isReadNotificationOn by remember { mutableStateOf(true) }
+
+                        IconButton(
+                            resId = if (isReadNotificationOn) R.drawable.iconbellswitch_on else R.drawable.iconbellswitch_off,
+                            contentDescription = if (isReadNotificationOn) "Notificación activada" else "Notificación desactivada",
+                            onClick = { isReadNotificationOn = !isReadNotificationOn}
+                        )
+
+                        IconButton(
+                            resId = R.drawable.icon_edit_blue,
+                            contentDescription = "Campana apagada",
+                            onClick = {
+                                //println("Icon button clicked")
+                            }
                         )
                     }
                 }
@@ -210,10 +253,10 @@ fun ViewConfigureNotificationScreen() {
             }
         }
         Header(
-            title          = "Notificaciones",
+            title = "Notificaciones",
             showBackButton = true,
-            onBackClick    = {  },
-            modifier       = Modifier.align(Alignment.TopCenter)
+            onBackClick = onNavigateUp,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 }
@@ -221,5 +264,5 @@ fun ViewConfigureNotificationScreen() {
 @Preview(showBackground = true, widthDp = 412, heightDp = 915)
 @Composable
 fun PreviewViewProfileScreen() {
-    ViewConfigureNotificationScreen()
+    ConfigureNotificationScreen()
 }

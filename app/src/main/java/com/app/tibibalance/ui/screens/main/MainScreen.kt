@@ -199,7 +199,7 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
         onAchievements = { /* TODO: Navegar a pantalla de logros */ },
         onSignOut      = mainVm::signOut,             // Acción de cierre de sesión (manejada por MainViewModel).
         onDelete       = { /* TODO: Implementar borrado de cuenta */ },
-        onNotis        = { /* TODO: Navegar a pantalla de config. notificaciones */ }
+        onNotis        = { rootNav.navigate(Screen.NotificationSettings.route) }
     )
 }
 
