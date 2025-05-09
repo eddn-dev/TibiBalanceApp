@@ -25,7 +25,8 @@ fun InputText(
     singleLine          : Boolean              = true,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     maxChars            : Int?                 = null,
-    keyboardOptions     : KeyboardOptions      = KeyboardOptions.Default
+    keyboardOptions     : KeyboardOptions      = KeyboardOptions.Default,
+    enabled             : Boolean              = true
 ) {
     // Colores personalizados para borde y fondo
     val colors = OutlinedTextFieldDefaults.colors(
@@ -57,6 +58,7 @@ fun InputText(
             }
         },
         colors           = colors,
-        shape            = RoundedCornerShape(12.dp)
+        shape            = RoundedCornerShape(12.dp),
+        enabled          = enabled
     )
 }
