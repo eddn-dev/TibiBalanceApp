@@ -44,6 +44,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -51,6 +52,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.domain.model.NotifConfig
 import com.app.tibibalance.domain.model.NotifMode
+import com.app.tibibalance.ui.components.DialogButton
+import com.app.tibibalance.ui.components.ModalInfoDialog
 import com.app.tibibalance.ui.components.modals.ModalDatePickerDialog
 import com.app.tibibalance.ui.components.SwitchToggle
 import com.app.tibibalance.ui.components.inputs.InputSelect
@@ -90,6 +93,10 @@ fun NotificationStep(
     /* Propaga cambios hacia el ViewModel padre */
     // Efecto que observa cambios en 'cfg' y llama a onCfgChange para notificar al ViewModel.
     LaunchedEffect(cfg) { onCfgChange(cfg) }
+
+    //Para el botón de ayuda al lado de añadir hora
+    var infoTimeDlg by remember { mutableStateOf(false) }
+
 
     /* -------- Diálogo TimePicker en AlertDialog -------- */
     // Muestra el AlertDialog con el TimePicker si showTimePicker es true.
@@ -163,9 +170,34 @@ fun NotificationStep(
                     }) { Text("Eliminar") }
                 }
             }
-            // Botón para abrir el diálogo TimePicker.
-            OutlinedButton(onClick = { showTimePicker = true }) { Text("Añadir hora") }
+
+            //Aquí se colocó una row para poder poner el botón de i al lado de añadir hora
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(onClick = { showTimePicker = true }) { // Botón para abrir el diálogo TimePicker.
+                    Text("Añadir hora")
+                }
+                IconButton(onClick = { infoTimeDlg = true }) {
+                    Icon(Icons.Default.Info, contentDescription = "Ayuda sobre añadir hora")
+                }
+            }
+
         }
+        //Botón de ayuda al lado del botón añadir hora
+        if (infoTimeDlg) {
+            ModalInfoDialog(
+                visible  = true,
+                icon     = Icons.Default.Info,
+                title    = "Horas de notificación",
+                message  = "Puedes ingresar más de una notificación al día.",
+                primaryButton = DialogButton("Entendido") {
+                    infoTimeDlg = false
+                }
+            )
+        }
+
 
         /* Sección: Mensaje de Notificación -------------------------------- */
         Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)

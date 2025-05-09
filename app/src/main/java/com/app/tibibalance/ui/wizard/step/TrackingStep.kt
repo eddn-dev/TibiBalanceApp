@@ -96,7 +96,7 @@ fun TrackingStep(
     // Efecto que propaga los cambios de 'form' al ViewModel padre.
     LaunchedEffect(form) { onFormChange(form) }
 
-
+    //Para el botón de ayuda en el campo repetir hábito
     var infoRepeatDlg by remember { mutableStateOf(false) }
 
 
@@ -172,6 +172,7 @@ fun TrackingStep(
 
 
         /* ---------- Repetición ---------- */
+        //Se añade una row para poder mostrar el botón de ayuda al lado del campo repetir hábito
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -339,6 +340,8 @@ fun TrackingStep(
             primaryButton = DialogButton("Entendido") { infoDlg = false } // Botón para cerrar el diálogo.
         )
     }
+
+    //Dialogo de ayuda para el botón de información de repetir hábito
     if (infoRepeatDlg) {
         ModalInfoDialog(
             visible  = true,
