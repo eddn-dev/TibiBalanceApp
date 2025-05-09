@@ -18,7 +18,7 @@ sealed class Screen(val route: String) {
     data object Profile      : Screen("main/profile")
     data object Settings     : Screen("main/settings")
 
-    /* Buttons Settig*/
-
+    /* nueva ruta para Editar Perfil */
     data object EditProfile  : Screen("main/settings/edit_profile")
+
 }

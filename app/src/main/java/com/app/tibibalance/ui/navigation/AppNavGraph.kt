@@ -14,6 +14,8 @@ import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
 import com.app.tibibalance.ui.screens.profile.EditProfileScreen
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.ktx.auth
 
 
 @Composable
@@ -25,12 +27,12 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable(Screen.VerifyEmail.route) { VerifyEmailScreen(navController) }
         composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
         composable(Screen.Main.route)        { MainScreen(navController) }
+
+
+
+        // — NUEVA RUTA: Editar Perfil —
         composable(Screen.EditProfile.route) {
-            EditProfileScreen(
-                onChangePhoto = {},
-                onSave        = { navController.popBackStack() },
-                onCancel      = { navController.popBackStack() }
-            )
+            EditProfileScreen(navController)
         }
 
     }

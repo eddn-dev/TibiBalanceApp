@@ -25,6 +25,8 @@ import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.buttons.DangerButton
 import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.Preview
+
 
 @Composable
 fun SettingsScreen(
@@ -148,3 +150,4 @@ private fun ReadyContent(
 @Composable
 private fun Icon24(icon: androidx.compose.ui.graphics.vector.ImageVector) =
     Icon(icon, contentDescription = null, tint = Color(0xFF3EA8FE), modifier = Modifier.size(24.dp))
+

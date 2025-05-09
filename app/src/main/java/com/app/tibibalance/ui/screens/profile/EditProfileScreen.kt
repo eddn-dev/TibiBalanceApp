@@ -4,175 +4,228 @@ import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.app.tibibalance.R
-import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.Header
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.inputs.InputText
 import com.app.tibibalance.ui.components.texts.Subtitle
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase             // ← IMPORT CORRECTO
+import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.LaunchedEffect
 
+// ——————————————————————————————————————————
+// 1) La UI pura, sin lógica, recibe todos los datos y callbacks
+// ——————————————————————————————————————————
 @Composable
-fun EditProfileScreen(
-    onChangePhoto: () -> Unit = {},
-    onSave: () -> Unit = {},
-    onCancel: () -> Unit = {}
+fun EditProfileContent(
+    photoUrl: String?,
+    username: String,
+    onUsernameChange: (String) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    birthDate: String,
+    onBirthDateClick: () -> Unit,
+    passwordHidden: Boolean,
+    onPasswordClick: () -> Unit,
+    onChangePhotoClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    // Estado de la fecha
-    var date by remember { mutableStateOf("01/05/2025") }
     val context = LocalContext.current
 
-    // DatePickerDialog externo
-    val datePicker = remember {
-        DatePickerDialog(
-            context,
-            { _, year, month, day ->
-                date = "%02d/%02d/%04d".format(day, month + 1, year)
-            },
-            2025, 4, 1
-        )
-    }
-
-    // Fondo degradado
-    val gradient = Brush.verticalGradient(
-        listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
-    )
-
-    Box(
-        modifier = Modifier
+    LazyColumn(
+        modifier = modifier
             .fillMaxSize()
-            .background(gradient)
+            .background(Brush.verticalGradient(listOf(Color(0xFFC3E2FA), Color.White)))
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(1.dp))
+        item {
+            Header("Editar información personal")
 
-            ProfileContainer(
-                imageResId = R.drawable.imagenprueba,
-                size = 110.dp,
-                contentDescription = "Foto de perfil"
-            )
-
-            Spacer(Modifier.height(5.dp))
-
-            SecondaryButton(
-                text = "Cambiar Foto",
-                onClick = onChangePhoto,
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(40.dp)
-            )
-
-            Spacer(Modifier.height(6.dp))
-
-            Subtitle(text = "Nombre de usuario:")
-            InputText(
-                value = "nora soto",
-                onValueChange = { /* TODO */ },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(2.dp))
-
-            Subtitle(text = "Correo electrónico:")
-            InputText(
-                value = "norasoto5@gmail.com",
-                onValueChange = { /* no editable */ },
-                modifier = Modifier
+            Column(
+                Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 0.dp),   // si aún quieres un “tirón” hacia arriba
-                supportingText = "ℹ\uFE0F El correo electrónico no es editable"
-            )
-
-            Spacer(Modifier.height(5.dp))
-
-            Subtitle(text = "Fecha de nacimiento:")
-            // ─── reemplazamos aquí InputDate ─────────────────────────────
-            OutlinedTextField(
-                value = date,
-                onValueChange = { /* read-only */ },
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { datePicker.show() },
-                label = { Text("Fecha de nacimiento") },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.CalendarToday,
-                        contentDescription = "Seleccionar fecha",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    // textColors: usa onSurface cuando esté disabled
-                    focusedTextColor       = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor     = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledTextColor      = MaterialTheme.colorScheme.onSurface,
-                    errorTextColor         = MaterialTheme.colorScheme.error,
-                    // containerColors
-                    focusedContainerColor   = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContainerColor  = MaterialTheme.colorScheme.surface,
-                    errorContainerColor     = MaterialTheme.colorScheme.surface,
-                    // borderColors
-                    focusedBorderColor      = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
-                    disabledBorderColor     = MaterialTheme.colorScheme.outline,
-                    errorBorderColor        = MaterialTheme.colorScheme.error
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            Spacer(Modifier.height(5.dp))
-
-            Subtitle(text = "Contraseña:")
-            InputText(
-                value = "********",
-                onValueChange = { /* TODO */ },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SecondaryButton(
-                    text = "Guardar",
-                    onClick = onSave,
-                    modifier = Modifier.weight(1f)
-                )
-                SecondaryButton(
-                    text = "Cancelar",
-                    onClick = onCancel,
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(photoUrl ?: R.drawable.imagenprueba)
+                        .build(),
+                    contentDescription = "Foto de perfil",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .width(150.dp)
-                        .height(40.dp)
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .clickable { onChangePhotoClick() }
                 )
+                Spacer(Modifier.height(10.dp))
+
+                SecondaryButton(
+                    text = "CAMBIAR FOTO",
+                    onClick = onChangePhotoClick,
+                    modifier = Modifier
+                        .width(170.dp)
+                        .height(38.dp)
+                )
+                Spacer(Modifier.height(10.dp))
+
+                Subtitle("Nombre de usuario", Modifier.align(Alignment.Start))
+                InputText(
+                    value = username,
+                    onValueChange = onUsernameChange,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(10.dp))
+
+                Subtitle("Correo electrónico", Modifier.align(Alignment.Start))
+                InputText(
+                    value = email,
+                    onValueChange = onEmailChange,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(10.dp))
+
+                Subtitle("Fecha de nacimiento", Modifier.align(Alignment.Start))
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = birthDate,
+                    onValueChange = { },
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        IconButton(onClick = onBirthDateClick) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = null)
+                        }
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor   = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedBorderColor      = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor    = MaterialTheme.colorScheme.outline
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(Modifier.height(10.dp))
+
+                Subtitle("Contraseña", Modifier.align(Alignment.Start))
+                Spacer(Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = if (passwordHidden) "••••••••" else "",
+                    onValueChange = { },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onPasswordClick() },
+                    trailingIcon = {
+                        Icon(Icons.Default.Lock, contentDescription = null)
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor   = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedBorderColor      = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor    = MaterialTheme.colorScheme.outline
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(Modifier.height(20.dp))
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    SecondaryButton(
+                        text = "Guardar",
+                        onClick = onSaveClick,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SecondaryButton(
+                        text = "Cancelar",
+                        onClick = onCancelClick,
+                        modifier = Modifier
+                            .width(150.dp)
+                            .height(40.dp)
+                    )
+                }
             }
         }
     }
 }
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+// ——————————————————————————————————————————
+    // 2) El wrapper que el NavGraph llamará: monta estado y datePicker
+// ——————————————————————————————————————————
 @Composable
-fun PreviewFeatureEditProfileScreen() {
-    EditProfileScreen()
+fun EditProfileScreen(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    // — Wrapper: lógica de carga de datos y estado —
+    val user = Firebase.auth.currentUser
+    val db   = Firebase.firestore
+    val uid  = user?.uid
+
+    var username by remember { mutableStateOf("") }
+    var email    by remember { mutableStateOf("") }
+    var birth    by remember { mutableStateOf("") }
+    var photoUrl by remember { mutableStateOf(user?.photoUrl?.toString()) }
+
+    LaunchedEffect(uid) {
+        if (uid != null) {
+            try {
+                val snap = db.collection("users")
+                    .document(uid)
+                    .get()
+                    .await()
+                username = snap.getString("userName").orEmpty()
+                email    = snap.getString("email").orEmpty()
+                birth    = snap.getString("birthDate").orEmpty()
+                snap.getString("photoUrl")?.let { photoUrl = it }
+            } catch (_: Exception) {
+                username = user?.email?.substringBefore("@").orEmpty()
+                email    = user?.email.orEmpty()
+            }
+        }
+    }
+
+    // Cuando quieras llamar a tu UI pura, pásale estos estados:
+    EditProfileContent(
+        photoUrl           = photoUrl,
+        username           = username,
+        onUsernameChange   = { username = it },
+        email              = email,
+        onEmailChange      = { /* opcional */ },
+        birthDate          = birth,
+        onBirthDateClick   = { /* despliega DatePicker */ },
+        passwordHidden     = true,
+        onPasswordClick    = { /* … */ },
+        onChangePhotoClick = { /* … */ },
+        onSaveClick        = { /* guarda de nuevo en Firestore */ },
+        onCancelClick      = { navController.popBackStack() },
+        modifier           = modifier
+    )
 }

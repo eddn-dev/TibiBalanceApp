@@ -55,6 +55,8 @@ room {
 
 dependencies {
 
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)            // Material-3, Nav, Icons, Activity
@@ -97,6 +99,9 @@ dependencies {
 
     /* ──────────────── Lottie Animation ────────────────*/
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
+
+
 }
 
 allprojects {
