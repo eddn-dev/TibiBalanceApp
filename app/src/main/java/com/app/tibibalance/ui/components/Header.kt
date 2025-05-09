@@ -50,7 +50,7 @@ import com.app.tibibalance.R // Para la preview
  * @param onBackClick La función lambda que se ejecutará cuando el usuario pulse el botón "Atrás".
  * Solo es relevante si `showBackButton` es `true`. Por defecto es una lambda vacía.
  * @param profileImage Un [Painter] opcional que representa la imagen de perfil del usuario.
- * Si se proporciona, se mostrará como un [IconButton] circular a la derecha. Por defecto es `null`.
+ * Si se proporciona, se mostrará como un [com.app.tibibalance.ui.components.buttons.IconButton] circular a la derecha. Por defecto es `null`.
  * @param onProfileClick La función lambda que se ejecutará cuando el usuario pulse sobre la imagen
  * de perfil. Solo es relevante si `profileImage` no es `null`. Por defecto es una lambda vacía.
  * @param modifier Un [Modifier] opcional para aplicar al [CenterAlignedTopAppBar] contenedor.

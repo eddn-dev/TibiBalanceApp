@@ -8,7 +8,7 @@
  * [Dialog] de Jetpack Compose y dentro de él un [Card] de Material 3 para darle
  * estilo (esquinas redondeadas, elevación, color de fondo).
  *
- * Incluye un [Box] interno que permite superponer un botón de cierre opcional ([IconButton] con icono [Icons.Filled.Close])
+ * Incluye un [Box] interno que permite superponer un botón de cierre opcional ([com.app.tibibalance.ui.components.buttons.IconButton] con icono [Icons.Filled.Close])
  * en la esquina superior derecha sobre el contenido principal. El contenido del modal
  * se pasa como una lambda con receptor [ColumnScope], facilitando la disposición vertical
  * de los elementos internos. El `ModalContainer` define un ancho fijo y padding interno
@@ -45,7 +45,7 @@ import androidx.compose.ui.window.DialogProperties
  *
  * @details Renderiza un [Dialog] de Compose que contiene un [Card] estilizado.
  * Dentro del [Card], un [Box] organiza el contenido principal (proporcionado a través del
- * slot `content` con [ColumnScope]) y superpone opcionalmente un [IconButton] de cierre
+ * slot `content` con [ColumnScope]) y superpone opcionalmente un [com.app.tibibalance.ui.components.buttons.IconButton] de cierre
  * en la esquina superior derecha. Proporciona padding interno y un ancho fijo para
  * consistencia visual.
  *

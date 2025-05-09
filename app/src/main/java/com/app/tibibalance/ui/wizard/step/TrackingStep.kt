@@ -23,7 +23,7 @@
  * - "Notificarme": Un [SwitchToggle] para activar/desactivar las notificaciones (visible
  * solo si se ha definido una frecuencia de repetición).
  * - "Modo reto": Un [SwitchToggle] para activar/desactivar el modo reto. Este modo
- * requiere que se definan la repetición y el periodo. Un [IconButton] con un
+ * requiere que se definan la repetición y el periodo. Un [com.app.tibibalance.ui.components.buttons.IconButton] con un
  * icono de información ([Icons.Default.Info]) abre un [ModalInfoDialog]
  * explicando las condiciones del modo reto.
  *
