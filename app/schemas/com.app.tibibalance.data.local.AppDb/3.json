@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "ebbdbc90b6e55a9ae95bf5ca9f85039e",
+    "identityHash": "2e812d6f121bccd8263045488e37efa8",
     "entities": [
       {
         "tableName": "profile",
@@ -58,7 +58,7 @@
       },
       {
         "tableName": "habit_templates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `category` TEXT NOT NULL, `icon` TEXT NOT NULL, `sessionQty` INTEGER, `sessionUnit` TEXT NOT NULL, `repeatPattern` TEXT NOT NULL, `periodQty` INTEGER, `periodUnit` TEXT NOT NULL, `notifMode` TEXT NOT NULL, `notifMessage` TEXT NOT NULL, `notifTimesOfDay` TEXT NOT NULL, `notifDaysOfWeek` TEXT NOT NULL, `notifAdvanceMin` INTEGER NOT NULL, `notifVibrate` INTEGER NOT NULL, `scheduled` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `category` TEXT NOT NULL, `icon` TEXT NOT NULL, `sessionQty` INTEGER, `sessionUnit` TEXT NOT NULL, `repeatPreset` TEXT NOT NULL, `periodQty` INTEGER, `periodUnit` TEXT NOT NULL, `notifMode` TEXT NOT NULL, `notifMessage` TEXT NOT NULL, `notifTimesOfDay` TEXT NOT NULL, `notifDaysOfWeek` TEXT NOT NULL, `notifAdvanceMin` INTEGER NOT NULL, `notifVibrate` INTEGER NOT NULL, `scheduled` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -102,8 +102,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "repeatPattern",
-            "columnName": "repeatPattern",
+            "fieldPath": "repeatPreset",
+            "columnName": "repeatPreset",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -171,7 +171,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ebbdbc90b6e55a9ae95bf5ca9f85039e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2e812d6f121bccd8263045488e37efa8')"
     ]
   }
 }
