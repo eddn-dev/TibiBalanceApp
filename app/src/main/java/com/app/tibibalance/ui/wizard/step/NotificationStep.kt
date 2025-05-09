@@ -191,7 +191,7 @@ fun NotificationStep(
 
         /* Sección: Modo de Notificación (Sonido/Vibración/Silencio) -------- */
         InputSelect(
-            label   = "Modo",
+            label   = "Modo de Notificación",
             options = remember { listOf("Silencioso","Sonido","Vibrar") }, // Opciones fijas.
             selectedOption = when (cfg.mode) { // Mapea el Enum a String para mostrar.
                 NotifMode.SOUND   -> "Sonido"

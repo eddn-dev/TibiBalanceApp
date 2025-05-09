@@ -68,6 +68,7 @@ import com.app.tibibalance.ui.components.inputs.* // Importa InputNumber, InputS
 import com.app.tibibalance.ui.components.texts.Title
 import com.app.tibibalance.ui.wizard.HabitFormSaver
 
+
 /**
  * @brief Composable para el paso de "Parámetros de seguimiento" en el asistente de hábitos.
  *
@@ -94,6 +95,10 @@ fun TrackingStep(
     var infoDlg by remember { mutableStateOf(false) }
     // Efecto que propaga los cambios de 'form' al ViewModel padre.
     LaunchedEffect(form) { onFormChange(form) }
+
+
+    var infoRepeatDlg by remember { mutableStateOf(false) }
+
 
     /* Lógica para apagar el modo reto si sus requisitos dejan de cumplirse */
     // Efecto que observa cambios en la repetición y unidad de periodo.
@@ -165,25 +170,30 @@ fun TrackingStep(
             )
         }
 
+
         /* ---------- Repetición ---------- */
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
         InputSelect(
             label            = "Repetir hábito",
-            options          = remember { listOf("Indefinido","Diariamente","Cada 3 días",
+            options          = remember { listOf("No aplica","Diario","Cada 3 días",
                 "Semanal","Quincenal","Mensual","Personalizado") }, // Opciones fijas.
             selectedOption   = when (form.repeatPreset) { // Mapea Enum a String.
-                RepeatPreset.DIARIO       -> "Diariamente"
+                RepeatPreset.DIARIO       -> "Diario"
                 RepeatPreset.CADA_3_DIAS   -> "Cada 3 días"
                 RepeatPreset.SEMANAL       -> "Semanal"
                 RepeatPreset.QUINCENAL     -> "Quincenal"
                 RepeatPreset.MENSUAL       -> "Mensual"
                 RepeatPreset.PERSONALIZADO -> "Personalizado"
-                else                       -> "Indefinido"
+                else                       -> "No aplica"
             },
             onOptionSelected = { selectedString -> // Callback al seleccionar.
                 // Actualiza 'form', limpiando weekDays si no es "Personalizado".
                 form = form.copy(
                     repeatPreset = when (selectedString) { // Mapea String de vuelta a Enum.
-                        "Diariamente"   -> RepeatPreset.DIARIO
+                        "Diario"        -> RepeatPreset.DIARIO
                         "Cada 3 días"   -> RepeatPreset.CADA_3_DIAS
                         "Semanal"       -> RepeatPreset.SEMANAL
                         "Quincenal"     -> RepeatPreset.QUINCENAL
@@ -196,8 +206,12 @@ fun TrackingStep(
             },
             isError        = repeatErr, // Indica estado de error.
             supportingText = if (repeatErr) "Requerido para modo reto" else null, // Mensaje de error.
-            modifier       = Modifier.padding(bottom = 4.dp) // Menos espacio inferior.
+            modifier = Modifier.weight(1f) // Modificado para dar espacio al botón de info
         )
+            IconButton(onClick = { infoRepeatDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Información sobre repetición")
+            }
+        }
 
         /* ---------- Días de la semana (rejilla para modo Personalizado) ---------- */
         // Muestra esta sección solo si la repetición es PERSONALIZADO.
@@ -325,7 +339,17 @@ fun TrackingStep(
             primaryButton = DialogButton("Entendido") { infoDlg = false } // Botón para cerrar el diálogo.
         )
     }
+    if (infoRepeatDlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Repetir hábito",
+            message  = "Indica con qué frecuencia quieres repetir este hábito para notificarte.",
+            primaryButton = DialogButton("Entendido") { infoRepeatDlg = false }
+        )
+    }
 }
+
 
 /**
  * @brief Composable helper privado para crear una fila con un texto y un [SwitchToggle].
