@@ -1,3 +1,14 @@
+/**
+ * @file    AchievementContainer.kt
+ * @ingroup ui_components
+ * @brief   Tarjeta que muestra el progreso de un logro.
+ *
+ * @param icon        Composable que dibuja el icono representativo.
+ * @param title       Título breve del logro.
+ * @param description Descripción o meta a alcanzar.
+ * @param percent     Avance en rango 0‒100 que alimenta la barra de progreso.
+ * @param modifier    Modificador externo para tamaño, padding o clics.
+ */
 package com.app.tibibalance.ui.components.containers
 
 import androidx.compose.foundation.background
