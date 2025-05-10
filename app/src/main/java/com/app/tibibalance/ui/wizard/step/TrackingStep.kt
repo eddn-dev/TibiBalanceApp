@@ -128,10 +128,10 @@ fun TrackingStep(
             .padding(horizontal = 12.dp, vertical = 16.dp), // Padding general.
         verticalArrangement = Arrangement.spacedBy(1.dp) // Espacio entre secciones.
     ) {
-        Row{Title("Parámetros de seguimiento", Modifier.fillMaxWidth())}
+        Title("Parámetros de seguimiento", Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(2.dp))
 
-        /* ---------- Duración de la actividad ---------- */
+        /* ------------------------------ Duración de la actividad ------------------------------ */
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -157,32 +157,46 @@ fun TrackingStep(
                 )
             }
 
-            // Selector para la unidad de duración de la sesión.
-            InputSelect(
-                options         = remember { listOf("No aplica","Minutos","Horas") }, // Opciones fijas.
-                selectedOption  = when (form.sessionUnit) { // Mapea Enum a String.
-                    SessionUnit.MINUTOS -> "Minutos"
-                    SessionUnit.HORAS   -> "Horas"
-                    else                -> "No aplica"
-                },
-                onOptionSelected = { selectedString -> // Callback al seleccionar.
-                    val unit = when (selectedString) { // Mapea String de vuelta a Enum.
-                        "Minutos" -> SessionUnit.MINUTOS
-                        "Horas"   -> SessionUnit.HORAS
-                        else      -> SessionUnit.INDEFINIDO
-                    }
-                    // Actualiza 'form', reseteando sessionQty si la unidad es INDEFINIDO.
-                    form = form.copy(
-                        sessionUnit = unit,
-                        sessionQty  = form.sessionQty.takeIf { unit != SessionUnit.INDEFINIDO }
+            BoxWithConstraints(
+                modifier = Modifier.weight(1f) // Solo ocupa el espacio restante
+            ) {
+                val isCompact = maxWidth < 180.dp // Umbral de espacio disponible
+
+                val optionMap = if (isCompact || form.sessionQty != null) {
+                    mapOf(
+                        "No aplica" to SessionUnit.INDEFINIDO,
+                        "min"       to SessionUnit.MINUTOS,
+                        "hrs"         to SessionUnit.HORAS
                     )
-                },
-                modifier = Modifier.fillMaxWidth() // Ocupa el espacio restante.
-            )
+                } else {
+                    mapOf(
+                        "No aplica"         to SessionUnit.INDEFINIDO,
+                        "Ingresar minutos"  to SessionUnit.MINUTOS,
+                        "Ingresar horas"    to SessionUnit.HORAS
+                    )
+                }
+
+                val options = optionMap.keys.toList()
+                val selectedOption = optionMap.entries.find { it.value == form.sessionUnit }?.key ?: "No aplica"
+
+                InputSelect(
+                    options = options,
+                    selectedOption = selectedOption,
+                    onOptionSelected = { selectedString ->
+                        val unit = optionMap[selectedString] ?: SessionUnit.INDEFINIDO
+                        form = form.copy(
+                            sessionUnit = unit,
+                            sessionQty = form.sessionQty.takeIf { unit != SessionUnit.INDEFINIDO }
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = sessionQtyErr && form.sessionUnit != SessionUnit.INDEFINIDO
+                )
+            }
         }
         Spacer(modifier = Modifier.height(1.dp))
 
-        /* ---------- Repetición ---------- */
+        /* ------------------------------ Repetición ------------------------------ */
         //Se añade una row para poder mostrar el botón de ayuda al lado del campo repetir hábito
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -271,7 +285,7 @@ fun TrackingStep(
 
 
 
-        /* ---------- Periodo total del Hábito ---------- */
+        /* ------------------------------ Periodo total del Hábito ------------------------------ */
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -306,9 +320,9 @@ fun TrackingStep(
                 val optionMap = if (isCompact) {
                     mapOf(
                         "No aplica" to PeriodUnit.INDEFINIDO,
-                        "Días" to PeriodUnit.DIAS,
-                        "Semanas" to PeriodUnit.SEMANAS,
-                        "Meses" to PeriodUnit.MESES
+                        "días" to PeriodUnit.DIAS,
+                        "semanas" to PeriodUnit.SEMANAS,
+                        "meses" to PeriodUnit.MESES
                     )
                 } else {
                     mapOf(

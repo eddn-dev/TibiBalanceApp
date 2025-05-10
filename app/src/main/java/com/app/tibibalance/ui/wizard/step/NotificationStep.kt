@@ -188,9 +188,6 @@ fun NotificationStep(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text("Modo de Notificación:", style = MaterialTheme.typography.bodyMedium)
-            IconButton(onClick = { infoMinsADlg = true }) {
-                Icon(Icons.Default.Info, contentDescription = "Ayuda sobre minutos de antelación")
-            }
         }
         InputSelect(
             options = remember { listOf("Silencioso","Sonido","Vibrar") }, // Opciones fijas.
@@ -230,7 +227,15 @@ fun NotificationStep(
         }
 
         /* -------------------------- Sección: Minutos de Antelación ---------------------------------- */
-        Text("Minutos de antelación:", style = MaterialTheme.typography.bodyMedium)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text("Minutos de antelación:", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoMinsADlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Ayuda sobre minutos de antelación")
+            }
+        }
         InputText(
             // Muestra el valor si es > 0, sino cadena vacía.
             value           = cfg.advanceMin.takeIf { it > 0 }?.toString().orEmpty(),
@@ -321,6 +326,12 @@ fun NotificationStep(
                 val kxDate = javaDate.toKotlinLocalDate()
                 // Actualiza el estado 'cfg' con la nueva fecha de inicio.
                 cfg = cfg.copy(startsAt = kxDate)
+            }
+        },
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val todayEpochMillis = LocalDate.now().toEpochDay() * 86_400_000L
+                return utcTimeMillis >= todayEpochMillis
             }
         }
     )
