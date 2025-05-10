@@ -1,0 +1,215 @@
+Index: app/src/main/java/com/app/tibibalance/ui/screens/emotional/RegisterEmotionalStateScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/screens/emotional/RegisterEmotionalStateScreen.kt b/app/src/main/java/com/app/tibibalance/ui/screens/emotional/RegisterEmotionalStateScreen.kt
+new file mode 100644
+--- /dev/null	(date 1746757877158)
++++ b/app/src/main/java/com/app/tibibalance/ui/screens/emotional/RegisterEmotionalStateScreen.kt	(date 1746757877158)
+@@ -0,0 +1,205 @@
++// ui/screens/emotional/EmotionalCalentarScreen.kt
++package com.app.tibibalance.ui.screens.emotional
++
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Text
++import androidx.compose.runtime.*
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.tooling.preview.Preview
++import com.app.tibibalance.R
++import com.app.tibibalance.ui.components.ImageContainer
++import com.app.tibibalance.ui.components.ModalContainer
++import com.app.tibibalance.ui.components.buttons.PrimaryButton
++import com.app.tibibalance.ui.components.texts.Subtitle
++
++/**
++ * Modal para seleccionar la emoción que más resonó hoy.
++ */
++@Composable
++fun RegisterEmotionalStateScreen(
++    onDismissRequest: () -> Unit,
++    onEmotionSelected: (Emotion) -> Unit = {},
++    onConfirm: () -> Unit
++) {
++    // Estado local de la emoción seleccionada
++    var selected by remember { mutableStateOf<Emotion?>(null) }
++
++    ModalContainer(
++        onDismissRequest = onDismissRequest,
++        shape            = RoundedCornerShape(16.dp)
++    ) {
++        Column(
++            modifier = Modifier
++                .fillMaxWidth()
++                .padding(horizontal = 16.dp),
++            horizontalAlignment   = Alignment.CenterHorizontally,
++            verticalArrangement   = Arrangement.spacedBy(16.dp)
++        ) {
++            // 1) Título
++            Subtitle(
++                text      = "Selecciona la emoción que más resonó contigo hoy.",
++                textAlign = TextAlign.Center,
++                modifier  = Modifier.fillMaxWidth()
++            )
++
++            // 2) Emociones en forma circular aproximada
++            Column(
++                horizontalAlignment = Alignment.CenterHorizontally,
++                verticalArrangement = Arrangement.spacedBy(12.dp)
++            ) {
++                // Fila superior: FELICIDAD
++                Row(
++                    Modifier.fillMaxWidth(),
++                    horizontalArrangement = Arrangement.Center
++                ) {
++                    EmotionItem(
++                        emotion  = Emotion.FELICIDAD,
++                        isSelected = selected == Emotion.FELICIDAD,
++                        onClick    = {
++                            selected = Emotion.FELICIDAD
++                            onEmotionSelected(Emotion.FELICIDAD)
++                        }
++                    )
++                }
++
++                // Fila media: TRANQUILIDAD y TRISTEZA
++                Row(
++                    Modifier.fillMaxWidth(),
++                    horizontalArrangement = Arrangement.SpaceBetween
++                ) {
++                    EmotionItem(
++                        emotion    = Emotion.TRANQUILIDAD,
++                        isSelected = selected == Emotion.TRANQUILIDAD,
++                        onClick    = {
++                            selected = Emotion.TRANQUILIDAD
++                            onEmotionSelected(Emotion.TRANQUILIDAD)
++                        }
++                    )
++                    EmotionItem(
++                        emotion    = Emotion.TRISTEZA,
++                        isSelected = selected == Emotion.TRISTEZA,
++                        onClick    = {
++                            selected = Emotion.TRISTEZA
++                            onEmotionSelected(Emotion.TRISTEZA)
++                        }
++                    )
++                }
++
++                // Fila inferior: ENOJO, DISGUSTO (más grande), MIEDO
++                Row(
++                    Modifier.fillMaxWidth(),
++                    horizontalArrangement = Arrangement.SpaceEvenly
++                ) {
++                    EmotionItem(
++                        emotion    = Emotion.ENOJO,
++                        isSelected = selected == Emotion.ENOJO,
++                        onClick    = {
++                            selected = Emotion.ENOJO
++                            onEmotionSelected(Emotion.ENOJO)
++                        }
++                    )
++                    // DISGUSTO más grande
++                    EmotionItem(
++                        emotion    = Emotion.DISGUSTO,
++                        sizeDp     = 80,
++                        isSelected = selected == Emotion.DISGUSTO,
++                        onClick    = {
++                            selected = Emotion.DISGUSTO
++                            onEmotionSelected(Emotion.DISGUSTO)
++                        }
++                    )
++                    EmotionItem(
++                        emotion    = Emotion.MIEDO,
++                        isSelected = selected == Emotion.MIEDO,
++                        onClick    = {
++                            selected = Emotion.MIEDO
++                            onEmotionSelected(Emotion.MIEDO)
++                        }
++                    )
++                }
++            }
++
++            Spacer(modifier = Modifier.height(8.dp))
++
++            // 3) Botón confirmar
++            PrimaryButton(
++                text     = "LISTO",
++                onClick  = onConfirm,
++                modifier = Modifier
++                    .fillMaxWidth()
++                    .padding(bottom = 16.dp)
++            )
++        }
++    }
++}
++
++/** Modelo de emociones y metadatos de recurso */
++enum class Emotion(
++    @Suppress("unused") val drawableRes: Int,
++    @Suppress("unused") val label: String
++) {
++    FELICIDAD  (R.drawable.iconhappyimage,      "Felicidad"),
++    TRANQUILIDAD(R.drawable.iconcalmimage,      "Tranquilidad"),
++    TRISTEZA   (R.drawable.iconsadimage,        "Tristeza"),
++    ENOJO      (R.drawable.iconangryimage,      "Enojo"),
++    DISGUSTO   (R.drawable.icondisgustimage,    "Disgusto"),
++    MIEDO      (R.drawable.iconfearimage,       "Miedo");
++}
++
++/**
++ * Composable auxiliar para cada emoción:
++ * - Imagen (ImageContainer)
++ * - Nombre debajo
++ * - Tamaño parametrizable
++ * - Indica selección con un ligero borde
++ */
++@Composable
++private fun EmotionItem(
++    emotion: Emotion,
++    sizeDp: Int = 48,
++    isSelected: Boolean,
++    onClick: () -> Unit
++) {
++    Column(
++        horizontalAlignment = Alignment.CenterHorizontally,
++        modifier            = Modifier
++            .padding(4.dp)
++    ) {
++        ImageContainer(
++            resId              = emotion.drawableRes,
++            contentDescription = emotion.label,
++            modifier           = Modifier
++                .size(sizeDp.dp)
++                .then(
++                    if (isSelected)
++                        Modifier.background(
++                            color   = MaterialTheme.colorScheme.primary.copy(alpha = .2f),
++                            shape   = RoundedCornerShape(50)
++                        )
++                    else Modifier
++                )
++                .clickable(onClick = onClick)
++        )
++        Spacer(modifier = Modifier.height(4.dp))
++        Text(
++            text  = emotion.label,
++            style = MaterialTheme.typography.bodySmall,
++            textAlign = TextAlign.Center
++        )
++    }
++}
++
++@Preview(showBackground = true, widthDp = 360)
++@Composable
++private fun PreviewRegisterEmotionalStateScreen() {
++        RegisterEmotionalStateScreen(
++        onDismissRequest = { /* cerrar */ },
++        onEmotionSelected = {},
++        onConfirm = {}
++    )
++}
