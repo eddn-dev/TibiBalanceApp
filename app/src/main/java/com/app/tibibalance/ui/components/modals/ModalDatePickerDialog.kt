@@ -25,6 +25,7 @@
  */
 package com.app.tibibalance.ui.components.modals
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -73,7 +74,8 @@ fun ModalDatePickerDialog(
     visible       : Boolean,
     initialDate   : LocalDate = LocalDate.now(), // Fecha inicial por defecto: hoy
     onConfirmDate : (LocalDate?) -> Unit, // Callback que devuelve LocalDate?
-    title         : String = "Selecciona fecha" // Título por defecto
+    title         : String = "Selecciona fecha", // Título por defecto
+    selectableDates : SelectableDates? = null
 ) {
     // Si el diálogo no debe ser visible, no renderizar nada.
     if (!visible) return
@@ -82,9 +84,15 @@ fun ModalDatePickerDialog(
     // Convierte LocalDate a milisegundos epoch UTC asumiendo inicio del día.
     // 86_400_000L es el número de milisegundos en un día (24 * 60 * 60 * 1000).
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate.toEpochDay() * 86_400_000L
-        // Podrían añadirse límites de fecha aquí con selectableDates, yearRange, etc.
+        initialSelectedDateMillis = initialDate.toEpochDay() * 86_400_000L,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val todayEpochMillis = LocalDate.now().toEpochDay() * 86_400_000L
+                return utcTimeMillis >= todayEpochMillis
+            }
+        }
     )
+
 
     // Renderiza el componente Dialog de Compose.
     Dialog(onDismissRequest = { onConfirmDate(null) }) { // Llama a onConfirmDate(null) si se descarta
@@ -171,6 +179,7 @@ fun ModalDatePickerDialog(
 /**
  * @brief Previsualización del [ModalDatePickerDialog].
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "ModalDatePickerDialog")
 @Composable
 private fun ModalDatePickerDialogPreview() {
