@@ -99,6 +99,9 @@ fun NotificationStep(
     //Para el botón de ayuda al lado de añadir hora
     var infoTimeDlg by remember { mutableStateOf(false) }
 
+    var infoMsgDlg by remember { mutableStateOf(false) }
+
+    var infoMinsADlg by remember { mutableStateOf(false) }
 
     /* ---------------------------------- Contenido Principal (Scrollable) ---------------------------------- */
     // Columna que permite desplazamiento vertical y define el padding y espaciado.
@@ -148,13 +151,22 @@ fun NotificationStep(
         }
 
         /* -------------------------------- Sección: Mensaje de Notificación -------------------------------- */
-        Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoMsgDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Ayuda sobre mensaje de notificación")
+            }
+        }
         InputText(
-            value         = cfg.message, // Valor actual del mensaje.
+            value = cfg.message, // Valor actual del mensaje.
             onValueChange = { newMsg -> cfg = cfg.copy(message = newMsg) }, // Actualiza 'cfg'.
-            placeholder   = "¡Hora de completar tu hábito!", // Placeholder.
-            modifier      = Modifier.fillMaxWidth()
+            placeholder = "¡Hora de completar tu hábito!", // Placeholder.
+            modifier = Modifier.fillMaxWidth()
         )
+
 
         /* -------------------------------- Sección: Fecha de Inicio -------------------------------------- */
         Text("Fecha de inicio del hábito:", style = MaterialTheme.typography.bodyMedium)
@@ -170,7 +182,16 @@ fun NotificationStep(
         }
 
         /* -------- Sección: Modo de Notificación (Sonido/Vibración/Silencio) -------- */
-        Text("Modo de Notificación:", style = MaterialTheme.typography.bodyMedium)
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text("Modo de Notificación:", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoMinsADlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Ayuda sobre minutos de antelación")
+            }
+        }
         InputSelect(
             options = remember { listOf("Silencioso","Sonido","Vibrar") }, // Opciones fijas.
             selectedOption = when (cfg.mode) { // Mapea el Enum a String para mostrar.
@@ -233,6 +254,31 @@ fun NotificationStep(
             message  = "Puedes ingresar más de una notificación al día.",
             primaryButton = DialogButton("Entendido") {
                 infoTimeDlg = false
+            }
+        )
+    }
+
+    if (infoMsgDlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Mensaje de notificación",
+            message  = "Este mensaje se mostrará en la notificación del hábito.",
+            primaryButton = DialogButton("Entendido") {
+                infoMsgDlg = false
+            }
+        )
+    }
+
+
+    if (infoMinsADlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Minutos de antelación",
+            message  = "Si necesitas tiempo para prepararte antes de iniciar este hábito, ingresa cuantos minutos necesitas.",
+            primaryButton = DialogButton("Entendido") {
+                infoMinsADlg = false
             }
         )
     }

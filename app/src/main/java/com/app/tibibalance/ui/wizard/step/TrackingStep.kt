@@ -99,6 +99,7 @@ fun TrackingStep(
     var infoDlg by remember { mutableStateOf(false) }
     var infoRepeatDlg by remember { mutableStateOf(false) }
     var infoPeriodDlg by remember { mutableStateOf(false) }
+    var infoDuracionDlg by remember { mutableStateOf(false) }
 
 
     /* Lógica para apagar el modo reto si sus requisitos dejan de cumplirse */
@@ -130,13 +131,15 @@ fun TrackingStep(
         Row{Title("Parámetros de seguimiento", Modifier.fillMaxWidth())}
         Spacer(modifier = Modifier.height(2.dp))
 
-        /* ---------- Duración de la sesión ---------- */
+        /* ---------- Duración de la actividad ---------- */
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ){
             Text("Duración de la actividad", style = MaterialTheme.typography.bodyMedium)
-            // <---- Aqui va el boton de ayuda al usuario i
+            IconButton(onClick = { infoDuracionDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Información sobre la duración de la actividad")
+            }
         }
         Row(
             Modifier.animateContentSize(), // Anima cambios de tamaño de la fila.
@@ -156,11 +159,11 @@ fun TrackingStep(
 
             // Selector para la unidad de duración de la sesión.
             InputSelect(
-                options         = remember { listOf("Indefinido","Minutos","Horas") }, // Opciones fijas.
+                options         = remember { listOf("No aplica","Minutos","Horas") }, // Opciones fijas.
                 selectedOption  = when (form.sessionUnit) { // Mapea Enum a String.
                     SessionUnit.MINUTOS -> "Minutos"
                     SessionUnit.HORAS   -> "Horas"
-                    else                -> "Indefinido"
+                    else                -> "No aplica"
                 },
                 onOptionSelected = { selectedString -> // Callback al seleccionar.
                     val unit = when (selectedString) { // Mapea String de vuelta a Enum.
@@ -381,6 +384,16 @@ fun TrackingStep(
         )
     }
 
+    if (infoDuracionDlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Duración de la actividad",
+            message  = "Selecciona cuánto tiempo realizaras la actividad.",
+            primaryButton = DialogButton("Entendido") { infoDuracionDlg = false }
+        )
+    }
+
     //Dialogo de ayuda para el botón de información de repetir hábito
     if (infoRepeatDlg) {
         ModalInfoDialog(
@@ -396,7 +409,7 @@ fun TrackingStep(
         ModalInfoDialog(
             visible  = true,
             icon     = Icons.Default.Info,
-            title    = "Preiodo de un hábito",
+            title    = "Periodo de un hábito",
             message  = "Indica durante cuánto tiempo quieres realizar un hábito y mantener su seguimiento.",
             primaryButton = DialogButton("Entendido") { infoPeriodDlg = false }
         )
