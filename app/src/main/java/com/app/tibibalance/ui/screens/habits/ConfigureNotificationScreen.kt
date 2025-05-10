@@ -288,3 +288,4 @@ fun ConfigureNotificationScreen(
 fun PreviewViewProfileScreen() {
     ConfigureNotificationScreen()
 }
+
