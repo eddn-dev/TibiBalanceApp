@@ -1,5 +1,6 @@
 package com.app.tibibalance.ui.screens.profile
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,7 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -27,33 +35,68 @@ import com.app.tibibalance.ui.components.Header
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.inputs.InputText
 import com.app.tibibalance.ui.components.texts.Subtitle
+import com.app.tibibalance.ui.screens.settings.SettingsUiState
+import com.app.tibibalance.ui.screens.settings.SettingsViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase             // ← IMPORT CORRECTO
+import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import androidx.compose.runtime.LaunchedEffect
 
-// ——————————————————————————————————————————
-// 1) La UI pura, sin lógica, recibe todos los datos y callbacks
-// ——————————————————————————————————————————
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileContent(
-    photoUrl: String?,
-    username: String,
-    onUsernameChange: (String) -> Unit,
-    email: String,
-    onEmailChange: (String) -> Unit,
-    birthDate: String,
-    onBirthDateClick: () -> Unit,
-    passwordHidden: Boolean,
-    onPasswordClick: () -> Unit,
-    onChangePhotoClick: () -> Unit,
-    onSaveClick: () -> Unit,
-    onCancelClick: () -> Unit,
-    modifier: Modifier = Modifier
+fun EditProfileScreen(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    // Observa el estado de SettingsViewModel
+    val uiState by viewModel.ui.collectAsState()
+    val profile = (uiState as? SettingsUiState.Ready)?.profile
 
+    // Estados locales de los campos
+    var username  by remember { mutableStateOf("") }
+    var email     by remember { mutableStateOf("") }
+    var birthDate by remember { mutableStateOf("") }
+    var photoUrl  by remember { mutableStateOf<String?>(null) }
+
+    // Inicializa los valores cuando llega el perfil
+    LaunchedEffect(profile) {
+        profile?.let {
+            username  = it.userName.orEmpty()
+            email     = it.email.orEmpty()
+            birthDate = it.birthDate.orEmpty()
+            photoUrl  = it.photoUrl
+        }
+    }
+
+    // DatePickerDialog configurado desde birthDate (formato dd/MM/yyyy)
+    val context = LocalContext.current
+    val (day0, month0, year0) = birthDate
+        .split("/")
+        .takeIf { it.size == 3 }
+        ?.let { (d, m, y) -> Triple(d.toInt(), m.toInt() - 1, y.toInt()) }
+        ?: Triple(1, 0, 2000)
+    val datePicker = remember {
+        DatePickerDialog(context, { _, yy, mm, dd ->
+            birthDate = "%02d/%02d/%04d".format(dd, mm + 1, yy)
+        }, year0, month0, day0)
+    }
+
+    // Función de guardado
+    val scope = rememberCoroutineScope()
+    fun onSave() {
+        scope.launch {
+            viewModel.updateProfile(username, birthDate)
+            // Sincroniza también en Firebase Auth
+            Firebase.auth.currentUser
+                ?.updateProfile(userProfileChangeRequest { displayName = username })
+                ?.await()
+            navController.popBackStack()
+        }
+    }
+
+    // UI
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -61,16 +104,17 @@ fun EditProfileContent(
     ) {
         item {
             Header("Editar información personal")
-
             Column(
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Foto
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(photoUrl ?: R.drawable.imagenprueba)
+                        .crossfade(true)
                         .build(),
                     contentDescription = "Foto de perfil",
                     contentScale = ContentScale.Crop,
@@ -78,93 +122,97 @@ fun EditProfileContent(
                         .size(120.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surface)
-                        .clickable { onChangePhotoClick() }
+                        .clickable { /* TODO: cambiar foto */ }
                 )
-                Spacer(Modifier.height(10.dp))
-
+                Spacer(Modifier.height(5.dp))
                 SecondaryButton(
                     text = "CAMBIAR FOTO",
-                    onClick = onChangePhotoClick,
+                    onClick = { /* TODO */ },
                     modifier = Modifier
                         .width(170.dp)
                         .height(38.dp)
                 )
-                Spacer(Modifier.height(10.dp))
 
-                Subtitle("Nombre de usuario", Modifier.align(Alignment.Start))
+                // Nombre
+                Spacer(Modifier.height(10.dp))
+                Subtitle(text = "Nombre de usuario", modifier = Modifier.align(Alignment.Start))
                 InputText(
                     value = username,
-                    onValueChange = onUsernameChange,
+                    onValueChange = { username = it },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(10.dp))
 
-                Subtitle("Correo electrónico", Modifier.align(Alignment.Start))
-                InputText(
+                // Correo (read-only)
+                Spacer(Modifier.height(10.dp))
+                Subtitle(text = "Correo electrónico", modifier = Modifier.align(Alignment.Start))
+                OutlinedTextField(
                     value = email,
-                    onValueChange = onEmailChange,
+                    onValueChange = { /* no editable */ },
+                    readOnly = true,
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(10.dp))
 
-                Subtitle("Fecha de nacimiento", Modifier.align(Alignment.Start))
+                // Fecha de nacimiento
                 Spacer(Modifier.height(10.dp))
+                Subtitle(text = "Fecha de nacimiento", modifier = Modifier.align(Alignment.Start))
                 OutlinedTextField(
                     value = birthDate,
-                    onValueChange = { },
+                    onValueChange = { /* no editable */ },
                     readOnly = true,
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     trailingIcon = {
-                        IconButton(onClick = onBirthDateClick) {
-                            Icon(Icons.Default.CalendarToday, contentDescription = null)
+                        IconButton(onClick = { datePicker.show() }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = "Seleccionar fecha")
                         }
                     },
-                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedBorderColor      = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor    = MaterialTheme.colorScheme.outline
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
-                Spacer(Modifier.height(10.dp))
 
-                Subtitle("Contraseña", Modifier.align(Alignment.Start))
+                // Contraseña
                 Spacer(Modifier.height(10.dp))
+                Subtitle(text = "Contraseña", modifier = Modifier.align(Alignment.Start))
                 OutlinedTextField(
-                    value = if (passwordHidden) "••••••••" else "",
-                    onValueChange = { },
+                    value = "••••••••",
+                    onValueChange = { /* no editable */ },
                     readOnly = true,
+                    singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onPasswordClick() },
+                        .clickable { navController.navigate("changePassword") },
                     trailingIcon = {
-                        Icon(Icons.Default.Lock, contentDescription = null)
+                        Icon(Icons.Default.Lock, contentDescription = "Cambiar contraseña")
                     },
-                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor   = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedBorderColor      = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor    = MaterialTheme.colorScheme.outline
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
-                Spacer(Modifier.height(20.dp))
 
+                // Botones
+                Spacer(Modifier.height(20.dp))
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     SecondaryButton(
                         text = "Guardar",
-                        onClick = onSaveClick,
+                        onClick = { onSave() },
                         modifier = Modifier.weight(1f)
                     )
                     SecondaryButton(
                         text = "Cancelar",
-                        onClick = onCancelClick,
+                        onClick = { navController.popBackStack() },
                         modifier = Modifier
                             .width(150.dp)
                             .height(40.dp)
@@ -173,58 +221,4 @@ fun EditProfileContent(
             }
         }
     }
-}
-
-// ——————————————————————————————————————————
-// 2) El wrapper que el NavGraph llamará: monta estado y datePicker
-// ——————————————————————————————————————————
-@Composable
-fun EditProfileScreen(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
-    // — Wrapper: lógica de carga de datos y estado —
-    val user = Firebase.auth.currentUser
-    val db   = Firebase.firestore
-    val uid  = user?.uid
-
-    var username by remember { mutableStateOf("") }
-    var email    by remember { mutableStateOf("") }
-    var birth    by remember { mutableStateOf("") }
-    var photoUrl by remember { mutableStateOf(user?.photoUrl?.toString()) }
-
-    LaunchedEffect(uid) {
-        if (uid != null) {
-            try {
-                val snap = db.collection("users")
-                    .document(uid)
-                    .get()
-                    .await()
-                username = snap.getString("userName").orEmpty()
-                email    = snap.getString("email").orEmpty()
-                birth    = snap.getString("birthDate").orEmpty()
-                snap.getString("photoUrl")?.let { photoUrl = it }
-            } catch (_: Exception) {
-                username = user?.email?.substringBefore("@").orEmpty()
-                email    = user?.email.orEmpty()
-            }
-        }
-    }
-
-    // Cuando quieras llamar a tu UI pura, pásale estos estados:
-    EditProfileContent(
-        photoUrl           = photoUrl,
-        username           = username,
-        onUsernameChange   = { username = it },
-        email              = email,
-        onEmailChange      = { /* opcional */ },
-        birthDate          = birth,
-        onBirthDateClick   = { /* despliega DatePicker */ },
-        passwordHidden     = true,
-        onPasswordClick    = { /* … */ },
-        onChangePhotoClick = { /* … */ },
-        onSaveClick        = { /* guarda de nuevo en Firestore */ },
-        onCancelClick      = { navController.popBackStack() },
-        modifier           = modifier
-    )
 }

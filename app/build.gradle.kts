@@ -57,6 +57,7 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:3.0.0-alpha03")
 
+
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)            // Material-3, Nav, Icons, Activity
