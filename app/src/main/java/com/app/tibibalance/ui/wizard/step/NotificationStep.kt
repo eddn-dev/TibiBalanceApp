@@ -58,6 +58,7 @@ import com.app.tibibalance.ui.components.modals.ModalDatePickerDialog
 import com.app.tibibalance.ui.components.SwitchToggle
 import com.app.tibibalance.ui.components.inputs.InputSelect
 import com.app.tibibalance.ui.components.inputs.InputText
+import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.datetime.toJavaLocalDate // Para convertir a java.time para DatePicker
 import java.time.LocalDate // Tipo usado por DatePicker
@@ -83,10 +84,11 @@ fun NotificationStep(
     /* -------- Estados Locales -------- */
     // Estado mutable para la configuración de notificación, inicializado con los datos recibidos.
     var cfg by remember { mutableStateOf(initialCfg) }
-    // Estado para controlar la visibilidad del diálogo TimePicker.
+
+    // Estados para controlar la visibilidad de los cuadros de diálogo.
     var showTimePicker by remember { mutableStateOf(false) }
-    // Estado para controlar la visibilidad del diálogo DatePicker.
     var showDatePicker by remember { mutableStateOf(false) }
+
     // Formateador para mostrar la fecha seleccionada en el botón.
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yy") }
 
@@ -97,6 +99,143 @@ fun NotificationStep(
     //Para el botón de ayuda al lado de añadir hora
     var infoTimeDlg by remember { mutableStateOf(false) }
 
+
+    /* ---------------------------------- Contenido Principal (Scrollable) ---------------------------------- */
+    // Columna que permite desplazamiento vertical y define el padding y espaciado.
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()) // Habilita scroll.
+            .padding(horizontal = 12.dp, vertical = 16.dp), // Padding externo.
+        verticalArrangement = Arrangement.spacedBy(10.dp) // Espacio vertical entre secciones.
+    ) {
+        // Título de la "pantalla".
+        Title("Notificaciones", Modifier.align(Alignment.CenterHorizontally))
+        // Subtítulo con el hábito que se esta ingresando
+        /*Subtitle(
+            text = title,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )*/
+
+        /* ---------------------------------- Sección: Horas de Recordatorio ---------------------------------- */
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            Text("Horas de recordatorio:", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoTimeDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Ayuda sobre añadir hora")
+            }
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { // Espacio entre horas y botón añadir.
+            // Muestra cada hora añadida con un botón para eliminarla.
+            cfg.timesOfDay.forEach { hhmm ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween // Alinea texto a la izq, botón a la der.
+                ) {
+                    Text(hhmm, style = MaterialTheme.typography.bodyLarge)
+                    TextButton(onClick = { // Botón Eliminar
+                        // Actualiza 'cfg' eliminando la hora correspondiente de la lista.
+                        cfg = cfg.copy(timesOfDay = cfg.timesOfDay - hhmm)
+                    }) { Text("Eliminar") }
+                }
+            }
+            OutlinedButton(onClick = { showTimePicker = true }) { // Botón para abrir el diálogo TimePicker. (reloj elegir hora)
+                Text("Añadir hora")
+            }
+        }
+
+        /* -------------------------------- Sección: Mensaje de Notificación -------------------------------- */
+        Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)
+        InputText(
+            value         = cfg.message, // Valor actual del mensaje.
+            onValueChange = { newMsg -> cfg = cfg.copy(message = newMsg) }, // Actualiza 'cfg'.
+            placeholder   = "¡Hora de completar tu hábito!", // Placeholder.
+            modifier      = Modifier.fillMaxWidth()
+        )
+
+        /* -------------------------------- Sección: Fecha de Inicio -------------------------------------- */
+        Text("Fecha de inicio del hábito:", style = MaterialTheme.typography.bodyMedium)
+        // Botón que muestra la fecha actual y abre el DatePickerDialog.
+        OutlinedButton(
+            onClick = { showDatePicker = true },
+            modifier = Modifier.align(Alignment.Start) // Alinea el botón a la izquierda.
+        ) {
+            Icon(Icons.Default.Event, contentDescription = null) // Icono de calendario.
+            Spacer(Modifier.width(8.dp))
+            // Muestra la fecha formateada o "Seleccionar fecha" si es null.
+            Text( cfg.startsAt?.toJavaLocalDate()?.format(dateFormatter) ?: "Seleccionar fecha" )
+        }
+
+        /* -------- Sección: Modo de Notificación (Sonido/Vibración/Silencio) -------- */
+        Text("Modo de Notificación:", style = MaterialTheme.typography.bodyMedium)
+        InputSelect(
+            options = remember { listOf("Silencioso","Sonido","Vibrar") }, // Opciones fijas.
+            selectedOption = when (cfg.mode) { // Mapea el Enum a String para mostrar.
+                NotifMode.SOUND   -> "Sonido"
+                NotifMode.VIBRATE -> "Vibrar"
+                else              -> "Silencioso"
+            },
+            onOptionSelected = { selectedString -> // Callback cuando se selecciona una opción.
+                // Mapea el String seleccionado de vuelta al Enum y actualiza 'cfg'.
+                cfg = cfg.copy(
+                    mode = when (selectedString) {
+                        "Sonido" -> NotifMode.SOUND
+                        "Vibrar" -> NotifMode.VIBRATE
+                        else     -> NotifMode.SILENT
+                    }
+                )
+            }
+        )
+
+        /* -------- Sección: Interruptor de Vibración (Condicional) ------------------- */
+        // Muestra esta fila solo si el modo es 'SOUND'.
+        AnimatedVisibility(visible = cfg.mode == NotifMode.SOUND) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { cfg = cfg.copy(vibrate = !cfg.vibrate) }, // Click en la fila alterna el switch.
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween // Texto a la izq, switch a la der.
+            ) {
+                Text("Vibrar", style = MaterialTheme.typography.bodyMedium)
+                SwitchToggle(
+                    checked = cfg.vibrate, // Estado actual de vibración.
+                    onCheckedChange = { isChecked -> cfg = cfg.copy(vibrate = isChecked) } // Actualiza 'cfg'.
+                )
+            }
+        }
+
+        /* -------------------------- Sección: Minutos de Antelación ---------------------------------- */
+        Text("Minutos de antelación:", style = MaterialTheme.typography.bodyMedium)
+        InputText(
+            // Muestra el valor si es > 0, sino cadena vacía.
+            value           = cfg.advanceMin.takeIf { it > 0 }?.toString().orEmpty(),
+            onValueChange   = { // Callback al cambiar el texto.
+                // Convierte a Int o usa 0 si la conversión falla o es vacío. Actualiza 'cfg'.
+                cfg = cfg.copy(advanceMin = it.toIntOrNull() ?: 0)
+            },
+            placeholder     = "0", // Placeholder para indicar 0 minutos.
+            // Configura el teclado numérico.
+            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+            modifier        = Modifier.width(120.dp) // Ancho fijo para el campo.
+        )
+    }
+
+    //Botón de ayuda al lado del botón añadir hora
+    if (infoTimeDlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Horas de notificación",
+            message  = "Puedes ingresar más de una notificación al día.",
+            primaryButton = DialogButton("Entendido") {
+                infoTimeDlg = false
+            }
+        )
+    }
 
     /* -------- Diálogo TimePicker en AlertDialog -------- */
     // Muestra el AlertDialog con el TimePicker si showTimePicker es true.
@@ -121,7 +260,7 @@ fun NotificationStep(
         )
     }
 
-    /* -------- Diálogo DatePicker (Personalizado) -------- */
+    /* -------- Diálogo DatePicker (Personalizado) -------- Seleccionar la fecha de inicio del hábito */
     // Muestra nuestro ModalDatePickerDialog si showDatePicker es true.
     ModalDatePickerDialog(
         visible     = showDatePicker,
@@ -139,140 +278,4 @@ fun NotificationStep(
             }
         }
     )
-
-
-    /* -------- Contenido Principal (Scrollable) -------- */
-    // Columna que permite desplazamiento vertical y define el padding y espaciado.
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()) // Habilita scroll.
-            .padding(horizontal = 12.dp, vertical = 16.dp), // Padding externo.
-        verticalArrangement = Arrangement.spacedBy(16.dp) // Espacio vertical entre secciones.
-    ) {
-        // Título del paso (nombre del hábito).
-        Title(title, Modifier.fillMaxWidth())
-
-        /* Sección: Horas de Recordatorio ---------------------------------- */
-        Text("Horas de recordatorio:", style = MaterialTheme.typography.bodyMedium)
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { // Espacio entre horas y botón añadir.
-            // Muestra cada hora añadida con un botón para eliminarla.
-            cfg.timesOfDay.forEach { hhmm ->
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween // Alinea texto a la izq, botón a la der.
-                ) {
-                    Text(hhmm, style = MaterialTheme.typography.bodyLarge)
-                    TextButton(onClick = { // Botón Eliminar
-                        // Actualiza 'cfg' eliminando la hora correspondiente de la lista.
-                        cfg = cfg.copy(timesOfDay = cfg.timesOfDay - hhmm)
-                    }) { Text("Eliminar") }
-                }
-            }
-
-            //Aquí se colocó una row para poder poner el botón de i al lado de añadir hora
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(onClick = { showTimePicker = true }) { // Botón para abrir el diálogo TimePicker.
-                    Text("Añadir hora")
-                }
-                IconButton(onClick = { infoTimeDlg = true }) {
-                    Icon(Icons.Default.Info, contentDescription = "Ayuda sobre añadir hora")
-                }
-            }
-
-        }
-        //Botón de ayuda al lado del botón añadir hora
-        if (infoTimeDlg) {
-            ModalInfoDialog(
-                visible  = true,
-                icon     = Icons.Default.Info,
-                title    = "Horas de notificación",
-                message  = "Puedes ingresar más de una notificación al día.",
-                primaryButton = DialogButton("Entendido") {
-                    infoTimeDlg = false
-                }
-            )
-        }
-
-
-        /* Sección: Mensaje de Notificación -------------------------------- */
-        Text("Mensaje:", style = MaterialTheme.typography.bodyMedium)
-        InputText(
-            value         = cfg.message, // Valor actual del mensaje.
-            onValueChange = { newMsg -> cfg = cfg.copy(message = newMsg) }, // Actualiza 'cfg'.
-            placeholder   = "¡Hora de completar tu hábito!", // Placeholder.
-            modifier      = Modifier.fillMaxWidth()
-        )
-
-        /* Sección: Fecha de Inicio -------------------------------------- */
-        Text("Inicia el:", style = MaterialTheme.typography.bodyMedium)
-        // Botón que muestra la fecha actual y abre el DatePickerDialog.
-        OutlinedButton(
-            onClick = { showDatePicker = true },
-            modifier = Modifier.align(Alignment.Start) // Alinea el botón a la izquierda.
-        ) {
-            Icon(Icons.Default.Event, contentDescription = null) // Icono de calendario.
-            Spacer(Modifier.width(8.dp))
-            // Muestra la fecha formateada o "Seleccionar fecha" si es null.
-            Text( cfg.startsAt?.toJavaLocalDate()?.format(dateFormatter) ?: "Seleccionar fecha" )
-        }
-
-        /* Sección: Modo de Notificación (Sonido/Vibración/Silencio) -------- */
-        InputSelect(
-            label   = "Modo de Notificación",
-            options = remember { listOf("Silencioso","Sonido","Vibrar") }, // Opciones fijas.
-            selectedOption = when (cfg.mode) { // Mapea el Enum a String para mostrar.
-                NotifMode.SOUND   -> "Sonido"
-                NotifMode.VIBRATE -> "Vibrar"
-                else              -> "Silencioso"
-            },
-            onOptionSelected = { selectedString -> // Callback cuando se selecciona una opción.
-                // Mapea el String seleccionado de vuelta al Enum y actualiza 'cfg'.
-                cfg = cfg.copy(
-                    mode = when (selectedString) {
-                        "Sonido" -> NotifMode.SOUND
-                        "Vibrar" -> NotifMode.VIBRATE
-                        else     -> NotifMode.SILENT
-                    }
-                )
-            }
-        )
-
-        /* Sección: Interruptor de Vibración (Condicional) ------------------- */
-        // Muestra esta fila solo si el modo es 'SOUND'.
-        AnimatedVisibility(visible = cfg.mode == NotifMode.SOUND) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .clickable { cfg = cfg.copy(vibrate = !cfg.vibrate) }, // Click en la fila alterna el switch.
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween // Texto a la izq, switch a la der.
-            ) {
-                Text("Vibrar", style = MaterialTheme.typography.bodyMedium)
-                SwitchToggle(
-                    checked = cfg.vibrate, // Estado actual de vibración.
-                    onCheckedChange = { isChecked -> cfg = cfg.copy(vibrate = isChecked) } // Actualiza 'cfg'.
-                )
-            }
-        }
-
-        /* Sección: Minutos de Antelación ---------------------------------- */
-        Text("Minutos de antelación:", style = MaterialTheme.typography.bodyMedium)
-        InputText(
-            // Muestra el valor si es > 0, sino cadena vacía.
-            value           = cfg.advanceMin.takeIf { it > 0 }?.toString().orEmpty(),
-            onValueChange   = { // Callback al cambiar el texto.
-                // Convierte a Int o usa 0 si la conversión falla o es vacío. Actualiza 'cfg'.
-                cfg = cfg.copy(advanceMin = it.toIntOrNull() ?: 0)
-            },
-            placeholder     = "0", // Placeholder para indicar 0 minutos.
-            // Configura el teclado numérico.
-            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-            modifier        = Modifier.width(120.dp) // Ancho fijo para el campo.
-        )
-    }
 }
