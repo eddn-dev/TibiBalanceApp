@@ -91,13 +91,15 @@ fun TrackingStep(
     // 'form' mantiene el estado actual de los campos de este paso.
     // Se inicializa con 'initial' y se guarda/restaura usando HabitFormSaver.
     var form   by rememberSaveable(stateSaver = HabitFormSaver) { mutableStateOf(initial) }
-    // Estado para controlar la visibilidad del diálogo de información sobre el modo reto.
-    var infoDlg by remember { mutableStateOf(false) }
+
     // Efecto que propaga los cambios de 'form' al ViewModel padre.
     LaunchedEffect(form) { onFormChange(form) }
 
-
+    //Estados para controlar la visibilidad de los diálogo de información
+    var infoDlg by remember { mutableStateOf(false) }
     var infoRepeatDlg by remember { mutableStateOf(false) }
+    var infoPeriodDlg by remember { mutableStateOf(false) }
+    var infoDuracionDlg by remember { mutableStateOf(false) }
 
 
     /* Lógica para apagar el modo reto si sus requisitos dejan de cumplirse */
@@ -124,12 +126,21 @@ fun TrackingStep(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()) // Permite desplazamiento vertical.
             .padding(horizontal = 12.dp, vertical = 16.dp), // Padding general.
-        verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio entre secciones.
+        verticalArrangement = Arrangement.spacedBy(1.dp) // Espacio entre secciones.
     ) {
-        Title("Parámetros de seguimiento", Modifier.fillMaxWidth())
+        Row{Title("Parámetros de seguimiento", Modifier.fillMaxWidth())}
+        Spacer(modifier = Modifier.height(2.dp))
 
-        /* ---------- Duración de la sesión ---------- */
-        Text("Duración de la actividad", style = MaterialTheme.typography.bodyMedium)
+        /* ---------- Duración de la actividad ---------- */
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text("Duración de la actividad", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoDuracionDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Información sobre la duración de la actividad")
+            }
+        }
         Row(
             Modifier.animateContentSize(), // Anima cambios de tamaño de la fila.
             horizontalArrangement = Arrangement.spacedBy(8.dp) // Espacio entre InputNumber e InputSelect.
@@ -148,11 +159,11 @@ fun TrackingStep(
 
             // Selector para la unidad de duración de la sesión.
             InputSelect(
-                options         = remember { listOf("Indefinido","Minutos","Horas") }, // Opciones fijas.
+                options         = remember { listOf("No aplica","Minutos","Horas") }, // Opciones fijas.
                 selectedOption  = when (form.sessionUnit) { // Mapea Enum a String.
                     SessionUnit.MINUTOS -> "Minutos"
                     SessionUnit.HORAS   -> "Horas"
-                    else                -> "Indefinido"
+                    else                -> "No aplica"
                 },
                 onOptionSelected = { selectedString -> // Callback al seleccionar.
                     val unit = when (selectedString) { // Mapea String de vuelta a Enum.
@@ -169,15 +180,25 @@ fun TrackingStep(
                 modifier = Modifier.fillMaxWidth() // Ocupa el espacio restante.
             )
         }
-
+        Spacer(modifier = Modifier.height(1.dp))
 
         /* ---------- Repetición ---------- */
+        //Se añade una row para poder mostrar el botón de ayuda al lado del campo repetir hábito
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text("Repetir hábito", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoRepeatDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Información sobre repetición")
+            }
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
         InputSelect(
-            label            = "Repetir hábito",
+            label            = "", //<----
             options          = remember { listOf("No aplica","Diario","Cada 3 días",
                 "Semanal","Quincenal","Mensual","Personalizado") }, // Opciones fijas.
             selectedOption   = when (form.repeatPreset) { // Mapea Enum a String.
@@ -208,9 +229,6 @@ fun TrackingStep(
             supportingText = if (repeatErr) "Requerido para modo reto" else null, // Mensaje de error.
             modifier = Modifier.weight(1f) // Modificado para dar espacio al botón de info
         )
-            IconButton(onClick = { infoRepeatDlg = true }) {
-                Icon(Icons.Default.Info, contentDescription = "Información sobre repetición")
-            }
         }
 
         /* ---------- Días de la semana (rejilla para modo Personalizado) ---------- */
@@ -249,55 +267,81 @@ fun TrackingStep(
                             color = MaterialTheme.colorScheme.error))
             }
         }
+        Spacer(modifier = Modifier.height(1.dp))
+
+
 
         /* ---------- Periodo total del Hábito ---------- */
-        Text("Periodo del hábito", style = MaterialTheme.typography.bodyMedium)
         Row(
-            Modifier.animateContentSize(), // Anima cambios de tamaño.
-            horizontalArrangement = Arrangement.spacedBy(8.dp) // Espacio entre campos.
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text("Periodo del hábito", style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = { infoPeriodDlg = true }) {
+                Icon(Icons.Default.Info, contentDescription = "Información sobre el Periodo")
+            }
+        }
+        Row(
+            Modifier.animateContentSize(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Muestra InputNumber solo si la unidad de periodo no es INDEFINIDO.
+            // Campo de número
             AnimatedVisibility(visible = form.periodUnit != PeriodUnit.INDEFINIDO) {
                 InputNumber(
-                    value          = form.periodQty?.toString().orEmpty(), // Valor actual o vacío.
-                    onValueChange  = { form = form.copy(periodQty = it.toIntOrNull()) }, // Actualiza 'form'.
-                    placeholder    = "Cantidad",
-                    modifier       = Modifier.width(120.dp), // Ancho fijo.
-                    isError        = periodQtyErr, // Indica estado de error.
-                    supportingText = if (periodQtyErr) "Requerido" else null // Mensaje de error.
+                    value = form.periodQty?.toString().orEmpty(),
+                    onValueChange = { form = form.copy(periodQty = it.toIntOrNull()) },
+                    placeholder = "Cantidad",
+                    modifier = Modifier.width(120.dp),
+                    isError = periodQtyErr,
+                    supportingText = if (periodQtyErr) "Requerido" else null
                 )
             }
 
-            // Selector para la unidad de periodo total.
-            InputSelect(
-                options         = remember { listOf("Indefinido","Días","Semanas","Meses") }, // Opciones fijas.
-                selectedOption  = when (form.periodUnit) { // Mapea Enum a String.
-                    PeriodUnit.DIAS    -> "Días"
-                    PeriodUnit.SEMANAS -> "Semanas"
-                    PeriodUnit.MESES   -> "Meses"
-                    else               -> "Indefinido"
-                },
-                onOptionSelected = { selectedString -> // Callback al seleccionar.
-                    val unit = when (selectedString) { // Mapea String de vuelta a Enum.
-                        "Días"    -> PeriodUnit.DIAS
-                        "Semanas" -> PeriodUnit.SEMANAS
-                        "Meses"   -> PeriodUnit.MESES
-                        else      -> PeriodUnit.INDEFINIDO
-                    }
-                    // Actualiza 'form', reseteando periodQty si la unidad es INDEFINIDO.
-                    form = form.copy(
-                        periodUnit = unit,
-                        periodQty  = form.periodQty.takeIf { unit != PeriodUnit.INDEFINIDO }
+            // Campo de selección adaptativo
+            BoxWithConstraints(
+                modifier = Modifier.weight(1f) // Solo ocupa el espacio restante
+            ) {
+                val isCompact = maxWidth < 180.dp // Ajusta este umbral como gustes
+
+                val optionMap = if (isCompact) {
+                    mapOf(
+                        "No aplica" to PeriodUnit.INDEFINIDO,
+                        "Días" to PeriodUnit.DIAS,
+                        "Semanas" to PeriodUnit.SEMANAS,
+                        "Meses" to PeriodUnit.MESES
                     )
-                },
-                modifier = Modifier.fillMaxWidth(), // Ocupa espacio restante.
-                // Marca error si periodQtyErr es true Y la unidad no es indefinida (espera cantidad).
-                isError  = periodQtyErr && form.periodUnit != PeriodUnit.INDEFINIDO
-            )
+                } else {
+                    mapOf(
+                        "No aplica" to PeriodUnit.INDEFINIDO,
+                        "Ingresar días" to PeriodUnit.DIAS,
+                        "Ingresar semanas" to PeriodUnit.SEMANAS,
+                        "Ingresar meses" to PeriodUnit.MESES
+                    )
+                }
+
+                val options = optionMap.keys.toList()
+                val selectedOption = optionMap.entries.find { it.value == form.periodUnit }?.key ?: "No aplica"
+
+                InputSelect(
+                    options = options,
+                    selectedOption = selectedOption,
+                    onOptionSelected = { selectedString ->
+                        val unit = optionMap[selectedString] ?: PeriodUnit.INDEFINIDO
+                        form = form.copy(
+                            periodUnit = unit,
+                            periodQty = form.periodQty.takeIf { unit != PeriodUnit.INDEFINIDO }
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = periodQtyErr && form.periodUnit != PeriodUnit.INDEFINIDO
+                )
+            }
         }
+        Spacer(modifier = Modifier.height(1.dp))
+
 
         /* ---------- Toggles: Notificarme y Modo Reto ---------- */
-        // Muestra el toggle "Notificarme" solo si la repetición no es indefinida.
+        // Muestra el toggle "Notificarme" solo si la repetición no es "No aplica".
         if (form.repeatPreset != RepeatPreset.INDEFINIDO) {
             ToggleRow(
                 label    = "Notificarme",
@@ -339,6 +383,18 @@ fun TrackingStep(
             primaryButton = DialogButton("Entendido") { infoDlg = false } // Botón para cerrar el diálogo.
         )
     }
+
+    if (infoDuracionDlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Duración de la actividad",
+            message  = "Selecciona cuánto tiempo realizaras la actividad.",
+            primaryButton = DialogButton("Entendido") { infoDuracionDlg = false }
+        )
+    }
+
+    //Dialogo de ayuda para el botón de información de repetir hábito
     if (infoRepeatDlg) {
         ModalInfoDialog(
             visible  = true,
@@ -346,6 +402,16 @@ fun TrackingStep(
             title    = "Repetir hábito",
             message  = "Indica con qué frecuencia quieres repetir este hábito para notificarte.",
             primaryButton = DialogButton("Entendido") { infoRepeatDlg = false }
+        )
+    }
+
+    if (infoPeriodDlg) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "Periodo de un hábito",
+            message  = "Indica durante cuánto tiempo quieres realizar un hábito y mantener su seguimiento.",
+            primaryButton = DialogButton("Entendido") { infoPeriodDlg = false }
         )
     }
 }

@@ -44,6 +44,8 @@ import com.app.tibibalance.ui.components.* // Importa componentes generales como
 import com.app.tibibalance.ui.components.inputs.iconByName // Helper para mapear nombre a ImageVector
 import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.components.texts.Title
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 /**
  * @brief Composable para la pantalla de sugerencias de hábitos en el asistente.
@@ -60,10 +62,12 @@ fun SuggestionStep(
     templates   : List<HabitTemplate>,
     onSuggestion: (HabitTemplate) -> Unit
 ) {
+    val scrollState = rememberScrollState()
     // Columna principal que contiene el título y la lista agrupada.
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(scrollState)
             .padding(horizontal = 12.dp, vertical = 20.dp) // Padding ajustado.
     ) {
         // Título de la pantalla.
