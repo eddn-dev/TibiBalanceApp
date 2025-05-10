@@ -57,13 +57,13 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         //     DetailsScreen(navController, itemId)
         // }
 
-        //Direcciona a la pantalla de editar perfil
-        composable(Screen.EditProfile.route) {
-            EditProfileScreen(navController)
-        }
+
         //Direcciona a la pantalla de norificaciones
         composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }
-
+        //Direcciona a la pantalla de editar perfil
+        composable(Screen.EditPersonal.route) {
+            EditProfileScreen(navController)
+        }
 
     }
 }

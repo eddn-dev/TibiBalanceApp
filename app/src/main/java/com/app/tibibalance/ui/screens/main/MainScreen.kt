@@ -194,7 +194,7 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     SettingsScreen(
         state          = uiState,                     // Pasa el estado actual de la UI de ajustes.
         onNavigateUp   = rootNav::navigateUp,         // Acción para el botón Atrás (usa el NavController global).
-        onEditPersonal = { /* TODO: Navegar a pantalla de edición */ },
+        onEditPersonal = {  rootNav.navigate(Screen.EditPersonal.route) },
         onDevices      = { /* TODO: Navegar a pantalla de dispositivos */ },
         onAchievements = { /* TODO: Navegar a pantalla de logros */ },
         onSignOut      = mainVm::signOut,             // Acción de cierre de sesión (manejada por MainViewModel).
