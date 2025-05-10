@@ -56,6 +56,10 @@ room {
 dependencies {
 
     implementation("io.coil-kt:coil-compose:2.3.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.hilt:hilt-navigation-compose:<versión>")
+
+
 
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
