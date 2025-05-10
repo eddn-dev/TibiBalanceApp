@@ -23,17 +23,21 @@ import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun ConfigureNotificationScreen(
-    onNavigateUp: () -> Unit = {}
+    onNavigateUp: () -> Unit = {},
+    //viewModel: ConfigureNotificationViewModel = hiltViewModel()
 ){
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
+    var showModal by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(gradient)
     ) {
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,6 +49,9 @@ fun ConfigureNotificationScreen(
             Spacer(Modifier.height(10.dp))
 
             FormContainer{
+
+
+
                 Spacer(modifier = Modifier.height(15.dp))
 
                 /*******************************MSGS PERSONALIZADOS*******************************/
@@ -136,9 +143,7 @@ fun ConfigureNotificationScreen(
                         IconButton(
                             resId = R.drawable.icon_edit_blue,// cambiar de imagen
                             contentDescription = "Campana apagada",
-                            onClick = {
-                               // println("Icon button clicked")
-                            }
+                            onClick = {showModal = true}
                         )
                     }
 
@@ -186,9 +191,7 @@ fun ConfigureNotificationScreen(
                         IconButton(
                             resId = R.drawable.icon_edit_blue,
                             contentDescription = "Campana apagada",
-                            onClick = {
-                               // println("Icon button clicked")
-                            }
+                            onClick = {showModal = true }
                         )
 
                     }
@@ -237,9 +240,7 @@ fun ConfigureNotificationScreen(
                         IconButton(
                             resId = R.drawable.icon_edit_blue,
                             contentDescription = "Campana apagada",
-                            onClick = {
-                                //println("Icon button clicked")
-                            }
+                            onClick = {showModal = true }
                         )
                     }
                 }
@@ -251,6 +252,7 @@ fun ConfigureNotificationScreen(
 
 
             }
+
         }
         Header(
             title = "Notificaciones",
@@ -259,6 +261,26 @@ fun ConfigureNotificationScreen(
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
+
+    // SIMPLEMENTE ES PRUEBA DE FUNCIONAMIENTO DE LA EDICIÓN, AUN NO SE TIENE FUNCIONALIDAD
+    if (showModal) {
+        ModalConfigNotification(
+            title              = "Configurar notificación",
+            initialTime        = "8:00 a.m.",
+            initialMessage     = "¡Hora de hacer el hábito!",
+            initialDays        = emptySet(),
+            initialRepeatValue = "",
+            initialRepeatUnit  = "",
+            initialTypes       = emptySet(),
+            onDismissRequest   = { showModal = false },
+            onSave             = { time, msg, days, repeatValue, repeatUnit, types ->
+                // Aquí se podra guardar los datos
+                showModal = false
+            }
+        )
+    }
+
+
 }
 
 @Preview(showBackground = true, widthDp = 412, heightDp = 915)
