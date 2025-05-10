@@ -89,4 +89,10 @@ interface HabitRepository {
      * durante la actualización del estado.
      */
     suspend fun setCheckedToday(id: String, checked: Boolean)
+
+
+
+
+
+
 }
