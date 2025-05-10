@@ -1,0 +1,876 @@
+Index: app/src/main/java/com/app/tibibalance/ui/components/SecondaryButton.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.app.tibibalance.ui.components\r\n\r\nimport androidx.compose.foundation.BorderStroke\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.width\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.material3.*\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\n\r\n@Composable\r\nfun SecondaryButton(\r\n    text: String,\r\n    onClick: () -> Unit,\r\n    modifier: Modifier = Modifier,\r\n    enabled: Boolean = true\r\n) {\r\n    OutlinedButton(\r\n        onClick = onClick,\r\n        modifier = modifier.width(120.dp).height(40.dp),\r\n        enabled = enabled,\r\n        shape = RoundedCornerShape(12.dp),\r\n        colors = ButtonDefaults.outlinedButtonColors(\r\n            contentColor = Color.Black\r\n        ),\r\n        border = BorderStroke(1.dp, Color.Black)\r\n    ) {\r\n        Text(\r\n            text = text,\r\n            style = MaterialTheme.typography.titleMedium.copy(\r\n                fontSize = 16.sp,\r\n                fontWeight = FontWeight.Medium\r\n            )\r\n        )\r\n    }\r\n}\r\n\r\n@Preview(showBackground = true)\r\n@Composable\r\nfun PreviewSecondaryButton() {\r\n    SecondaryButton(\r\n        text = \"Cancelar\",\r\n        onClick = {}\r\n    )\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/SecondaryButton.kt b/app/src/main/java/com/app/tibibalance/ui/components/SecondaryButton.kt
+--- a/app/src/main/java/com/app/tibibalance/ui/components/SecondaryButton.kt	(revision 03e5c9b28c592c4364b2825bab01085b709f09eb)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/SecondaryButton.kt	(date 1746174310306)
+@@ -26,7 +26,8 @@
+         enabled = enabled,
+         shape = RoundedCornerShape(12.dp),
+         colors = ButtonDefaults.outlinedButtonColors(
+-            contentColor = Color.Black
++            contentColor = Color.Black,
++            containerColor = Color.White
+         ),
+         border = BorderStroke(1.dp, Color.Black)
+     ) {
+Index: app/src/main/java/com/app/tibibalance/ui/components/ProfileContainer.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.app.tibibalance.ui.components\r\n\r\nimport com.app.tibibalance.R\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.shape.CircleShape\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.unit.Dp\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.layout.ContentScale\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.tooling.preview.Preview\r\n\r\n@Composable\r\nfun ProfileContainer(\r\n    imageResId: Int,\r\n    size: Dp = 96.dp, // tamaño del círculo\r\n    backgroundColor: Color = Color.LightGray,\r\n    contentDescription: String? = null,\r\n    modifier: Modifier = Modifier\r\n) {\r\n    Box(\r\n        modifier = modifier\r\n            .size(size)\r\n            .clip(CircleShape)\r\n            .background(backgroundColor),\r\n        contentAlignment = Alignment.Center\r\n    ) {\r\n        Image(\r\n            painter = painterResource(id = imageResId),\r\n            contentDescription = contentDescription,\r\n            contentScale = ContentScale.Crop,\r\n            modifier = Modifier.fillMaxSize()\r\n        )\r\n    }\r\n}\r\n\r\n\r\n@Preview\r\n@Composable\r\nfun ProfilePreview() {\r\n    ProfileContainer(\r\n        imageResId = R.drawable.imagenprueba,\r\n        size = 80.dp,\r\n        contentDescription = \"Foto de perfil\"\r\n    )\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/ProfileContainer.kt b/app/src/main/java/com/app/tibibalance/ui/components/ProfileContainer.kt
+--- a/app/src/main/java/com/app/tibibalance/ui/components/ProfileContainer.kt	(revision 03e5c9b28c592c4364b2825bab01085b709f09eb)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/ProfileContainer.kt	(date 1746174310305)
+@@ -40,7 +40,7 @@
+     }
+ }
+ 
+-
++/*
+ @Preview
+ @Composable
+ fun ProfilePreview() {
+@@ -50,3 +50,4 @@
+         contentDescription = "Foto de perfil"
+     )
+ }
++*/
+\ No newline at end of file
+Index: app/src/main/java/com/app/tibibalance/ui/screens/FeatureForgotPasswordScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.app.tibibalance.ui.screens\r\n\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.compose.ui.unit.sp\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.material3.TextField\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.compose.ui.tooling.preview.Preview\r\n\r\nimport com.app.tibibalance.R\r\nimport com.app.tibibalance.ui.components.*\r\n\r\n@Composable\r\nfun FeatureForgotPasswordScreen() {\r\n    //Degradado del background\r\n    GradientBackgroundScreen {\r\n    // Contenido de la pantalla\r\n        Box(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n        ) {\r\n            //Encabezado/Header - - - - -> Falta un componente?\r\n            Header(\r\n                title = \"Recuperar Contraseña\",\r\n                showBackButton = true,\r\n                onBackClick = { }, //Redireccionar a iniciar sesión\r\n                profileImage = null\r\n            )\r\n            Column(\r\n                modifier = Modifier\r\n                    .align(Alignment.Center)\r\n                    .padding(16.dp)\r\n            ) {\r\n                ImageContainer(\r\n                    imageResId = R.drawable.password1,\r\n                    contentDescription = \"Recuperar contraseña\",\r\n                    modifier = Modifier\r\n                        .fillMaxWidth()\r\n                        .height(400.dp)\r\n                        .padding(vertical = 16.dp)\r\n                )\r\n                Description(\r\n                    text = \"Ingresa tu correo electrónico y enviaremos un link para recuperar tu contraseña\",\r\n                    modifier = Modifier\r\n                        .fillMaxWidth()\r\n                        .padding(bottom = 16.dp),\r\n                    textAlign = TextAlign.Center\r\n                )\r\n                FormContainer {\r\n                    var email by remember { mutableStateOf(\"\") }\r\n                    InputEmail(\r\n                        value = email,\r\n                        onValueChange = { email = it },\r\n                        placeholder = \"Correo electrónico\"\r\n                    )\r\n                }\r\n\r\n                PrimaryButton(\r\n                    text = \"Enviar\",  // Pasamos el texto al botón\r\n                    onClick = { /* Acción del primer botón */ },\r\n                    modifier = Modifier\r\n                        .fillMaxWidth()\r\n                        .padding(bottom = 16.dp, top = 16.dp)\r\n                )\r\n\r\n            }\r\n        }\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/screens/FeatureForgotPasswordScreen.kt b/app/src/main/java/com/app/tibibalance/ui/screens/FeatureForgotPasswordScreen.kt
+--- a/app/src/main/java/com/app/tibibalance/ui/screens/FeatureForgotPasswordScreen.kt	(revision 03e5c9b28c592c4364b2825bab01085b709f09eb)
++++ b/app/src/main/java/com/app/tibibalance/ui/screens/FeatureForgotPasswordScreen.kt	(date 1746174310308)
+@@ -31,7 +31,6 @@
+             modifier = Modifier
+                 .fillMaxSize()
+         ) {
+-            //Encabezado/Header - - - - -> Falta un componente?
+             Header(
+                 title = "Recuperar Contraseña",
+                 showBackButton = true,
+Index: app/src/main/java/com/app/tibibalance/ui/components/ModalWithTabs.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/ModalWithTabs.kt b/app/src/main/java/com/app/tibibalance/ui/components/ModalWithTabs.kt
+new file mode 100644
+--- /dev/null	(date 1746174310304)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/ModalWithTabs.kt	(date 1746174310304)
+@@ -0,0 +1,245 @@
++package com.app.tibibalance.ui.components
++
++import androidx.compose.foundation.ExperimentalFoundationApi
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.pager.HorizontalPager
++import androidx.compose.foundation.pager.PagerState
++import androidx.compose.foundation.pager.rememberPagerState
++import androidx.compose.foundation.shape.CircleShape
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.Close
++import androidx.compose.material3.*
++import androidx.compose.runtime.*
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.draw.clip
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.graphics.Shape
++import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.window.DialogProperties // Necesario para ModalContainer
++import kotlinx.coroutines.launch
++
++
++data class ModalTabItem(
++    val title: String,
++    val content: @Composable () -> Unit
++)
++
++/**
++ * Un contenedor modal con pestañas, ancho fijo, altura de pestañas ajustada
++ * y espacio para el botón de cierre.
++ */
++@OptIn(ExperimentalFoundationApi::class)
++@Composable
++fun ModalWithTabs(
++    onDismissRequest: () -> Unit,
++    tabs: List<ModalTabItem>,
++    modifier: Modifier = Modifier,
++    shape: Shape = RoundedCornerShape(16.dp),
++    containerColor: Color = MaterialTheme.colorScheme.surface,
++    contentColor: Color = contentColorFor(containerColor),
++    properties: DialogProperties = DialogProperties(),
++    closeButtonEnabled: Boolean = true,
++    initialTabIndex: Int = 0,
++    selectedTabColor: Color = MaterialTheme.colorScheme.primaryContainer,
++    unselectedTabColor: Color = containerColor,
++    selectedTextColor: Color = contentColorFor(selectedTabColor),
++    unselectedTextColor: Color = contentColorFor(unselectedTabColor).copy(alpha = 0.7f)
++) {
++    if (tabs.isEmpty()) return
++    val validInitialIndex = initialTabIndex.coerceIn(0, tabs.lastIndex)
++    val pagerState = rememberPagerState(initialPage = validInitialIndex) { tabs.size }
++    val coroutineScope = rememberCoroutineScope()
++
++    ModalContainer(
++        onDismissRequest = onDismissRequest,
++        modifier = modifier,
++        shape = shape,
++        containerColor = containerColor,
++        contentColor = contentColor,
++        properties = properties,
++        closeButtonEnabled = closeButtonEnabled
++    ) {
++        Column(modifier = Modifier.fillMaxWidth()) {
++            // Fila de Pestañas
++            TabRow(
++                selectedTabIndex = pagerState.currentPage,
++                containerColor = unselectedTabColor,
++                contentColor = unselectedTextColor,
++                indicator = {},
++                divider = {},
++                // CAMBIO: Añadir padding al final para dejar espacio al botón 'X'
++                modifier = Modifier.padding(end = if (closeButtonEnabled) 40.dp else 0.dp)
++            ) {
++                tabs.forEachIndexed { index, tabItem ->
++                    val selected = pagerState.currentPage == index
++                    Tab(
++                        selected = selected,
++                        onClick = {
++                            coroutineScope.launch { pagerState.animateScrollToPage(index) }
++                        },
++                        modifier = Modifier
++                            .height(48.dp) // Altura fija
++                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
++                            .background(if (selected) selectedTabColor else unselectedTabColor)
++                            .padding(vertical = 4.dp, horizontal = 12.dp), // Padding interno reducido
++                        text = {
++                            Text(
++                                text = tabItem.title,
++                                color = if (selected) selectedTextColor else unselectedTextColor,
++                                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
++                            )
++                        }
++                    )
++                }
++            } // Fin TabRow
++
++            HorizontalPager(
++                state = pagerState,
++                modifier = Modifier
++                    .fillMaxWidth()
++                    .weight(1f)
++            ) { pageIndex ->
++                Box(
++                    modifier = Modifier
++                        .fillMaxSize()
++                        .padding(16.dp),
++                    contentAlignment = Alignment.TopStart
++                ) {
++                    tabs[pageIndex].content()
++                }
++            } // Fin HorizontalPager
++        } // Fin Column
++    } // Fin ModalContainer
++}
++
++
++// --- Preview para ModalWithTabs con Espacio para Botón ---
++@OptIn(ExperimentalFoundationApi::class)
++@Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)")
++@Composable
++fun ModalWithTabsPreview() {
++    MaterialTheme {
++        // Datos de ejemplo con los títulos solicitados
++        val sampleTabs = remember {
++            listOf(
++                ModalTabItem("Semanal") {
++                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier=Modifier.fillMaxWidth()) {
++                        Title(text = "Contenido Semanal", textAlign = TextAlign.Center)
++                        Spacer(modifier = Modifier.height(10.dp))
++                        Description(text = "Aquí va la información semanal.", textAlign = TextAlign.Center)
++                        Spacer(modifier = Modifier.height(20.dp))
++                        PrimaryButton(text = "Ver Semana", onClick = {})
++                    }
++                },
++                ModalTabItem("Mensual") {
++                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier=Modifier.fillMaxWidth()) {
++                        Title(text = "Contenido Mensual", textAlign = TextAlign.Center)
++                        Spacer(modifier = Modifier.height(10.dp))
++                        Row(verticalAlignment = Alignment.CenterVertically) {
++                            var checked by remember { mutableStateOf(true) }
++                            Description(text="Activar Resumen:")
++                            Spacer(modifier=Modifier.width(8.dp))
++                            SwitchToggle(checked = checked, onCheckedChange = {checked = it})
++                        }
++                        Spacer(modifier = Modifier.height(10.dp))
++                        Description(text = "Resumen detallado del mes.", textAlign = TextAlign.Center)
++                    }
++                }
++                // Puedes añadir más pestañas aquí si lo necesitas
++            )
++        }
++        // Colores y forma (sin cambios)
++        val previewContainerColor = Color(0xFFE3F2FD)
++        val previewSelectedTabColor = Color(0xFFBBDEFB)
++        val previewUnselectedTabColor = previewContainerColor
++        val previewSelectedTextColor = Color.Black
++        val previewUnselectedTextColor = Color.Black.copy(alpha = 0.6f)
++        val shape = RoundedCornerShape(16.dp)
++        val closeButtonEnabled = true // Mantenerlo true en preview para ver el efecto
++        val closeButtonBackgroundColor = Color.White
++        val closeButtonContentColor = contentColorFor(closeButtonBackgroundColor)
++        val pagerState = rememberPagerState(initialPage = 0) { sampleTabs.size } // Empezar en la primera
++        val coroutineScope = rememberCoroutineScope()
++
++        // Simulación del Card
++        Card(
++            modifier = Modifier
++                .width(320.dp)
++                .wrapContentHeight(),
++            shape = shape,
++            colors = CardDefaults.cardColors(
++                containerColor = previewContainerColor,
++                contentColor = contentColorFor(previewContainerColor)
++            )
++        ) {
++            Box(
++                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
++            ) {
++                Column(modifier = Modifier.fillMaxWidth()) {
++                    // TabRow con padding al final
++                    TabRow(
++                        selectedTabIndex = pagerState.currentPage,
++                        containerColor = previewUnselectedTabColor,
++                        contentColor = previewUnselectedTextColor,
++                        indicator = {},
++                        divider = {},
++                        // CAMBIO: Añadir padding al final en la preview también
++                        modifier = Modifier.padding(end = if (closeButtonEnabled) 40.dp else 0.dp)
++                    ) {
++                        sampleTabs.forEachIndexed { index, tabItem ->
++                            val selected = pagerState.currentPage == index
++                            Tab(
++                                selected = selected,
++                                onClick = {
++                                    coroutineScope.launch { pagerState.animateScrollToPage(index) }
++                                },
++                                modifier = Modifier
++                                    .height(48.dp) // Altura fija
++                                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
++                                    .background(if (selected) previewSelectedTabColor else previewUnselectedTabColor)
++                                    .padding(vertical = 4.dp, horizontal = 12.dp), // Padding interno reducido
++                                text = {
++                                    Text(
++                                        text = tabItem.title, // Usar títulos de ejemplo actualizados
++                                        color = if (selected) previewSelectedTextColor else previewUnselectedTextColor,
++                                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
++                                    )
++                                }
++                            )
++                        }
++                    }
++                    // HorizontalPager
++                    HorizontalPager(
++                        state = pagerState,
++                        modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 200.dp)
++                    ) { pageIndex ->
++                        Box(
++                            modifier = Modifier.fillMaxSize().padding(16.dp),
++                            contentAlignment = Alignment.TopCenter
++                        ) {
++                            sampleTabs[pageIndex].content()
++                        }
++                    }
++                } // Fin Column principal
++                // Botón de cierre 'X' (simulado)
++                if (closeButtonEnabled) {
++                    Surface(
++                        modifier = Modifier.align(Alignment.TopEnd).size(32.dp),
++                        shape = CircleShape, color = closeButtonBackgroundColor, shadowElevation = 2.dp
++                    ) {
++                        IconButton(onClick = { /* No-op */ }, modifier = Modifier.size(32.dp)) {
++                            Icon(Icons.Filled.Close, "Cerrar modal", tint = closeButtonContentColor, modifier = Modifier.size(18.dp))
++                        }
++                    }
++                }
++            } // Fin Box externo
++        } // Fin Card
++    } // Fin MaterialTheme
++}
++
+Index: app/src/main/java/com/app/tibibalance/ui/components/Switch.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/Switch.kt b/app/src/main/java/com/app/tibibalance/ui/components/Switch.kt
+new file mode 100644
+--- /dev/null	(date 1746174310306)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/Switch.kt	(date 1746174310306)
+@@ -0,0 +1,72 @@
++package com.app.tibibalance.ui.components
++
++import androidx.compose.foundation.layout.*
++import androidx.compose.material3.MaterialTheme // Importar MaterialTheme si no está ya
++import androidx.compose.material3.Switch
++import androidx.compose.material3.SwitchDefaults
++import androidx.compose.runtime.*
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++
++/**
++ * Un composable Switch personalizado con colores específicos y borde visible en estado apagado.
++ *
++ * @param checked Estado actual del switch (encendido/apagado).
++ * @param onCheckedChange Lambda que se ejecuta cuando el estado cambia.
++ * @param modifier Modificador a aplicar al Switch. Evita usar width/height directamente aquí.
++ * @param enabled Controla si el switch está habilitado o deshabilitado.
++ */
++@Composable
++fun SwitchToggle(
++    checked: Boolean,
++    onCheckedChange: (Boolean) -> Unit,
++    modifier: Modifier = Modifier, // El modifier se pasa al Switch
++    enabled: Boolean = true // Añadido parámetro enabled por completitud
++) {
++    Switch(
++        checked = checked,
++        onCheckedChange = onCheckedChange,
++        modifier = modifier,
++        enabled = enabled,
++        colors = SwitchDefaults.colors(
++            // Colores personalizados para el estado 'checked' (encendido)
++            checkedThumbColor = Color.White,
++            checkedTrackColor = Color(0xFF458BAE),
++            checkedBorderColor = Color.Transparent, // Sin borde cuando está encendido
++            checkedIconColor = Color.Transparent,
++
++            // Colores personalizados para el estado 'unchecked' (apagado)
++            uncheckedThumbColor = Color.White,
++            uncheckedTrackColor = Color(0xFFB0BEC5), // Gris claro para el riel
++            // CORRECCIÓN: Se añade un color de borde visible para el estado apagado
++            uncheckedBorderColor = Color(0xFF78909C), // Gris más oscuro para el borde
++            uncheckedIconColor = Color.Transparent,
++
++            // Colores para el estado deshabilitado (opcional)
++            // ...
++        )
++    )
++}
++
++@Preview(showBackground = true)
++@Composable
++fun SwitchTogglePreview() {
++    MaterialTheme {
++        Row(
++            Modifier
++                .padding(16.dp)
++                .wrapContentWidth(),
++            horizontalArrangement = Arrangement.spacedBy(16.dp)
++        ) {
++            var off by remember { mutableStateOf(false) }
++            // El Switch apagado ahora debería mostrar el borde
++            SwitchToggle(checked = off, onCheckedChange = { off = it })
++
++            var on by remember { mutableStateOf(true) }
++            // El Switch encendido no debería mostrar borde
++            SwitchToggle(checked = on, onCheckedChange = { on = it })
++        }
++    }
++}
+Index: app/src/main/java/com/app/tibibalance/ui/preview/FeatureEditProfileScreenPreview.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/preview/FeatureEditProfileScreenPreview.kt b/app/src/main/java/com/app/tibibalance/ui/preview/FeatureEditProfileScreenPreview.kt
+new file mode 100644
+--- /dev/null	(date 1746174310307)
++++ b/app/src/main/java/com/app/tibibalance/ui/preview/FeatureEditProfileScreenPreview.kt	(date 1746174310307)
+@@ -0,0 +1,11 @@
++package com.app.tibibalance.ui.preview
++
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.tooling.preview.Preview
++import com.app.tibibalance.ui.screens.FeatureEditProfileScreen
++
++@Preview
++@Composable
++fun FeatureEditProfileScreenPreview() {
++    FeatureEditProfileScreen()
++}
+\ No newline at end of file
+Index: app/src/main/java/com/app/tibibalance/ui/screens/FeatureEditProfileScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/screens/FeatureEditProfileScreen.kt b/app/src/main/java/com/app/tibibalance/ui/screens/FeatureEditProfileScreen.kt
+new file mode 100644
+--- /dev/null	(date 1746174310307)
++++ b/app/src/main/java/com/app/tibibalance/ui/screens/FeatureEditProfileScreen.kt	(date 1746174310307)
+@@ -0,0 +1,129 @@
++package com.app.tibibalance.ui.screens
++
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.wrapContentHeight
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.ui.unit.dp
++import com.app.tibibalance.R
++import com.app.tibibalance.ui.components.*
++import androidx.compose.foundation.layout.Arrangement
++
++
++@Composable
++fun FeatureEditProfileScreen() {
++    //Degradado del background
++    GradientBackgroundScreen {
++        // Contenido de la pantalla
++        Box(
++            modifier = Modifier
++                .fillMaxSize()
++        ) {
++            Header(
++                title = "Editar Información Personal",
++                // Si se ingresa a esta pantalla desde los ajustes, el boton de regreso onBackClick lleva a ajustes, no a Visualizar perfil *
++                showBackButton = true,
++                onBackClick = { }, //Redireccionar a Visualizar perfil
++                profileImage = null
++            )
++            Column(
++                modifier = Modifier
++                    .align(Alignment.TopCenter)
++                    .padding(top = 80.dp)
++            ) {
++                ProfileContainer(
++                    imageResId = R.drawable.imagenprueba,
++                    size = 110.dp,
++                    contentDescription = "Foto de perfil"
++                )
++
++                // Este es otro botón? Falta el componente? <- - - - - - - - alargar componente
++                SecondaryButton(
++                    modifier = Modifier.padding(top=10.dp),
++                    text = "Cambiar Foto",
++                    onClick = { } //Cambiar Foto de perfil
++                )
++            }
++            Column(
++                modifier = Modifier.padding(top = 270.dp)
++            ) {
++                Subtitle(
++                    text = "Nombre de usuario:"
++                )
++                InputText(
++                    value = "nora soto", //Colocar el nombre del usuario desde Firebase
++                    onValueChange = {  },
++                    modifier = Modifier.padding(top = 10.dp)
++                )
++                //Falta icono de editar (lapiz)
++
++                Subtitle(
++                    text = "Correo electrónico:",
++                    modifier = Modifier.padding(top=20.dp)
++                )
++                InputText(
++                    value = "norasoto5@gmail.com", //Colocar el nombre del usuario desde Firebase
++                    onValueChange = {  },
++                    modifier = Modifier.padding(top = 10.dp)
++                )
++                Caption(
++                    text = "El correo electrónico no es editable"
++                )
++
++                Subtitle(
++                    text = "Fecha de nacimiento:",
++                    modifier = Modifier.padding(top=20.dp)
++                )
++                //Falta incono de calendario
++                InputText(
++                    value = "29/07/2004", //Colocar el nombre del usuario desde Firebase
++                    onValueChange = {  },
++                    modifier = Modifier.padding(top = 10.dp)
++                )
++                //Falta icono de editar (lapiz)
++
++                Subtitle(
++                    text = "Contraseña:",
++                    modifier = Modifier.padding(top=20.dp)
++                )
++                InputText(
++                    value = "********", //Colocar contraseña encriptada desde Firebase
++                    onValueChange = {  },
++                    modifier = Modifier
++                        .padding(top = 10.dp)
++                )
++                //Falta icono de editar (lapiz)
++                Box(modifier = Modifier.fillMaxSize()){
++                Row (
++                    modifier = Modifier
++                        .align(Alignment.TopCenter)
++                        .padding(top=50.dp), // Padding externo (alrededor de toda la fila)
++
++                    horizontalArrangement = Arrangement.spacedBy(30.dp), // Espacio entre los elementos de la fila
++                    verticalAlignment = Alignment.CenterVertically
++                ){
++                    SecondaryButton(
++                        text = "Guardar",
++                        onClick = {} //Mostrar mensaje de confirmacion o warning (si no se hicieron cambios)
++                    )
++
++                    SecondaryButton(
++                        text = "Cancelar",
++                        onClick = {} //Mostrar mensaje de alerta
++                    )
++                }
++}
++                //Agregar navbar
++            }
++        }
++    }
++
++}
+\ No newline at end of file
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Estructura de Directorios UI en Android Studio con Jetpack Compose\r\n\r\nEsta documentación describe una estructura recomendada para organizar el código de la interfaz de usuario (UI) en un proyecto Android utilizando Jetpack Compose, centrándose específicamente en los directorios `ui/components` y `ui/preview`. Esta estructura promueve la modularidad, reutilización, mantenibilidad y facilita las pruebas unitarias y de UI.\r\n\r\n## Contexto General\r\n\r\napp/\r\n└── src/\r\n    └── main/\r\n        └── java/\r\n            └── com/\r\n                └── app/\r\n                    └── tibibalance/\r\n                    ├── data/\r\n                    ├── domain/\r\n                    ├── di/\r\n                    └── ui/  <-- Directorio base para la UI\r\n                        ├── components/\r\n                        ├── preview/\r\n                        ├── screens/\r\n                        ├── theme/\r\n                        ├── navigation/\r\n## Directorio `ui/components`\r\n\r\n### Propósito\r\n\r\nEl directorio `ui/components` está destinado a albergar **elementos de UI reutilizables y atómicos (o de bajo nivel de composición)**. Estos componentes son la base fundamental sobre la cual se construyen pantallas más complejas. Idealmente, estos componentes deberían ser:\r\n\r\n1.  **Sin estado (Stateless):** Reciben datos y callbacks como parámetros y no gestionan su propio estado interno complejo.\r\n3.  **Foco único:** Cada componente realiza una tarea específica de UI.\r\n\r\n### Organización Interna\r\n\r\nLa convención principal es **crear un archivo `.kt` separado para cada función `@Composable` que define un componente**. El nombre del archivo debe coincidir exactamente (respetando mayúsculas y minúsculas) con el nombre de la función `@Composable` principal que contiene.\r\n\r\n└── ui/\r\n    └── components/\r\n        ├── PrimaryButton.kt         # Contiene @Composable fun PrimaryButton(...)\r\n\r\n\r\n## Directorio `ui/preview`\r\n\r\n\r\nEl directorio ui/preview contiene funciones @Composable específicamente anotadas con @Preview. El propósito fundamental de este directorio es facilitar la visualización y el desarrollo iterativo de los componentes de UI (ui/components) y pantallas completas (ui/screens) directamente en el panel de vista previa de Android Studio, sin necesidad de ejecutar la aplicación completa en un emulador o dispositivo físico.Organización InternaLa organización puede variar, pero un enfoque común es tener archivos .kt que agrupen previews para componentes relacionados o para un componente específico si tiene muchas variantes de previsualización. Los nombres de archivo suelen incluir el sufijo Previews o Preview.└── ui/\r\n    ├── components/\r\n    │   ├── CustomButton.kt\r\n    │   └── InputField.kt\r\n    │   └── ...\r\n    └── preview/\r\n        ├── ButtonPreviews.kt     # Contiene @Preview para CustomButton\r\n        ├── InputFieldPreviews.kt # Contiene @Preview para InputField\r\n        ├── ComponentPreviews.kt  # Alternativa: Agrupa previews de varios componentes pequeños\r\n        ├── LoginScreenPreview.kt # Contiene @Preview para la pantalla de Login\r\n        └── ...\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision 03e5c9b28c592c4364b2825bab01085b709f09eb)
++++ b/README.md	(date 1746174310302)
+@@ -27,7 +27,7 @@
+ El directorio `ui/components` está destinado a albergar **elementos de UI reutilizables y atómicos (o de bajo nivel de composición)**. Estos componentes son la base fundamental sobre la cual se construyen pantallas más complejas. Idealmente, estos componentes deberían ser:
+ 
+ 1.  **Sin estado (Stateless):** Reciben datos y callbacks como parámetros y no gestionan su propio estado interno complejo.
+-3.  **Foco único:** Cada componente realiza una tarea específica de UI.
++.  **Foco único:** Cada componente realiza una tarea específica de UI.
+ 
+ ### Organización Interna
+ 
+Index: app/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    alias(libs.plugins.android.application)\r\n    alias(libs.plugins.kotlin.android)\r\n    alias(libs.plugins.kotlin.compose)\r\n    // Add the Google services Gradle plugin\r\n    id(\"com.google.gms.google-services\")\r\n\r\n}\r\n\r\nandroid {\r\n    namespace = \"com.app.tibibalance\"\r\n    compileSdk = 35\r\n\r\n    defaultConfig {\r\n        applicationId = \"com.app.tibibalance\"\r\n        minSdk = 24\r\n        targetSdk = 35\r\n        versionCode = 1\r\n        versionName = \"1.0\"\r\n\r\n        testInstrumentationRunner = \"androidx.test.runner.AndroidJUnitRunner\"\r\n    }\r\n\r\n    buildTypes {\r\n        release {\r\n            isMinifyEnabled = false\r\n            proguardFiles(\r\n                getDefaultProguardFile(\"proguard-android-optimize.txt\"),\r\n                \"proguard-rules.pro\"\r\n            )\r\n        }\r\n    }\r\n    compileOptions {\r\n        sourceCompatibility = JavaVersion.VERSION_11\r\n        targetCompatibility = JavaVersion.VERSION_11\r\n    }\r\n    kotlinOptions {\r\n        jvmTarget = \"11\"\r\n    }\r\n    buildFeatures {\r\n        compose = true\r\n    }\r\n}\r\n\r\ndependencies {\r\n    // Íconos extendidos (válidos y estables)\r\n    implementation(\"androidx.compose.material:material-icons-extended:1.5.4\")\r\n\r\n    // Material 3 base (botones, layouts, etc.)\r\n    implementation(libs.androidx.material3)\r\n\r\n    // Firebase\r\n    implementation(platform(\"com.google.firebase:firebase-bom:33.13.0\"))\r\n    implementation(\"com.google.firebase:firebase-analytics\")\r\n    implementation(\"com.google.firebase:firebase-auth-ktx\")\r\n\r\n    // Core de AndroidX\r\n    implementation(libs.androidx.core.ktx)\r\n    implementation(libs.androidx.lifecycle.runtime.ktx)\r\n    implementation(libs.androidx.activity.compose)\r\n\r\n    // Compose\r\n    implementation(platform(libs.androidx.compose.bom))\r\n    implementation(libs.androidx.ui)\r\n    implementation(libs.androidx.ui.graphics)\r\n    implementation(libs.androidx.ui.tooling.preview)\r\n\r\n    // Testing\r\n    testImplementation(libs.junit)\r\n    androidTestImplementation(libs.androidx.junit)\r\n    androidTestImplementation(libs.androidx.espresso.core)\r\n    androidTestImplementation(platform(libs.androidx.compose.bom))\r\n    androidTestImplementation(libs.androidx.ui.test.junit4)\r\n    debugImplementation(libs.androidx.ui.tooling)\r\n    debugImplementation(libs.androidx.ui.test.manifest)\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+--- a/app/build.gradle.kts	(revision 03e5c9b28c592c4364b2825bab01085b709f09eb)
++++ b/app/build.gradle.kts	(date 1746174322404)
+@@ -43,34 +43,27 @@
+ }
+ 
+ dependencies {
+-    // Íconos extendidos (válidos y estables)
++    //implementation("androidx.compose.material3:material3-icons-extended:1.2.0-alpha03")
++    implementation("androidx.compose.foundation:foundation-layout:1.6.0")
++    implementation("androidx.compose.material:material-icons-extended:<versión>")
+     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+-
+-    // Material 3 base (botones, layouts, etc.)
+-    implementation(libs.androidx.material3)
+-
+-    // Firebase
+     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+     implementation("com.google.firebase:firebase-analytics")
+-    implementation("com.google.firebase:firebase-auth-ktx")
+-
+-    // Core de AndroidX
++    implementation("com.google.firebase:firebase-auth-ktx") // La extensión -ktx es para soporte de Kotlin
+     implementation(libs.androidx.core.ktx)
+     implementation(libs.androidx.lifecycle.runtime.ktx)
+     implementation(libs.androidx.activity.compose)
+-
+-    // Compose
+     implementation(platform(libs.androidx.compose.bom))
+     implementation(libs.androidx.ui)
+     implementation(libs.androidx.ui.graphics)
+     implementation(libs.androidx.ui.tooling.preview)
+-
+-    // Testing
++    implementation(libs.androidx.material3)
+     testImplementation(libs.junit)
+     androidTestImplementation(libs.androidx.junit)
+     androidTestImplementation(libs.androidx.espresso.core)
+     androidTestImplementation(platform(libs.androidx.compose.bom))
+     androidTestImplementation(libs.androidx.ui.test.junit4)
+-    debugImplementation(libs.androidx.ui.tooling)
++    debugImplementation(libs.androidx.ui.tooling) 
+     debugImplementation(libs.androidx.ui.test.manifest)
+-}
++    implementation("androidx.compose.material:material-icons-extended")
++}
+\ No newline at end of file
+Index: app/src/main/java/com/app/tibibalance/ui/components/ModalContainer.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/ModalContainer.kt b/app/src/main/java/com/app/tibibalance/ui/components/ModalContainer.kt
+new file mode 100644
+--- /dev/null	(date 1746174310304)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/ModalContainer.kt	(date 1746174310304)
+@@ -0,0 +1,126 @@
++package com.app.tibibalance.ui.components
++
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.shape.CircleShape // Importar CircleShape
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material.icons.Icons // Importar Icons
++import androidx.compose.material.icons.filled.Close // Importar Close
++import androidx.compose.material3.*
++import androidx.compose.runtime.*
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.draw.clip // Necesario para clip
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.graphics.Shape
++import androidx.compose.ui.text.font.FontWeight // Para negrita opcional
++import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.window.Dialog // Importación clave
++import androidx.compose.ui.window.DialogProperties
++import kotlinx.coroutines.launch
++
++/**
++ * Contenedor base para modales, con un ancho fijo de 320.dp.
++ *
++ * @param onDismissRequest Se llama cuando el usuario intenta cerrar el diálogo.
++ * @param modifier Modificador a aplicar al Card interno.
++ * @param shape La forma del Card interno.
++ * @param containerColor Color de fondo del Card interno.
++ * @param contentColor Color del contenido dentro del Card.
++ * @param properties Propiedades del Dialog.
++ * @param closeButtonEnabled Si el botón 'X' debe mostrarse.
++ * @param closeButtonBackgroundColor Color de fondo para el botón de cierre.
++ * @param closeButtonContentColor Color del icono del botón de cierre.
++ * @param content El contenido composable que se mostrará dentro del diálogo.
++ */
++@Composable
++fun ModalContainer(
++    onDismissRequest: () -> Unit,
++    modifier: Modifier = Modifier, // Modificador para el Card interno
++    shape: Shape = RoundedCornerShape(16.dp),
++    containerColor: Color = MaterialTheme.colorScheme.surface,
++    contentColor: Color = contentColorFor(containerColor),
++    properties: DialogProperties = DialogProperties(), // Propiedades del Dialog
++    closeButtonEnabled: Boolean = true,
++    closeButtonBackgroundColor: Color = Color.White,
++    closeButtonContentColor: Color = MaterialTheme.colorScheme.onSurface,
++    content: @Composable ColumnScope.() -> Unit // Contenido del modal
++) {
++    Dialog(
++        onDismissRequest = onDismissRequest,
++        properties = properties
++    ) {
++        Card(
++            // Se aplica width(320.dp) para el ancho fijo
++            modifier = modifier.width(320.dp),
++            shape = shape,
++            colors = CardDefaults.cardColors(
++                containerColor = containerColor,
++                contentColor = contentColor
++            )
++        ) {
++            Box(
++                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp) // Padding interno del Box
++            ) {
++                Column(
++                    modifier = Modifier
++                        .fillMaxWidth() // La columna sí llena el ancho del Card
++                        .padding( // Padding interno de la columna
++                            top = if (closeButtonEnabled) 40.dp else 16.dp,
++                            start = 16.dp,
++                            end = 16.dp,
++                            bottom = 16.dp
++                        )
++                ) {
++                    content() // Contenido personalizado
++                }
++
++                // Botón de cierre 'X'.
++                if (closeButtonEnabled) {
++                    Surface(
++                        modifier = Modifier
++                            .align(Alignment.TopEnd)
++                            .size(32.dp),
++                        shape = CircleShape,
++                        color = closeButtonBackgroundColor,
++                        shadowElevation = 2.dp
++                    ) {
++                        IconButton(
++                            onClick = onDismissRequest,
++                            modifier = Modifier.size(32.dp)
++                        ) {
++                            Icon(
++                                imageVector = Icons.Filled.Close,
++                                contentDescription = "Cerrar modal",
++                                tint = closeButtonContentColor,
++                                modifier = Modifier.size(18.dp)
++                            )
++                        }
++                    }
++                }
++            }
++        }
++    }
++}
++
++@Preview(showBackground = true)
++@Composable
++fun ModalContainerPreview() {
++    MaterialTheme {
++        // Usamos un Box para simular una pantalla base
++        Box(modifier = Modifier.fillMaxSize()) {
++            ModalContainer(
++                onDismissRequest = {}, // Aquí puedes conectar a una variable si lo deseas
++                closeButtonEnabled = true
++            ) {
++                Text("Este es un ejemplo de contenido del modal.")
++                Spacer(modifier = Modifier.height(8.dp))
++                Button(onClick = {}) {
++                    Text("Aceptar")
++                }
++            }
++        }
++    }
++}
++
+Index: app/src/main/java/com/app/tibibalance/ui/components/ProgressBar.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/ProgressBar.kt b/app/src/main/java/com/app/tibibalance/ui/components/ProgressBar.kt
+new file mode 100644
+--- /dev/null	(date 1746174310305)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/ProgressBar.kt	(date 1746174310305)
+@@ -0,0 +1,67 @@
++// file: ui/components/ProgressBar.kt
++package com.app.tibibalance.ui.components
++
++import androidx.compose.foundation.background
++import androidx.compose.foundation.layout.*
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.draw.clip
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.text.style.TextAlign
++import androidx.compose.material3.Text
++import androidx.compose.ui.tooling.preview.Preview
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
++import androidx.compose.foundation.shape.RoundedCornerShape
++
++@Composable
++fun ProgressBar(
++    percent: Int,
++    modifier: Modifier = Modifier,
++    barColor: Color = Color(0xFFBCE2C2),
++    trackColor: Color = Color(0xFFE0E0E0)
++) {
++    Column(
++        modifier = modifier
++            .padding(top = 5.dp)
++            .fillMaxWidth(),
++        horizontalAlignment = Alignment.CenterHorizontally,
++    ) {
++        // Track
++        Box(
++            modifier = Modifier
++                .width(160.dp)
++                .height(18.dp)
++                .clip(RoundedCornerShape(9.dp))
++                .background(trackColor)
++
++        ) {
++            // Progress fill
++            Box(
++                modifier = Modifier
++                    .fillMaxHeight()
++                    .fillMaxWidth(percent.coerceIn(0, 100) / 100f)
++                    .clip(RoundedCornerShape(9.dp))
++                    .background(barColor)
++            )
++        }
++        // Percentage text
++        Spacer(modifier = Modifier.height(4.dp))
++        Text(
++            text = "$percent%",
++            fontSize = 12.sp,
++            fontWeight = FontWeight.Medium,
++            color = Color(0xFF000000),
++            textAlign = TextAlign.Center,
++            modifier = Modifier.fillMaxWidth()
++        )
++    }
++}
++
++@Preview(showBackground = true, widthDp = 200, heightDp = 40)
++@Composable
++fun ProgressBarPreview() {
++    ProgressBar(percent = 100)
++}
+Index: app/src/main/java/com/app/tibibalance/ui/components/ImageContainer.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.app.tibibalance.ui.components\r\n\r\nimport androidx.compose.foundation.Image\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.*\r\nimport androidx.compose.foundation.shape.RoundedCornerShape\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.draw.clip\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.layout.ContentScale\r\nimport androidx.compose.ui.res.painterResource\r\nimport androidx.compose.ui.unit.dp\r\n\r\n@Suppress(\"UNUSED_FUNCTION\")\r\n@Composable\r\nfun ImageContainer(\r\n    imageResId: Int,\r\n    contentDescription: String?,\r\n    modifier: Modifier = Modifier,\r\n    cornerRadius: Int = 12,\r\n    backgroundColor: Color = Color.Transparent,\r\n    contentScale: ContentScale = ContentScale.Crop\r\n) {\r\n    Box(\r\n        modifier = modifier\r\n            .clip(RoundedCornerShape(cornerRadius.dp))\r\n            .background(backgroundColor)\r\n    ) {\r\n        Image(\r\n            painter = painterResource(id = imageResId),\r\n            contentDescription = contentDescription,\r\n            contentScale = contentScale,\r\n            modifier = Modifier.fillMaxSize()\r\n        )\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/app/tibibalance/ui/components/ImageContainer.kt b/app/src/main/java/com/app/tibibalance/ui/components/ImageContainer.kt
+--- a/app/src/main/java/com/app/tibibalance/ui/components/ImageContainer.kt	(revision 03e5c9b28c592c4364b2825bab01085b709f09eb)
++++ b/app/src/main/java/com/app/tibibalance/ui/components/ImageContainer.kt	(date 1746174310303)
+@@ -34,4 +34,15 @@
+             modifier = Modifier.fillMaxSize()
+         )
+     }
+-}
+\ No newline at end of file
++}
++
++/*
++@Preview
++@Composable
++fun ImageContainerPreview() {
++    ImageContainer(
++        imageResId = R.drawable.imagenprueba,
++        contentDescription = "ImagenPrueba",
++        modifier = Modifier.size(100.dp)
++    )
++}*/
