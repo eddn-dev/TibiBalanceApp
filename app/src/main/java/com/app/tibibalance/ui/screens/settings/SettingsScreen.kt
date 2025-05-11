@@ -12,8 +12,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -25,6 +27,10 @@ import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.buttons.DangerButton
 import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.shape.CircleShape
+import coil.compose.AsyncImage
+
+
 
 @Composable
 fun SettingsScreen(
@@ -40,6 +46,7 @@ fun SettingsScreen(
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val showDeleteDialog = remember { mutableStateOf(false) }
+
 
     if (showDeleteDialog.value) {
         AlertDialog(
@@ -107,6 +114,8 @@ private fun ReadyContent(
     onSignOut      : () -> Unit,
     onNotis        : () -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -115,14 +124,24 @@ private fun ReadyContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        LaunchedEffect(Unit) {
+            println("DEBUG - photoUrl: ${profile.photoUrl}")
+        }
+
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(profile.photoUrl ?: R.drawable.imagenprueba)
-                .crossfade(true)
-                .build(),
+            model = profile.photoUrl?.takeIf { it.isNotBlank() } ?: R.drawable.imagenprueba,
             contentDescription = "Foto de perfil de ${profile.userName}",
-            modifier = Modifier.size(112.dp)
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(112.dp)
+                .clip(CircleShape)
         )
+
+
+
+
+
+
         Title(profile.userName ?: "Sin nombre")
 
         FormContainer(

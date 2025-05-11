@@ -101,6 +101,9 @@ dependencies {
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
 
 
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
+
 }
 
 /*allprojects {

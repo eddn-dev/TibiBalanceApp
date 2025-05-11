@@ -35,6 +35,7 @@ import com.app.tibibalance.data.repository.FirebaseProfileRepository
 import com.app.tibibalance.data.repository.ProfileRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -155,4 +156,9 @@ object FirebaseModule {
         auth: FirebaseAuth,   // Inyecta FirebaseAuth
         @IoDispatcher io: CoroutineDispatcher // Inyecta el dispatcher IO
     ): ProfileRepository = FirebaseProfileRepository(svc, dao, auth, io) // Crea y devuelve la implementación
+
+    @Provides
+    @Singleton
+    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+
 }

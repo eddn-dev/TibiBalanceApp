@@ -1,7 +1,9 @@
 package com.app.tibibalance.ui.screens.profile
 
+import android.Manifest
 import android.app.DatePickerDialog
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,7 +35,6 @@ import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.Header
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.texts.Subtitle
-import com.app.tibibalance.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
@@ -51,15 +52,44 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var username         by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
     var originalUsername by rememberSaveable { mutableStateOf("") }
-    var birthDate        by rememberSaveable { mutableStateOf("") }
+    var birthDate by rememberSaveable { mutableStateOf("") }
     var originalBirthDate by rememberSaveable { mutableStateOf("") }
-    var photoUrl         by rememberSaveable { mutableStateOf<String?>(null) }
+    var photoUrl by rememberSaveable { mutableStateOf<String?>(null) }
 
     val email = Firebase.auth.currentUser?.email.orEmpty()
 
-    // Simula carga inicial de datos desde repositorio
+    // Galería: selector de imagen
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            viewModel.updateProfilePhoto(it, context)
+            photoUrl = it.toString()
+        }
+    }
+
+    // Permiso de galería dinámico
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            imagePickerLauncher.launch("image/*")
+        } else {
+            Toast.makeText(context, "Permiso denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun requestGalleryPermission() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            Manifest.permission.READ_MEDIA_IMAGES
+        else
+            Manifest.permission.READ_EXTERNAL_STORAGE
+
+        permissionLauncher.launch(permission)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.loadInitialProfile()?.let { profile ->
             username = profile.userName.orEmpty()
@@ -70,11 +100,6 @@ fun EditProfileScreen(
         }
     }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> uri?.let { viewModel.updateProfilePhoto(it) } }
-
-    // DatePicker
     val (d0, m0, y0) = birthDate.split("/").takeIf { it.size == 3 }
         ?.let { (d, m, y) -> Triple(d.toInt(), m.toInt() - 1, y.toInt()) }
         ?: Triple(1, 0, Calendar.getInstance().get(Calendar.YEAR) - 18)
@@ -141,12 +166,12 @@ fun EditProfileScreen(
                             .size(120.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surface)
-                            .clickable { imagePickerLauncher.launch("image/*") }
+                            .clickable { requestGalleryPermission() }
                     )
                     Spacer(Modifier.height(5.dp))
                     SecondaryButton(
                         text = "CAMBIAR FOTO",
-                        onClick = { imagePickerLauncher.launch("image/*") },
+                        onClick = { requestGalleryPermission() },
                         modifier = Modifier
                             .width(170.dp)
                             .height(38.dp)
@@ -238,7 +263,9 @@ fun EditProfileScreen(
 
                     Spacer(Modifier.height(20.dp))
                     Row(
-                        Modifier.fillMaxWidth().padding(top = 24.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         SecondaryButton(
