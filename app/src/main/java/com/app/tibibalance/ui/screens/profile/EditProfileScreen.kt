@@ -16,7 +16,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.MaterialTheme
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +32,6 @@ import coil.request.ImageRequest
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.Header
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
-import com.app.tibibalance.ui.components.inputs.InputText
 import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.screens.settings.SettingsUiState
 import com.app.tibibalance.ui.screens.settings.SettingsViewModel
@@ -50,27 +48,29 @@ fun EditProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    // Observa el estado de SettingsViewModel
+    // 1. Estado de la UI
     val uiState by viewModel.ui.collectAsState()
     val profile = (uiState as? SettingsUiState.Ready)?.profile
 
-    // Estados locales de los campos
+    // 2. Campos editables
     var username  by remember { mutableStateOf("") }
-    var email     by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf("") }
     var photoUrl  by remember { mutableStateOf<String?>(null) }
 
-    // Inicializa los valores cuando llega el perfil
+    // 3. Email fijo desde Firebase Auth
+    val currentUser = Firebase.auth.currentUser
+    val email = currentUser?.email.orEmpty()
+
+    // 4. Inicializar valores al cargar el perfil
     LaunchedEffect(profile) {
         profile?.let {
             username  = it.userName.orEmpty()
-            email     = it.email.orEmpty()
             birthDate = it.birthDate.orEmpty()
             photoUrl  = it.photoUrl
         }
     }
 
-    // DatePickerDialog configurado desde birthDate (formato dd/MM/yyyy)
+    // 5. Configuración de DatePicker
     val context = LocalContext.current
     val (day0, month0, year0) = birthDate
         .split("/")
@@ -83,12 +83,11 @@ fun EditProfileScreen(
         }, year0, month0, day0)
     }
 
-    // Función de guardado
+    // 6. Lógica de guardado
     val scope = rememberCoroutineScope()
     fun onSave() {
         scope.launch {
             viewModel.updateProfile(username, birthDate)
-            // Sincroniza también en Firebase Auth
             Firebase.auth.currentUser
                 ?.updateProfile(userProfileChangeRequest { displayName = username })
                 ?.await()
@@ -96,7 +95,7 @@ fun EditProfileScreen(
         }
     }
 
-    // UI
+    // 7. UI
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -104,13 +103,14 @@ fun EditProfileScreen(
     ) {
         item {
             Header("Editar información personal")
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Foto
+                // Foto de perfil
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(photoUrl ?: R.drawable.imagenprueba)
@@ -133,16 +133,22 @@ fun EditProfileScreen(
                         .height(38.dp)
                 )
 
-                // Nombre
+                // Nombre de usuario
                 Spacer(Modifier.height(10.dp))
                 Subtitle(text = "Nombre de usuario", modifier = Modifier.align(Alignment.Start))
-                InputText(
+                OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
-                    modifier = Modifier.fillMaxWidth()
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    )
                 )
 
-                // Correo (read-only)
+                // Correo electrónico (solo lectura)
                 Spacer(Modifier.height(10.dp))
                 Subtitle(text = "Correo electrónico", modifier = Modifier.align(Alignment.Start))
                 OutlinedTextField(
@@ -150,7 +156,13 @@ fun EditProfileScreen(
                     onValueChange = { /* no editable */ },
                     readOnly = true,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedBorderColor = MaterialTheme.colorScheme.outline,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
 
                 // Fecha de nacimiento
@@ -176,7 +188,7 @@ fun EditProfileScreen(
                     )
                 )
 
-                // Contraseña
+                // Contraseña (navega a cambiar)
                 Spacer(Modifier.height(10.dp))
                 Subtitle(text = "Contraseña", modifier = Modifier.align(Alignment.Start))
                 OutlinedTextField(
@@ -199,7 +211,7 @@ fun EditProfileScreen(
                     )
                 )
 
-                // Botones
+                // Botones de acción
                 Spacer(Modifier.height(20.dp))
                 Row(
                     Modifier.fillMaxWidth(),
