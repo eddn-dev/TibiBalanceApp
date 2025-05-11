@@ -16,6 +16,9 @@ import com.app.tibibalance.ui.screens.launch.LaunchScreen
 import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
 import com.app.tibibalance.ui.screens.settings.ChangePasswordScreenPreviewOnly
+import com.app.tibibalance.ui.screens.settings.DeleteAccountScreen
+import com.google.firebase.auth.FirebaseAuth
+
 
 /**
  * @brief Configura y muestra el [NavHost] principal que gestiona la navegación entre las diferentes pantallas de la aplicación.
@@ -48,7 +51,12 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         // Asocia la ruta "forgot_pass" con el Composable ForgotPasswordScreen
         composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
         // Asocia la ruta "main" con el Composable MainScreen (que probablemente contiene su propio NavHost o Pager)
-        composable(Screen.Main.route)        { MainScreen(navController) }
+        composable(Screen.Main.route) {
+            MainScreen(rootNav = navController) // <- parámetro corregido
+        }
+
+
+
 
         // Aquí se podrían añadir más destinos (pantallas) a medida que la aplicación crezca.
         // Por ejemplo:
@@ -69,6 +77,18 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable("changePassword") {
             ChangePasswordScreenPreviewOnly(navController = navController)
         }
+
+        composable("delete_account/{isGoogleUser}") { backStackEntry ->
+            val isGoogleUserArg = backStackEntry.arguments?.getString("isGoogleUser")?.toBooleanStrictOrNull() ?: false
+
+            DeleteAccountScreen(
+                navController = navController,
+                isGoogleUser = isGoogleUserArg
+            )
+        }
+
+
+
 
     }
 }

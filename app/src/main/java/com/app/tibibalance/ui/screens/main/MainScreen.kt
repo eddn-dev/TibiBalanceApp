@@ -193,6 +193,7 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     // Renderiza la pantalla de Ajustes.
     SettingsScreen(
         state          = uiState,
+        navController  = rootNav, // ← ESTA ES LA LÍNEA CLAVE
         onNavigateUp   = rootNav::navigateUp,
         onEditPersonal = { rootNav.navigate(Screen.EditPersonal.route) },
         onDevices      = { /* TODO */ },
@@ -200,9 +201,9 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
         onSignOut      = mainVm::signOut,
         onDelete = {
             vm.deleteAccount()
-            mainVm.signOut() // <- Esto dispara el MainEvent.SignedOut manualmente
+            mainVm.signOut()
         },
-                onNotis        = { rootNav.navigate(Screen.NotificationSettings.route) }
+        onNotis        = { rootNav.navigate(Screen.NotificationSettings.route) }
     )
 
 }

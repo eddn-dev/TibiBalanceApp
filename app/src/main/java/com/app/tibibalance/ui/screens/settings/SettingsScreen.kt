@@ -29,12 +29,16 @@ import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.CircleShape
 import coil.compose.AsyncImage
+import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
+
 
 
 
 @Composable
 fun SettingsScreen(
     state          : SettingsUiState,
+    navController  : NavHostController, // ← AGREGA ESTO
     onNavigateUp   : () -> Unit,
     onEditPersonal : () -> Unit,
     onDevices      : () -> Unit,
@@ -43,9 +47,11 @@ fun SettingsScreen(
     onDelete       : () -> Unit,
     onNotis        : () -> Unit
 ) {
+
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val showDeleteDialog = remember { mutableStateOf(false) }
+
 
 
     if (showDeleteDialog.value) {
@@ -94,7 +100,8 @@ fun SettingsScreen(
                 onDevices      = onDevices,
                 onAchievements = onAchievements,
                 onSignOut      = onSignOut,
-                onNotis        = onNotis
+                onNotis        = onNotis,
+                navController  = navController
             )
 
             is SettingsUiState.Error -> {}
@@ -112,7 +119,8 @@ private fun ReadyContent(
     onDevices      : () -> Unit,
     onAchievements : () -> Unit,
     onSignOut      : () -> Unit,
-    onNotis        : () -> Unit
+    onNotis        : () -> Unit,
+    navController  : NavHostController
 ) {
     val context = LocalContext.current
 
@@ -178,11 +186,22 @@ private fun ReadyContent(
             Spacer(Modifier.height(12.dp))
             DangerButton(
                 text = "Eliminar cuenta",
-                onClick = onDelete,
+                onClick = {
+                    val user = FirebaseAuth.getInstance().currentUser
+                    val isGoogleUser = user?.providerData?.any { it.providerId == "google.com" } == true
+
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("isGoogleUser", isGoogleUser)
+
+                    navController.navigate("delete_account/$isGoogleUser")
+
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 8.dp)
             )
+
         }
     }
 }
