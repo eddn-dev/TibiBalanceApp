@@ -18,10 +18,13 @@ import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.inputs.InputPassword
 import com.app.tibibalance.ui.components.texts.Description
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 
 
 @Composable
-fun ChangePasswordScreenPreviewOnly() {
+fun ChangePasswordScreenPreviewOnly(
+    navController: NavHostController
+) {
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
@@ -82,7 +85,7 @@ fun ChangePasswordScreenPreviewOnly() {
             Spacer(Modifier.height(32.dp))
 
             PrimaryButton(
-                text = "Enviar",
+                text = "Guardar",
                 onClick = { /* Sin lógica */ }
             )
         }
@@ -90,17 +93,9 @@ fun ChangePasswordScreenPreviewOnly() {
         Header(
             title = "Cambiar Contraseña",
             showBackButton = true,
-            onBackClick = { /* Sin navegación */ },
+            onBackClick = { navController.navigateUp() },
             modifier = Modifier.align(Alignment.TopCenter)
         )
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun Preview_ChangePasswordScreen() {
-    MaterialTheme {
-        ChangePasswordScreenPreviewOnly()
     }
 }
 
