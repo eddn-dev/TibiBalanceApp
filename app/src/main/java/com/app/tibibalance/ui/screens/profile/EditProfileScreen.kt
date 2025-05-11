@@ -12,13 +12,13 @@ package com.app.tibibalance.ui.screens.profile
  *    • Edición de nombre de usuario
  *    • Fecha de nacimiento con DatePicker **restringido**:
  *        - No permite fechas futuras
- *        - Obliga a que la edad sea ≥ 18 años
+ *        - Obliga a que la edad sea ≥ 18 años
  *      El botón “Guardar” se deshabilita mientras la fecha sea inválida y
- *      el texto de ayuda se resalta en rojo.
- *    • Correo electrónico solo‑lectura (gris) con texto de soporte permanente
+ *      solo si hay cambios en nombre o fecha.
+ *    • Correo electrónico solo-lectura con texto de soporte permanente
  *    • Navegación a ChangePasswordScreen al tocar el campo de contraseña
  *
- *  © 2025 TibiBalance App
+ *  © 2025 TibiBalance App
  * ----------------------------------------------------------------------
  */
 
@@ -72,41 +72,41 @@ fun EditProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    /*───────────────────────────────
-     * Estado y datos del perfil
-     *───────────────────────────────*/
+    // Estado y datos del perfil
     val uiState by viewModel.ui.collectAsState()
     val profile = (uiState as? SettingsUiState.Ready)?.profile
 
-    /* Picker de imagen */
+    // Picker de imagen
     val imagePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? -> uri?.let { viewModel.uploadProfilePhoto(it) } }
 
-    /* Campos editables */
-    var username  by rememberSaveable { mutableStateOf("") }
-    var birthDate by rememberSaveable { mutableStateOf("") }
-    var photoUrl  by rememberSaveable { mutableStateOf<String?>(null) }
+    // Campos editables
+    var username          by rememberSaveable { mutableStateOf("") }
+    var originalUsername  by rememberSaveable { mutableStateOf("") }
+    var birthDate         by rememberSaveable { mutableStateOf("") }
+    var originalBirthDate by rememberSaveable { mutableStateOf("") }
+    var photoUrl          by rememberSaveable { mutableStateOf<String?>(null) }
 
-    /* Email solo‑lectura */
+    // Email solo-lectura
     val email = Firebase.auth.currentUser?.email.orEmpty()
 
-    /* Inicializar campos con los datos del perfil */
+    // Inicializar campos con los datos del perfil
     LaunchedEffect(profile) {
         profile?.let {
-            username  = it.userName.orEmpty()
-            birthDate = it.birthDate.orEmpty()
-            photoUrl  = it.photoUrl
+            username          = it.userName.orEmpty()
+            originalUsername  = it.userName.orEmpty()
+            birthDate         = it.birthDate.orEmpty()
+            originalBirthDate = it.birthDate.orEmpty()
+            photoUrl          = it.photoUrl
         }
     }
 
-    /*───────────────────────────────
-     * DatePicker con restricción 18 años
-     *───────────────────────────────*/
+    // DatePicker restringido a ≥18 años y no futuro
     val context = LocalContext.current
     val (d0, m0, y0) = birthDate.split("/").takeIf { it.size == 3 }
         ?.let { (d, m, y) -> Triple(d.toInt(), m.toInt() - 1, y.toInt()) }
-        ?: Triple(1, 0, 2000)
+        ?: Triple(1, 0, Calendar.getInstance().get(Calendar.YEAR) - 18)
 
     val datePicker = remember {
         DatePickerDialog(
@@ -114,16 +114,15 @@ fun EditProfileScreen(
             { _, y, m, d -> birthDate = "%02d/%02d/%04d".format(d, m + 1, y) },
             y0, m0, d0
         ).apply {
-            val cal18 = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
-            this.datePicker.maxDate = cal18.timeInMillis  // ← límite máximo
+            val maxDate = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
+            datePicker.maxDate = maxDate.timeInMillis
         }
     }
 
-    /* Validación de fecha seleccionada */
-    val todayMillis = Calendar.getInstance().timeInMillis
-    val cal18       = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
-
-    val selectedMillis = runCatching {
+    // Validación de fecha
+    val todayMs = Calendar.getInstance().timeInMillis
+    val cal18   = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
+    val selMs   = runCatching {
         birthDate.split("/").let { (d, m, y) ->
             Calendar.getInstance().apply {
                 set(y.toInt(), m.toInt() - 1, d.toInt())
@@ -131,15 +130,16 @@ fun EditProfileScreen(
         }
     }.getOrNull() ?: 0L
 
-    val isDateValid = selectedMillis <= cal18.timeInMillis && selectedMillis <= todayMillis
+    val dateChanged = birthDate != originalBirthDate
+    val dateValid   = !dateChanged || (birthDate.isNotBlank() && selMs <= cal18.timeInMillis && selMs <= todayMs)
+    val hasChanges  = (username != originalUsername) || dateChanged
 
-    /*───────────────────────────────
-     * Acción Guardar
-     *───────────────────────────────*/
+    // Acción Guardar
     val scope = rememberCoroutineScope()
     fun onSave() {
         scope.launch {
-            viewModel.updateProfile(username, birthDate)
+            val newBirth = if (dateChanged) birthDate else null
+            viewModel.updateProfile(username, newBirth)
             Firebase.auth.currentUser
                 ?.updateProfile(userProfileChangeRequest { displayName = username })
                 ?.await()
@@ -147,16 +147,12 @@ fun EditProfileScreen(
         }
     }
 
-    /*───────────────────────────────
-     * UI principal
-     *───────────────────────────────*/
+    // UI principal (diseño original intacto)
     Box(modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(listOf(Color(0xFFC3E2FA), Color.White))
-                )
+                .background(Brush.verticalGradient(listOf(Color(0xFFC3E2FA), Color.White)))
         ) {
             item {
                 Header("Editar información personal")
@@ -167,7 +163,7 @@ fun EditProfileScreen(
                         .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    /* Foto de perfil */
+                    // Foto de perfil
                     AsyncImage(
                         model = ImageRequest.Builder(context)
                             .data(photoUrl ?: R.drawable.imagenprueba)
@@ -188,7 +184,7 @@ fun EditProfileScreen(
                         modifier = Modifier.width(170.dp).height(38.dp)
                     )
 
-                    /* Nombre de usuario */
+                    // Nombre de usuario
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Nombre de usuario", Modifier.align(Alignment.Start))
                     OutlinedTextField(
@@ -198,30 +194,29 @@ fun EditProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            focusedContainerColor   = Color.White,
+                            unfocusedContainerColor = Color.White
                         )
                     )
 
-                    /* Correo electrónico */
+                    // Correo electrónico
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Correo electrónico", Modifier.align(Alignment.Start))
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { /* no editable */ },
+                        onValueChange = {},
                         readOnly = true,
                         enabled = false,
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor   = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            disabledContainerColor  = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor   = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor  = Color.White,
                             focusedBorderColor      = MaterialTheme.colorScheme.outline,
                             unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
-                            disabledBorderColor     = MaterialTheme.colorScheme.outline,
-                            disabledTextColor       = MaterialTheme.colorScheme.onSurface
+                            disabledBorderColor     = MaterialTheme.colorScheme.outline
                         ),
                         supportingText = {
                             Text(
@@ -232,13 +227,13 @@ fun EditProfileScreen(
                         }
                     )
 
-                    /* Fecha de nacimiento */
+                    // Fecha de nacimiento
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Fecha de nacimiento", Modifier.align(Alignment.Start))
                     Column(Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             value = birthDate,
-                            onValueChange = { /* no editable */ },
+                            onValueChange = {},
                             readOnly = true,
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
@@ -249,8 +244,8 @@ fun EditProfileScreen(
                             },
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor   = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                focusedContainerColor   = Color.White,
+                                unfocusedContainerColor = Color.White,
                                 focusedBorderColor      = MaterialTheme.colorScheme.primary,
                                 unfocusedBorderColor    = MaterialTheme.colorScheme.outline
                             )
@@ -258,15 +253,13 @@ fun EditProfileScreen(
                         Text(
                             text = "Debes tener al menos 18 años",
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (isDateValid)
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            else
-                                MaterialTheme.colorScheme.error,
+                            color = if (dateValid) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                         )
                     }
 
-                    /* Contraseña */
+                    // Contraseña
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Contraseña", Modifier.align(Alignment.Start))
                     Box(
@@ -276,37 +269,36 @@ fun EditProfileScreen(
                     ) {
                         OutlinedTextField(
                             value = "••••••••",
-                            onValueChange = { /* no editable */ },
+                            onValueChange = {},
                             readOnly = true,
                             enabled = false,
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
+                            trailingIcon = { Icon(Icons.Default.Lock, null) },
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor   = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                                disabledContainerColor  = MaterialTheme.colorScheme.surface,
+                                focusedContainerColor   = Color.White,
+                                unfocusedContainerColor = Color.White,
+                                disabledContainerColor  = Color.White,
                                 focusedBorderColor      = MaterialTheme.colorScheme.primary,
                                 unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
-                                disabledBorderColor     = MaterialTheme.colorScheme.outline,
-                                disabledTextColor       = MaterialTheme.colorScheme.onSurface
-                            ),
-                            trailingIcon = {
-                                Icon(Icons.Default.Lock, null)
-                            }
+                                disabledBorderColor     = MaterialTheme.colorScheme.outline
+                            )
                         )
                     }
 
-                    /* Botones de acción */
+                    // Botones de acción
                     Spacer(Modifier.height(20.dp))
                     Row(
-                        Modifier.fillMaxWidth().padding(top = 24.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         SecondaryButton(
                             text = "Guardar",
                             onClick = { onSave() },
-                            enabled = isDateValid,
+                            enabled = hasChanges && dateValid,
                             modifier = Modifier.weight(1f)
                         )
                         SecondaryButton(
@@ -321,13 +313,12 @@ fun EditProfileScreen(
             }
         }
 
-        /* Loader & errores */
+        // Loader & errores
         when (uiState) {
             SettingsUiState.Loading -> Box(
                 Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-
             is SettingsUiState.Error -> {
                 val msg = (uiState as SettingsUiState.Error).message
                 LaunchedEffect(msg) {
@@ -335,7 +326,6 @@ fun EditProfileScreen(
                     viewModel.consumeError()
                 }
             }
-
             else -> Unit
         }
     }
