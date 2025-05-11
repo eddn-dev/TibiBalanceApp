@@ -41,9 +41,9 @@ fun AchievementsScreen() {
                     modifier = Modifier.size(64.dp)
                 )
             },
-            title = "Bienvenido",
-            description = "Primer día usando la app",
-            percent = 100
+            title = "Todo en su lugar",
+            description = "Registra un estado de ánimo 'feliz' por siete días consecutivos ",
+            percent = 45
         )
 
         AchievementContainer(
@@ -54,9 +54,9 @@ fun AchievementsScreen() {
                     modifier = Modifier.size(64.dp)
                 )
             },
-            title = "Logros",
-            description = "Visitaste todos los módulos de la app",
-            percent = 80
+            title = "Siete días en línea",
+            description = "Cumplir un hábito por siete días consecutivos",
+            percent = 15
         )
 
         AchievementContainer(
@@ -67,8 +67,8 @@ fun AchievementsScreen() {
                     modifier = Modifier.size(64.dp)
                 )
             },
-            title = "Personalizado",
-            description = "Cambiaste tu avatar",
+            title = "Un placer conocernos",
+            description = "Agrega una foto de perfil",
             percent = 100
         )
     }
