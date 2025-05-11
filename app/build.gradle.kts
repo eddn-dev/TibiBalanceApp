@@ -55,8 +55,7 @@ room {
 
 dependencies {
 
-    implementation("io.coil-kt:coil-compose:3.0.0-alpha03")
-
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
@@ -104,8 +103,8 @@ dependencies {
 
 }
 
-allprojects {
+/*allprojects {
     repositories {
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/*") }
     }
-}
+}*/
