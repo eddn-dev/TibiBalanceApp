@@ -4,6 +4,7 @@ import android.net.Uri
 import com.app.tibibalance.domain.model.UserProfile
 import kotlinx.coroutines.flow.Flow
 
+
 /**
  * @brief Contrato para la gestión del perfil de usuario.
  *
@@ -34,3 +35,4 @@ interface ProfileRepository {
      */
     suspend fun clearLocal()
 }
+

@@ -1,26 +1,4 @@
-// EditProfileScreen.kt
 package com.app.tibibalance.ui.screens.profile
-
-/*
- * -------------------------------------------------------------------------
- *  EditProfileScreen.kt
- *  ----------------------------------------------------------------------
- *  Pantalla Compose para editar la información personal del usuario.
- *
- *  Funcionalidades:
- *    • Cambio de foto de perfil (selector + subida a Firebase Storage)
- *    • Edición de nombre de usuario
- *    • Fecha de nacimiento con DatePicker **restringido**:
- *        - No permite fechas futuras
- *        - Obliga a que la edad sea ≥ 18 años
- *      El botón “Guardar” se deshabilita mientras la fecha sea inválida y
- *      solo si hay cambios en nombre o fecha.
- *    • Correo electrónico solo-lectura con texto de soporte permanente
- *    • Navegación a ChangePasswordScreen al tocar el campo de contraseña
- *
- *  © 2025 TibiBalance App
- * ----------------------------------------------------------------------
- */
 
 import android.app.DatePickerDialog
 import android.net.Uri
@@ -56,8 +34,6 @@ import com.app.tibibalance.ui.components.Header
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.navigation.Screen
-import com.app.tibibalance.ui.screens.settings.SettingsUiState
-import com.app.tibibalance.ui.screens.settings.SettingsViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
@@ -69,41 +45,36 @@ import java.util.Calendar
 @Composable
 fun EditProfileScreen(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: EditProfileViewModel = hiltViewModel()
 ) {
-    // Estado y datos del perfil
-    val uiState by viewModel.ui.collectAsState()
-    val profile = (uiState as? SettingsUiState.Ready)?.profile
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    // Picker de imagen
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> uri?.let { viewModel.uploadProfilePhoto(it) } }
-
-    // Campos editables
-    var username          by rememberSaveable { mutableStateOf("") }
-    var originalUsername  by rememberSaveable { mutableStateOf("") }
-    var birthDate         by rememberSaveable { mutableStateOf("") }
+    var username         by rememberSaveable { mutableStateOf("") }
+    var originalUsername by rememberSaveable { mutableStateOf("") }
+    var birthDate        by rememberSaveable { mutableStateOf("") }
     var originalBirthDate by rememberSaveable { mutableStateOf("") }
-    var photoUrl          by rememberSaveable { mutableStateOf<String?>(null) }
+    var photoUrl         by rememberSaveable { mutableStateOf<String?>(null) }
 
-    // Email solo-lectura
     val email = Firebase.auth.currentUser?.email.orEmpty()
 
-    // Inicializar campos con los datos del perfil
-    LaunchedEffect(profile) {
-        profile?.let {
-            username          = it.userName.orEmpty()
-            originalUsername  = it.userName.orEmpty()
-            birthDate         = it.birthDate.orEmpty()
-            originalBirthDate = it.birthDate.orEmpty()
-            photoUrl          = it.photoUrl
+    // Simula carga inicial de datos desde repositorio
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialProfile()?.let { profile ->
+            username = profile.userName.orEmpty()
+            originalUsername = username
+            birthDate = profile.birthDate.orEmpty()
+            originalBirthDate = birthDate
+            photoUrl = profile.photoUrl
         }
     }
 
-    // DatePicker restringido a ≥18 años y no futuro
-    val context = LocalContext.current
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? -> uri?.let { viewModel.updateProfilePhoto(it) } }
+
+    // DatePicker
     val (d0, m0, y0) = birthDate.split("/").takeIf { it.size == 3 }
         ?.let { (d, m, y) -> Triple(d.toInt(), m.toInt() - 1, y.toInt()) }
         ?: Triple(1, 0, Calendar.getInstance().get(Calendar.YEAR) - 18)
@@ -119,10 +90,9 @@ fun EditProfileScreen(
         }
     }
 
-    // Validación de fecha
     val todayMs = Calendar.getInstance().timeInMillis
-    val cal18   = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
-    val selMs   = runCatching {
+    val cal18 = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
+    val selMs = runCatching {
         birthDate.split("/").let { (d, m, y) ->
             Calendar.getInstance().apply {
                 set(y.toInt(), m.toInt() - 1, d.toInt())
@@ -131,11 +101,9 @@ fun EditProfileScreen(
     }.getOrNull() ?: 0L
 
     val dateChanged = birthDate != originalBirthDate
-    val dateValid   = !dateChanged || (birthDate.isNotBlank() && selMs <= cal18.timeInMillis && selMs <= todayMs)
-    val hasChanges  = (username != originalUsername) || dateChanged
+    val dateValid = !dateChanged || (birthDate.isNotBlank() && selMs <= cal18.timeInMillis && selMs <= todayMs)
+    val hasChanges = (username != originalUsername) || dateChanged
 
-    // Acción Guardar
-    val scope = rememberCoroutineScope()
     fun onSave() {
         scope.launch {
             val newBirth = if (dateChanged) birthDate else null
@@ -147,8 +115,7 @@ fun EditProfileScreen(
         }
     }
 
-    // UI principal (diseño original intacto)
-    Box(modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -163,7 +130,6 @@ fun EditProfileScreen(
                         .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Foto de perfil
                     AsyncImage(
                         model = ImageRequest.Builder(context)
                             .data(photoUrl ?: R.drawable.imagenprueba)
@@ -181,10 +147,11 @@ fun EditProfileScreen(
                     SecondaryButton(
                         text = "CAMBIAR FOTO",
                         onClick = { imagePickerLauncher.launch("image/*") },
-                        modifier = Modifier.width(170.dp).height(38.dp)
+                        modifier = Modifier
+                            .width(170.dp)
+                            .height(38.dp)
                     )
 
-                    // Nombre de usuario
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Nombre de usuario", Modifier.align(Alignment.Start))
                     OutlinedTextField(
@@ -194,12 +161,11 @@ fun EditProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor   = Color.White,
+                            focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White
                         )
                     )
 
-                    // Correo electrónico
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Correo electrónico", Modifier.align(Alignment.Start))
                     OutlinedTextField(
@@ -211,12 +177,10 @@ fun EditProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor   = Color.White,
+                            focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White,
-                            disabledContainerColor  = Color.White,
-                            focusedBorderColor      = MaterialTheme.colorScheme.outline,
-                            unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
-                            disabledBorderColor     = MaterialTheme.colorScheme.outline
+                            disabledContainerColor = Color.White,
+                            disabledBorderColor = MaterialTheme.colorScheme.outline
                         ),
                         supportingText = {
                             Text(
@@ -227,7 +191,6 @@ fun EditProfileScreen(
                         }
                     )
 
-                    // Fecha de nacimiento
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Fecha de nacimiento", Modifier.align(Alignment.Start))
                     Column(Modifier.fillMaxWidth()) {
@@ -244,10 +207,8 @@ fun EditProfileScreen(
                             },
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor   = Color.White,
-                                unfocusedContainerColor = Color.White,
-                                focusedBorderColor      = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor    = MaterialTheme.colorScheme.outline
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White
                             )
                         )
                         Text(
@@ -259,40 +220,25 @@ fun EditProfileScreen(
                         )
                     }
 
-                    // Contraseña
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Contraseña", Modifier.align(Alignment.Start))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { navController.navigate(Screen.ChangePassword.route) }
-                    ) {
-                        OutlinedTextField(
-                            value = "••••••••",
-                            onValueChange = {},
-                            readOnly = true,
-                            enabled = false,
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            trailingIcon = { Icon(Icons.Default.Lock, null) },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor   = Color.White,
-                                unfocusedContainerColor = Color.White,
-                                disabledContainerColor  = Color.White,
-                                focusedBorderColor      = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor    = MaterialTheme.colorScheme.outline,
-                                disabledBorderColor     = MaterialTheme.colorScheme.outline
-                            )
+                    OutlinedTextField(
+                        value = "••••••••",
+                        onValueChange = {},
+                        readOnly = true,
+                        enabled = false,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = { Icon(Icons.Default.Lock, null) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledContainerColor = Color.White
                         )
-                    }
+                    )
 
-                    // Botones de acción
                     Spacer(Modifier.height(20.dp))
                     Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 24.dp),
+                        Modifier.fillMaxWidth().padding(top = 24.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         SecondaryButton(
@@ -304,29 +250,18 @@ fun EditProfileScreen(
                         SecondaryButton(
                             text = "Cancelar",
                             onClick = { navController.popBackStack() },
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(40.dp)
+                            modifier = Modifier.width(150.dp).height(40.dp)
                         )
                     }
                 }
             }
         }
 
-        // Loader & errores
-        when (uiState) {
-            SettingsUiState.Loading -> Box(
-                Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-            is SettingsUiState.Error -> {
-                val msg = (uiState as SettingsUiState.Error).message
-                LaunchedEffect(msg) {
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                    viewModel.consumeError()
-                }
+        if (state.error != null) {
+            LaunchedEffect(state.error) {
+                Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
+                viewModel.consumeError()
             }
-            else -> Unit
         }
     }
 }

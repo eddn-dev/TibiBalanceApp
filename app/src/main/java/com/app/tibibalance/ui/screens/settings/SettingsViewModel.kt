@@ -1,74 +1,72 @@
 package com.app.tibibalance.ui.screens.settings
 
-import android.net.Uri
+import com.app.tibibalance.domain.usecase.SignOutUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.app.tibibalance.data.repository.AuthRepository
-import com.app.tibibalance.data.repository.ProfileRepository
-import com.app.tibibalance.domain.model.UserProfile
+import com.app.tibibalance.domain.usecase.GetProfileUseCase
+import com.app.tibibalance.domain.usecase.ObserveAuthStateUseCase
+import com.app.tibibalance.domain.usecase.DeleteAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch      //  <--  ¡ESTE IMPORT FALTABA!
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val authRepo   : AuthRepository,
-    private val profileRepo: ProfileRepository
+    private val getProfileUseCase: GetProfileUseCase,
+    private val observeAuthStateUseCase: ObserveAuthStateUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
+    private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
-    /* ---------- STATE ---------- */
-    private val _ui = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
-    val ui: StateFlow<SettingsUiState> = _ui.asStateFlow()
+    private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
+    val ui: StateFlow<SettingsUiState> = _uiState
 
-    /* ---------- INIT ---------- */
     init {
-        profileRepo.profile
-            .filterNotNull()                               // Flow<UserProfile>
-            .map { prof: UserProfile ->                   // → Flow<SettingsUiState>
-                SettingsUiState.Ready(prof)
+        observeAuthState()
+        getUserProfile()
+    }
+
+    private fun observeAuthState() {
+        viewModelScope.launch {
+            observeAuthStateUseCase().collectLatest { isLoggedIn ->
+                if (!isLoggedIn) {
+                    _uiState.value = SettingsUiState.SignedOut
+                }
             }
-            .onStart  { _ui.value = SettingsUiState.Loading }
-            .catch    { e -> _ui.value = SettingsUiState.Error(e.message ?: "Error") }
-            .onEach   { state -> _ui.value = state }
-            .launchIn(viewModelScope)                      // <-- necesita launch import
-    }
-
-    /* ---------- ACTIONS ---------- */
-    fun uploadProfilePhoto(uri: Uri) = viewModelScope.launch {
-        _ui.value = SettingsUiState.Loading
-        runCatching {
-            profileRepo.update(name = null, photo = uri, birthDate = null)
-        }.onFailure { e ->
-            _ui.value = SettingsUiState.Error(e.message ?: "Error al subir foto")
         }
     }
 
-    fun updateProfile(newName: String?, newBirthDate: String?) = viewModelScope.launch {
-        _ui.value = SettingsUiState.Loading
-        runCatching {
-            profileRepo.update(
-                name      = newName,
-                photo     = null,
-                birthDate = newBirthDate
-            )
-        }.onFailure { e ->
-            _ui.value = SettingsUiState.Error(e.message ?: "Error al actualizar perfil")
+    private fun getUserProfile() {
+        viewModelScope.launch {
+            try {
+                val profile = getProfileUseCase()
+                _uiState.value = SettingsUiState.Ready(profile)
+            } catch (e: Exception) {
+                _uiState.value = SettingsUiState.Error("Error al cargar el perfil")
+            }
         }
     }
 
-    fun signOut() = viewModelScope.launch {
-        _ui.value = SettingsUiState.Loading
-        try {
-            authRepo.signOut()
-            profileRepo.clearLocal()
-            _ui.value = SettingsUiState.SignedOut
-        } catch (e: Exception) {
-            _ui.value = SettingsUiState.Error(e.message ?: "No se pudo cerrar sesión")
+    fun deleteAccount() {
+        viewModelScope.launch {
+            try {
+                deleteAccountUseCase()
+                signOutUseCase() // <- Esto cierra la sesión y dispara el evento en MainViewModel
+            } catch (e: Exception) {
+                val message = if (e.message?.contains("recent") == true) {
+                    "Debes volver a iniciar sesión para eliminar tu cuenta."
+                } else {
+                    "Error al eliminar la cuenta: ${e.message}"
+                }
+                _uiState.value = SettingsUiState.Error(message)
+            }
         }
     }
 
-    /* ---------- CONSUMERS ---------- */
-    fun consumeSignedOut() { if (_ui.value is SettingsUiState.SignedOut) _ui.value = SettingsUiState.Loading }
-    fun consumeError()     { if (_ui.value is SettingsUiState.Error)     _ui.value = SettingsUiState.Loading }
+
+
 }

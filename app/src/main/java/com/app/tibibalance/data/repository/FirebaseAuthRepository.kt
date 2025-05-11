@@ -48,6 +48,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class FirebaseAuthRepository @Inject constructor(
+    private val auth: FirebaseAuth,
     private val service : AuthService,
     private val db      : FirebaseFirestore,
     @IoDispatcher private val io: CoroutineDispatcher
@@ -227,4 +228,24 @@ class FirebaseAuthRepository @Inject constructor(
             // Log.d("AuthRepo", "Documento de perfil ya existe para ${user.uid}")
         }
     }
+
+    override suspend fun deleteAccount() {
+        val user = auth.currentUser ?: throw Exception("Usuario no autenticado")
+        val uid = user.uid
+
+        // Intenta borrar el documento de Firestore primero
+        try {
+            db.collection("profiles").document(uid).delete().await()
+        } catch (e: Exception) {
+            throw Exception("No se pudo eliminar el perfil de Firestore: ${e.message}")
+        }
+
+        // Luego elimina la cuenta de FirebaseAuth
+        try {
+            user.delete().await()
+        } catch (e: Exception) {
+            throw Exception("No se pudo eliminar la cuenta: ${e.message}")
+        }
+    }
+
 }
