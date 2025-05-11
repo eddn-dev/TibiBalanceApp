@@ -16,7 +16,7 @@
  * - Un botón de acción principal ([PrimaryButton]) para enviar la solicitud.
  *
  * Maneja los estados de la UI (Idle, Loading, Success, Error) emitidos por el ViewModel:
- * - **Loading/Success:** Muestra un [ModalInfoDialog] para feedback.
+ * - **Loading/Success:** Muestra un [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog] para feedback.
  * - **Error:** Muestra un [Snackbar] con el mensaje de error.
  * Tras un envío exitoso, navega a la pantalla de inicio de sesión ([Screen.SignIn]).
  *
@@ -28,7 +28,7 @@
  * @see FormContainer Contenedor para el campo de email.
  * @see InputEmail Campo de texto para el correo electrónico.
  * @see PrimaryButton Botón para enviar la solicitud.
- * @see ModalInfoDialog Diálogo para estados de carga y éxito.
+ * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Diálogo para estados de carga y éxito.
  * @see androidx.compose.material3.SnackbarHost Para mostrar errores.
  * @see com.app.tibibalance.ui.navigation.Screen Rutas de navegación.
  */
@@ -41,21 +41,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.MaterialTheme // Para colores y tipografía en Preview
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview // Para Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController // Para Preview
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.components.inputs.InputEmail
 import com.app.tibibalance.ui.components.texts.Description
 import com.app.tibibalance.ui.navigation.Screen
@@ -64,7 +63,7 @@ import com.app.tibibalance.ui.navigation.Screen
  * @brief Composable que define la interfaz de usuario para la pantalla de recuperación de contraseña.
  *
  * @details Muestra una imagen, un texto instructivo, un campo para ingresar el correo electrónico
- * y un botón para enviar la solicitud de restablecimiento. Utiliza [ModalInfoDialog] para
+ * y un botón para enviar la solicitud de restablecimiento. Utiliza [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog] para
  * indicar el estado de carga y éxito, y un [Snackbar] para errores.
  *
  * @param nav El [NavController] utilizado para la navegación entre pantallas.
@@ -107,7 +106,7 @@ fun ForgotPasswordScreen(
         loading = uiState is ForgotPasswordUiState.Loading, // Muestra el spinner si está cargando.
 
         /* fase ÉXITO */
-        icon    = if (uiState is ForgotPasswordUiState.Success) Icons.Default.Check else null, // Icono de check para éxito.
+        icon = if (uiState is ForgotPasswordUiState.Success) Icons.Default.Check else null, // Icono de check para éxito.
         message = if (uiState is ForgotPasswordUiState.Success)
             "Hemos enviado un enlace para restablecer tu contraseña.\nRevisa tu correo." // Mensaje de éxito.
         else null,
@@ -125,7 +124,7 @@ fun ForgotPasswordScreen(
 
         /* bloqueo de back/click-outside mientras carga */
         // Permite descartar el diálogo con el botón "Atrás" solo si no está cargando.
-        dismissOnBack         = uiState !is ForgotPasswordUiState.Loading,
+        dismissOnBack = uiState !is ForgotPasswordUiState.Loading,
         // Permite descartar el diálogo pulsando fuera solo si no está cargando.
         dismissOnClickOutside = uiState !is ForgotPasswordUiState.Loading
     )

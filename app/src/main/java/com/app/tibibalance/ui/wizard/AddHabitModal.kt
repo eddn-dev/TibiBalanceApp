@@ -19,7 +19,7 @@
  * del formulario. Incluye un [PagerIndicator].
  * - **Carga de Plantillas:** Utiliza la función helper [rememberTemplates] (con Hilt EntryPoint)
  * para obtener la lista de [HabitTemplate]s para el `SuggestionStep`.
- * - **Diálogos Auxiliares:** Muestra [ModalInfoDialog]s para comunicar estados finales
+ * - **Diálogos Auxiliares:** Muestra [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog]s para comunicar estados finales
  * o confirmaciones, como `Saved`, `Error`, o `ConfirmDiscard`.
  * - **Restricción de Altura:** Limita la altura máxima del modal para adaptarse a diferentes
  * tamaños de pantalla usando `LocalConfiguration`.
@@ -31,7 +31,7 @@
  * @see PagerState Estado que gestiona el Pager.
  * @see PagerIndicator Indicador visual de la página actual.
  * @see SuggestionStep, BasicInfoStep, TrackingStep, NotificationStep Composables para cada paso del asistente.
- * @see ModalInfoDialog Componente para mostrar diálogos de información/error/confirmación.
+ * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Componente para mostrar diálogos de información/error/confirmación.
  * @see HabitTemplate Modelo de dominio para las plantillas de hábitos.
  * @see rememberTemplates Función helper para obtener las plantillas.
  * @see TemplateRepoEntryPoint Hilt EntryPoint para acceder al repositorio de plantillas.
@@ -62,6 +62,8 @@ import com.app.tibibalance.domain.model.RepeatPreset
 import com.app.tibibalance.ui.components.* // Importa componentes generales como ModalContainer, ModalInfoDialog, etc.
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.wizard.step.* // Importa los Composables de cada paso
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -233,8 +235,8 @@ fun AddHabitModal(
         // Muestra diálogo de éxito al guardar.
         is AddHabitUiState.Saved -> ModalInfoDialog(
             visible = true,
-            icon    = Icons.Default.Check,
-            title   = currentState.title,
+            icon = Icons.Default.Check,
+            title = currentState.title,
             message = currentState.message
             // Se cierra automáticamente por el flujo del ViewModel (delay + onFinish).
         )
@@ -242,9 +244,9 @@ fun AddHabitModal(
         // Muestra diálogo de error general.
         is AddHabitUiState.Error -> ModalInfoDialog(
             visible = true,
-            icon    = Icons.Default.Error,
+            icon = Icons.Default.Error,
             iconColor = MaterialTheme.colorScheme.error,
-            title   = "Ups…",
+            title = "Ups…",
             message = currentState.msg,
             // Botón para volver al inicio del formulario vacío.
             primaryButton = DialogButton("Entendido") { vm.startBlankForm() }

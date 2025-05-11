@@ -17,7 +17,7 @@
  * El feedback al usuario se proporciona de la siguiente manera:
  * - **Errores de campo:** Se muestran directamente en los componentes de entrada ([InputText], [InputDate], etc.)
  * mediante sus parámetros `isError` y `supportingText`.
- * - **Errores globales de formulario o carga:** Se utiliza un [ModalInfoDialog] para indicar estados
+ * - **Errores globales de formulario o carga:** Se utiliza un [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog] para indicar estados
  * de carga (`Loading`), éxito en el registro por formulario (`Success`), o errores generales (`Error`).
  * - **Errores locales de Google One-Tap:** Se muestran en un [Snackbar] (e.g., si el usuario cancela la hoja de Google).
  * - **Navegación:**
@@ -32,7 +32,7 @@
  * - [PrimaryButton]: Para la acción principal de "Registrarse".
  * - [GoogleSignButton]: Para la opción de "Continuar con Google".
  * - [TextButtonLink]: Para el enlace "Iniciar sesión" si el usuario ya tiene cuenta.
- * - [ModalInfoDialog]: Para mostrar diálogos de carga, éxito o error global.
+ * - [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog]: Para mostrar diálogos de carga, éxito o error global.
  * - [SnackbarHost]: Para mensajes de error de Google One-Tap.
  *
  * @see SignUpViewModel ViewModel que gestiona la lógica y el estado de esta pantalla.
@@ -71,6 +71,8 @@ import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.buttons.GoogleSignButton
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.components.inputs.InputDate
 import com.app.tibibalance.ui.components.inputs.InputEmail
 import com.app.tibibalance.ui.components.inputs.InputPassword
@@ -221,30 +223,30 @@ fun SignUpScreen(
     ModalInfoDialog(
         visible = dialogVisible, // Controla la visibilidad.
         loading = isLoading,     // Muestra spinner si está cargando.
-        icon    = when {         // Icono según el estado.
+        icon = when {         // Icono según el estado.
             isSuccess -> Icons.Default.Check
-            isError   -> Icons.Default.Error
-            else      -> null
+            isError -> Icons.Default.Error
+            else -> null
         },
         iconColor = when {      // Color del icono.
             isSuccess -> MaterialTheme.colorScheme.onPrimaryContainer
-            isError   -> MaterialTheme.colorScheme.error
-            else      -> MaterialTheme.colorScheme.onPrimaryContainer
+            isError -> MaterialTheme.colorScheme.error
+            else -> MaterialTheme.colorScheme.onPrimaryContainer
         },
         iconBgColor = when {    // Color de fondo del icono.
             isSuccess -> MaterialTheme.colorScheme.primaryContainer
-            isError   -> MaterialTheme.colorScheme.errorContainer
-            else      -> MaterialTheme.colorScheme.primaryContainer
+            isError -> MaterialTheme.colorScheme.errorContainer
+            else -> MaterialTheme.colorScheme.primaryContainer
         },
         title = when {          // Título del diálogo.
             isSuccess -> "Cuenta creada"
-            isError   -> "Error"
-            else      -> null
+            isError -> "Error"
+            else -> null
         },
         message = when {        // Mensaje principal del diálogo.
             isSuccess -> "Te enviamos un enlace para verificar tu correo."
-            isError   -> (uiState as SignUpUiState.Error).message
-            else      -> null
+            isError -> (uiState as SignUpUiState.Error).message
+            else -> null
         },
         primaryButton = when {  // Botón primario.
             isSuccess -> DialogButton("Continuar") { // Para éxito de formulario:
@@ -253,11 +255,12 @@ fun SignUpScreen(
                     popUpTo(Screen.SignUp.route) { inclusive = true }
                 }
             }
+
             isError -> DialogButton("Aceptar") { vm.consumeError() } // Para error global: limpia estado.
             else -> null
         },
         // Permite descartar el diálogo solo si no está cargando.
-        dismissOnBack         = !isLoading,
+        dismissOnBack = !isLoading,
         dismissOnClickOutside = !isLoading
     )
 

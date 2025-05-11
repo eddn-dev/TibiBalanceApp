@@ -47,6 +47,7 @@ import androidx.navigation.compose.*
 import com.app.tibibalance.ui.components.navigation.BottomNavBar
 import com.app.tibibalance.ui.components.navigation.bottomItems
 import com.app.tibibalance.ui.navigation.Screen
+import com.app.tibibalance.ui.screens.emotional.EmotionalCalendarScreen
 import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.*
 import com.app.tibibalance.ui.screens.habits.ShowHabitsScreen   // ← nuevo
@@ -164,7 +165,7 @@ fun MainScreen(
             // Determina qué pantalla mostrar basado en el índice de la página actual.
             when (routes[pageIndex]) {
                 Screen.Home.route     -> HomeScreen()
-                Screen.Emotions.route -> Centered("Emociones") // Placeholder
+                Screen.Emotions.route -> EmotionalCalendarScreen() // Placeholder
                 Screen.Habits.route   -> ShowHabitsScreen()
                 Screen.Profile.route  -> Centered("Perfil")   // Placeholder
                 Screen.Settings.route -> SettingsTab(mainVm, rootNav) // Contenido específico para Ajustes

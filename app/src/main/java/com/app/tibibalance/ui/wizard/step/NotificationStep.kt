@@ -52,13 +52,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.domain.model.NotifConfig
 import com.app.tibibalance.domain.model.NotifMode
-import com.app.tibibalance.ui.components.DialogButton
-import com.app.tibibalance.ui.components.ModalInfoDialog
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.components.modals.ModalDatePickerDialog
 import com.app.tibibalance.ui.components.SwitchToggle
 import com.app.tibibalance.ui.components.inputs.InputSelect
 import com.app.tibibalance.ui.components.inputs.InputText
-import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.components.texts.Title
 import kotlinx.datetime.toJavaLocalDate // Para convertir a java.time para DatePicker
 import java.time.LocalDate // Tipo usado por DatePicker

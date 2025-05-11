@@ -16,7 +16,7 @@
  * - Un encabezado ([Header]) con título y botón de retroceso.
  *
  * Utiliza [SignInViewModel] para manejar la lógica de autenticación y el estado de la UI.
- * Los errores globales o de carga se muestran mediante [ModalInfoDialog], mientras que los
+ * Los errores globales o de carga se muestran mediante [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog], mientras que los
  * errores específicos de Google One-Tap (cancelación, token inválido) se muestran en un [Snackbar].
  * Los errores de validación de campos se reflejan directamente en los componentes de entrada.
  *
@@ -33,7 +33,7 @@
  * @see PrimaryButton Botón para la acción principal de inicio de sesión.
  * @see GoogleSignButton Botón para iniciar sesión con Google.
  * @see TextButtonLink Componente para enlaces de texto.
- * @see ModalInfoDialog Diálogo para estados de carga y errores globales.
+ * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Diálogo para estados de carga y errores globales.
  * @see androidx.compose.material3.SnackbarHost Para mostrar errores locales de One-Tap.
  * @see androidx.credentials.CredentialManager Para la integración con Google One-Tap.
  * @see com.google.android.libraries.identity.googleid.GoogleIdTokenCredential Para procesar la credencial de Google.
@@ -70,9 +70,10 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
-import com.app.tibibalance.ui.components.DialogButton
+import com.app.tibibalance.ui.components.dialogs.DialogButton
 import com.app.tibibalance.ui.components.buttons.GoogleSignButton
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.components.inputs.InputEmail
 import com.app.tibibalance.ui.components.inputs.InputPassword
 
@@ -176,10 +177,10 @@ fun SignInScreen(
         visible = showDialog,
         loading = isLoading, // Muestra spinner si está cargando.
 
-        icon    = if (isError) Icons.Default.Error else null, // Icono de error para errores.
-        iconColor   = MaterialTheme.colorScheme.error,
+        icon = if (isError) Icons.Default.Error else null, // Icono de error para errores.
+        iconColor = MaterialTheme.colorScheme.error,
         iconBgColor = MaterialTheme.colorScheme.errorContainer,
-        title   = if (isError) "Error" else null, // Título para errores.
+        title = if (isError) "Error" else null, // Título para errores.
         message = (uiState as? SignInUiState.Error)?.message, // Mensaje del error.
 
         // Botón "Aceptar" solo si hay un error global, para limpiar el estado.
@@ -187,7 +188,7 @@ fun SignInScreen(
             DialogButton("Aceptar") { vm.consumeError() } else null,
 
         // Controla si el diálogo se puede descartar.
-        dismissOnBack         = !isLoading,
+        dismissOnBack = !isLoading,
         dismissOnClickOutside = !isLoading
     )
 

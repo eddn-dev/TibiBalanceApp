@@ -17,7 +17,7 @@
  * - Ofrecer una opción para "Cerrar sesión" si el usuario desea abandonar el proceso.
  * - Interactuar con [VerifyEmailViewModel] para manejar la lógica de reenvío,
  * verificación y cierre de sesión.
- * - Mostrar feedback al usuario mediante [ModalInfoDialog] para estados de carga,
+ * - Mostrar feedback al usuario mediante [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog] para estados de carga,
  * éxito (correo reenviado, verificación exitosa) o errores.
  * - Navegar a [Screen.Launch] si el usuario cierra sesión.
  * - Navegar a [Screen.Main] si la verificación es exitosa.
@@ -27,7 +27,7 @@
  *
  * @see VerifyEmailViewModel ViewModel que gestiona la lógica y el estado de esta pantalla.
  * @see VerifyEmailUiState Estados de la UI para esta pantalla.
- * @see ModalInfoDialog Componente para mostrar diálogos de carga, éxito y error.
+ * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Componente para mostrar diálogos de carga, éxito y error.
  * @see Header Componente para la barra superior de la pantalla.
  * @see ImageContainer Componente para mostrar la ilustración.
  * @see PrimaryButton Componente para los botones de acción principales.
@@ -58,6 +58,8 @@ import androidx.navigation.NavController
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.navigation.Screen
 
 /**
@@ -98,27 +100,27 @@ fun VerifyEmailScreen(
     val showDialog = loading || success != null || error != null
 
     ModalInfoDialog(
-        visible   = showDialog, // Visibilidad del diálogo.
-        loading   = loading,    // Muestra spinner si está cargando.
-        icon      = when {      // Icono según el estado.
+        visible = showDialog, // Visibilidad del diálogo.
+        loading = loading,    // Muestra spinner si está cargando.
+        icon = when {      // Icono según el estado.
             success != null -> Icons.Default.Check
-            error   != null -> Icons.Default.Error
-            else            -> null
+            error != null -> Icons.Default.Error
+            else -> null
         },
         iconColor = when {      // Color del icono.
             success != null -> MaterialTheme.colorScheme.onPrimaryContainer
-            error   != null -> MaterialTheme.colorScheme.error
-            else            -> MaterialTheme.colorScheme.onPrimaryContainer
+            error != null -> MaterialTheme.colorScheme.error
+            else -> MaterialTheme.colorScheme.onPrimaryContainer
         },
         iconBgColor = when {    // Color de fondo para el contenedor del icono.
             success != null -> MaterialTheme.colorScheme.primaryContainer
-            error   != null -> MaterialTheme.colorScheme.errorContainer
-            else            -> MaterialTheme.colorScheme.primaryContainer
+            error != null -> MaterialTheme.colorScheme.errorContainer
+            else -> MaterialTheme.colorScheme.primaryContainer
         },
         title = when {          // Título del diálogo.
             success != null -> "Listo"
-            error   != null -> "Error"
-            else            -> null
+            error != null -> "Error"
+            else -> null
         },
         message = success?.message ?: error?.message, // Mensaje principal.
         primaryButton = when { // Botón primario del diálogo.
@@ -130,11 +132,12 @@ fun VerifyEmailScreen(
                     }
                 }
             }
-            error != null   -> DialogButton("Aceptar") { vm.clear() } // Para mensajes de error.
-            else            -> null
+
+            error != null -> DialogButton("Aceptar") { vm.clear() } // Para mensajes de error.
+            else -> null
         },
         // El diálogo no se puede descartar con el botón "Atrás" o pulsando fuera si está cargando.
-        dismissOnBack         = !loading,
+        dismissOnBack = !loading,
         dismissOnClickOutside = !loading
     )
 

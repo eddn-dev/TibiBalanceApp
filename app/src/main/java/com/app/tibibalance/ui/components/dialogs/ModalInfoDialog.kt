@@ -41,16 +41,16 @@
  * )
  * ```
  *
- * @see androidx.compose.ui.window.Dialog Componente base para diálogos.
- * @see androidx.compose.material3.Surface Usado como contenedor visual del diálogo.
- * @see androidx.compose.material3.CircularProgressIndicator Indicador para el estado de carga.
- * @see androidx.compose.material3.Icon Para mostrar el icono informativo.
- * @see androidx.compose.material3.Text Para mostrar título, mensaje y texto de carga.
- * @see com.app.tibibalance.ui.components.buttons.PrimaryButton
- * @see com.app.tibibalance.ui.components.buttons.SecondaryButton
+ * @see Dialog Componente base para diálogos.
+ * @see Surface Usado como contenedor visual del diálogo.
+ * @see CircularProgressIndicator Indicador para el estado de carga.
+ * @see Icon Para mostrar el icono informativo.
+ * @see Text Para mostrar título, mensaje y texto de carga.
+ * @see PrimaryButton
+ * @see SecondaryButton
  * @see DialogButton Data class para definir los botones de acción.
  */
-package com.app.tibibalance.ui.components
+package com.app.tibibalance.ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -70,6 +70,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview // Para previews
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 
@@ -138,7 +139,7 @@ fun ModalInfoDialog(
     Dialog(
         // El onDismissRequest se maneja a través de DialogProperties
         onDismissRequest = { /* No hacer nada aquí; controlado por properties */ },
-        properties = androidx.compose.ui.window.DialogProperties(
+        properties = DialogProperties(
             dismissOnBackPress = dismissOnBack, // Controla descarte con botón Atrás
             dismissOnClickOutside = dismissOnClickOutside // Controla descarte con clic fuera
         )

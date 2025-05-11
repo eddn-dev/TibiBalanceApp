@@ -25,7 +25,7 @@
  *
  * @see VerifyEmailScreen Composable de la pantalla que observa estos estados.
  * @see VerifyEmailViewModel ViewModel que emite y gestiona estos estados.
- * @see com.app.tibibalance.ui.components.ModalInfoDialog Componente usado para mostrar feedback en los estados Loading, Success y Error.
+ * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Componente usado para mostrar feedback en los estados Loading, Success y Error.
  */
 package com.app.tibibalance.ui.screens.auth
 

@@ -24,7 +24,7 @@
  * solo si se ha definido una frecuencia de repetición).
  * - "Modo reto": Un [SwitchToggle] para activar/desactivar el modo reto. Este modo
  * requiere que se definan la repetición y el periodo. Un [com.app.tibibalance.ui.components.buttons.IconButton] con un
- * icono de información ([Icons.Default.Info]) abre un [ModalInfoDialog]
+ * icono de información ([Icons.Default.Info]) abre un [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog]
  * explicando las condiciones del modo reto.
  *
  * El estado del formulario ([HabitForm]) se gestiona localmente con `rememberSaveable`
@@ -41,7 +41,7 @@
  * @see com.app.tibibalance.domain.model.PeriodUnit Enum para las unidades del periodo total.
  * @see InputNumber, InputSelect, SwitchToggle Componentes de entrada reutilizables.
  * @see Title Componente para el título de la pantalla.
- * @see ModalInfoDialog Diálogo para mostrar información sobre el modo reto.
+ * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Diálogo para mostrar información sobre el modo reto.
  * @see androidx.compose.foundation.ExperimentalFoundationApi Requerido por FlowRow.
  * @see androidx.compose.foundation.layout.FlowRow Layout experimental para la cuadrícula de días.
  */
@@ -64,6 +64,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.domain.model.*
 import com.app.tibibalance.ui.components.* // Importa DialogButton, ModalInfoDialog, SwitchToggle
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.components.inputs.* // Importa InputNumber, InputSelect
 import com.app.tibibalance.ui.components.texts.Title
 import com.app.tibibalance.ui.wizard.HabitFormSaver
@@ -389,21 +391,23 @@ fun TrackingStep(
     // Muestra el ModalInfoDialog si infoDlg es true.
     if (infoDlg) {
         ModalInfoDialog(
-            visible  = true, // Controla la visibilidad del diálogo.
-            icon     = Icons.Default.Info, // Icono a mostrar.
-            title    = "Modo reto", // Título del diálogo.
-            message  = "Cuando un hábito está en modo reto no se puede editar.\n" +
+            visible = true, // Controla la visibilidad del diálogo.
+            icon = Icons.Default.Info, // Icono a mostrar.
+            title = "Modo reto", // Título del diálogo.
+            message = "Cuando un hábito está en modo reto no se puede editar.\n" +
                     "Debes definir repetición y periodo obligatorios.", // Mensaje explicativo.
-            primaryButton = DialogButton("Entendido") { infoDlg = false } // Botón para cerrar el diálogo.
+            primaryButton = DialogButton("Entendido") {
+                infoDlg = false
+            } // Botón para cerrar el diálogo.
         )
     }
 
     if (infoDuracionDlg) {
         ModalInfoDialog(
-            visible  = true,
-            icon     = Icons.Default.Info,
-            title    = "Duración de la actividad",
-            message  = "Selecciona cuánto tiempo realizaras la actividad.",
+            visible = true,
+            icon = Icons.Default.Info,
+            title = "Duración de la actividad",
+            message = "Selecciona cuánto tiempo realizaras la actividad.",
             primaryButton = DialogButton("Entendido") { infoDuracionDlg = false }
         )
     }
@@ -411,20 +415,20 @@ fun TrackingStep(
     //Dialogo de ayuda para el botón de información de repetir hábito
     if (infoRepeatDlg) {
         ModalInfoDialog(
-            visible  = true,
-            icon     = Icons.Default.Info,
-            title    = "Repetir hábito",
-            message  = "Indica con qué frecuencia quieres repetir este hábito para notificarte.",
+            visible = true,
+            icon = Icons.Default.Info,
+            title = "Repetir hábito",
+            message = "Indica con qué frecuencia quieres repetir este hábito para notificarte.",
             primaryButton = DialogButton("Entendido") { infoRepeatDlg = false }
         )
     }
 
     if (infoPeriodDlg) {
         ModalInfoDialog(
-            visible  = true,
-            icon     = Icons.Default.Info,
-            title    = "Periodo de un hábito",
-            message  = "Indica durante cuánto tiempo quieres realizar un hábito y mantener su seguimiento.",
+            visible = true,
+            icon = Icons.Default.Info,
+            title = "Periodo de un hábito",
+            message = "Indica durante cuánto tiempo quieres realizar un hábito y mantener su seguimiento.",
             primaryButton = DialogButton("Entendido") { infoPeriodDlg = false }
         )
     }
