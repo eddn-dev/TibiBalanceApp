@@ -1,25 +1,16 @@
 /**
  * @file    HabitList.kt
  * @ingroup ui_component
- * @brief   Define Composables para mostrar la lista de hábitos del usuario y su estado vacío.
+ * @brief   Composables para mostrar la lista de hábitos agrupados dinámicamente.
  *
- * @details Este archivo contiene los Composables [HabitList], que es el componente principal
- * para renderizar la lista de hábitos agrupados por categoría, y [EmptyState], que se
- * muestra cuando no existen hábitos. Utiliza componentes reutilizables como [HeaderBox],
- * [Category] (privado), [SettingItem], [RoundedIconButton], [Title], [Subtitle],
- * [Description] e [Icon] para construir la interfaz.
+ * @details Se reemplazó la lógica de filtros rígidos por una agrupación
+ * mediante `groupBy { it.category }`.  Si `HabitUi` aún no expone
+ * `category`, agrega la propiedad o calcula una heurística en el mapper.
  *
- * La lista se puede desplazar verticalmente y el componente [HabitList] se encarga
- * de organizar los hábitos pasados en secciones según su categoría (actualmente filtrando
- * por nombre de icono como proxy de categoría). Proporciona callbacks para las acciones
- * de marcar/desmarcar, editar y añadir hábitos.
+ * Las secciones se pintan en el orden dado por [sectionOrder]; cualquier
+ * categoría no listada caerá en "Otros".
  *
- * @see com.app.tibibalance.ui.screens.habits.HabitUi Data class que representa un hábito en la UI.
- * @see com.app.tibibalance.ui.screens.habits.ShowHabitsScreen Pantalla que probablemente utiliza estos componentes.
- * @see SettingItem Componente utilizado para renderizar cada fila de hábito.
- * @see RoundedIconButton Botón utilizado para la acción de añadir.
- * @see Subtitle Usado para los títulos de categoría.
- * @see Title Usado en el HeaderBox.
+ * @see HabitUi Modelo de UI.  Debe contener `val category: String`.
  */
 package com.app.tibibalance.ui.components
 
@@ -30,39 +21,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.* // Import genérico para iconos usados
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text // Import explícito aunque Description/Title/Subtitle lo usen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview // Para las Previews
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.tibibalance.domain.model.HabitCategory
+import com.app.tibibalance.ui.components.inputs.iconByName
 import com.app.tibibalance.ui.components.texts.Description
 import com.app.tibibalance.ui.components.texts.Subtitle
 import com.app.tibibalance.ui.components.texts.Title
 import com.app.tibibalance.ui.screens.habits.HabitUi
 
+/* ────────────────────────────────────────────────────────────────── */
+/* Sección pública                                                   */
+/* ────────────────────────────────────────────────────────────────── */
+
 /**
- * @brief Renderiza la lista principal de hábitos, agrupados por categoría, o el estado vacío si no hay hábitos.
+ * @brief Renderiza la lista de hábitos agrupados de forma dinámica.
  *
- * @details Organiza los hábitos proporcionados en secciones lógicas utilizando el componente
- * privado [Category]. Incluye un encabezado ([HeaderBox]) y un botón flotante de acción
- * ([RoundedIconButton]) para añadir nuevos hábitos. El contenido es desplazable verticalmente.
- * La agrupación actual se basa en el nombre del icono asociado al `HabitUi`, que actúa como
- * proxy para la categoría (Salud, Productividad, Bienestar).
- *
- * @param habits La lista de objetos [HabitUi] que representan los hábitos a mostrar.
- * @param onCheck Callback invocado cuando el estado del [Checkbox] de un hábito cambia.
- * Recibe el [HabitUi] afectado y el nuevo estado `Boolean` (marcado/desmarcado).
- * @param onEdit Callback invocado cuando el usuario pulsa sobre la fila de un hábito
- * (excluyendo el checkbox). Recibe el [HabitUi] correspondiente.
- * @param onAdd Callback invocado cuando el usuario pulsa el botón de añadir hábito ([RoundedIconButton]).
+ * @param habits  Lista de [HabitUi] a mostrar.
+ * @param onCheck Callback del checkbox.
+ * @param onEdit  Callback al pulsar la fila.
+ * @param onAdd   Callback del botón “+”.
  */
 @Composable
 internal fun HabitList(
@@ -71,50 +58,52 @@ internal fun HabitList(
     onEdit : (HabitUi) -> Unit,
     onAdd  : () -> Unit
 ) {
+    /** Orden de secciones preferido; lo que no esté aquí va a “Otros”. */
+    val sectionOrder = listOf(
+        HabitCategory.SALUD,
+        HabitCategory.PRODUCTIVIDAD,
+        HabitCategory.BIENESTAR,
+        HabitCategory.PERSONALIZADA
+    )
+
+
+
+    /* Agrupa por categoría (clave String) */
+    val grouped: Map<String, List<HabitUi>> =
+        habits.groupBy { it.category.ifBlank { "Otros" } }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize() // Ocupa todo el espacio disponible
-            .verticalScroll(rememberScrollState()) // Permite desplazamiento vertical
-            .padding(16.dp), // Padding general
-        verticalArrangement = Arrangement.spacedBy(16.dp) // Espacio entre elementos principales
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Encabezado de la sección
         HeaderBox("Mis hábitos")
 
-        // Sección de categoría: Salud (filtrado por iconos específicos)
-        Category(
-            title = "Salud",
-            rows = habits.filter { it.icon == "LocalDrink" || it.icon == "Bedtime" }, // Filtra hábitos de salud
-            onCheck = onCheck, // Pasa los callbacks
-            onEdit = onEdit
-        )
-        // Sección de categoría: Productividad (filtrado por icono)
-        Category(
-            title = "Productividad",
-            rows = habits.filter { it.icon == "MenuBook" }, // Filtra hábitos de productividad
-            onCheck = onCheck,
-            onEdit = onEdit
-        )
-        // Sección de categoría: Bienestar (filtrado por icono)
-        Category(
-            title = "Bienestar",
-            rows = habits.filter { it.icon == "SelfImprovement" }, // Filtra hábitos de bienestar
-            onCheck = onCheck,
-            onEdit = onEdit
-        )
+        sectionOrder.forEach { cat ->
+            Category(
+                title   = cat,                 // enum directo
+                rows    = grouped[cat.display].orEmpty(),
+                onCheck = onCheck,
+                onEdit  = onEdit
+            )
+        }
 
-        // Botón flotante de acción (FAB simulado) para añadir hábitos, centrado al final
+        /* FAB centrado */
         Box(Modifier.fillMaxWidth(), Alignment.Center) {
             RoundedIconButton(
-                onClick = onAdd,
-                icon = Icons.Default.Add,
+                onClick            = onAdd,
+                icon               = Icons.Default.Add,
                 contentDescription = "Agregar hábito",
-                backgroundColor = Color(0xFF3EA8FE), // Color primario personalizado
-                iconTint = Color.White
+                backgroundColor    = Color(0xFF3EA8FE),
+                iconTint           = Color.White
             )
         }
     }
 }
+
+
 
 /**
  * @brief Composable privado para renderizar una sección de categoría dentro de [HabitList].
@@ -130,7 +119,7 @@ internal fun HabitList(
  */
 @Composable
 private fun Category(
-    title : String,
+    title   : HabitCategory,
     rows  : List<HabitUi>,
     onCheck: (HabitUi, Boolean) -> Unit,
     onEdit : (HabitUi) -> Unit
@@ -139,7 +128,7 @@ private fun Category(
     if (rows.isEmpty()) return
 
     // Título de la categoría
-    Subtitle(title)
+    Subtitle(title.display)
 
     // Itera sobre los hábitos de esta categoría
     rows.forEach { h ->
@@ -149,15 +138,7 @@ private fun Category(
             leadingIcon = {
                 Icon(
                     // Selecciona el icono basado en el nombre guardado en HabitUi
-                    imageVector = Icons.Filled.run {
-                        when (h.icon) {
-                            "LocalDrink"       -> LocalDrink
-                            "Bedtime"          -> Bedtime
-                            "MenuBook"         -> Icons.AutoMirrored.Filled.MenuBook // Icono auto-reflejado
-                            "SelfImprovement"  -> SelfImprovement
-                            else               -> CheckBoxOutlineBlank // Icono por defecto si no coincide
-                        }
-                    },
+                    imageVector = iconByName(h.icon),
                     contentDescription = null, // Icono decorativo dentro de un item con texto
                     tint = MaterialTheme.colorScheme.primary // Tinte primario del tema
                 )
@@ -247,50 +228,3 @@ private fun HeaderBox(text: String) = Box(
 internal fun Centered(txt: String) = Box(
     Modifier.fillMaxSize(), Alignment.Center
 ) { androidx.compose.material3.Text(txt, fontSize = 32.sp) }
-
-// --- Previews (Opcionales, pero recomendadas) ---
-
-/**
- * @brief Previsualización del componente [HabitList] con datos de ejemplo.
- */
-@Preview(showBackground = true, name = "HabitList Preview")
-@Composable
-private fun HabitListPreview() {
-    val sampleHabits = listOf(
-        HabitUi("h1", "Beber 2L Agua", "LocalDrink", false),
-        HabitUi("h2", "Dormir 8h", "Bedtime", true),
-        HabitUi("h3", "Leer Libro", "MenuBook", false),
-        HabitUi("h4", "Meditar", "SelfImprovement", false),
-        HabitUi("h5", "Ejercicio Matutino", "FitnessCenter", true) // Icono no mapeado -> CheckBoxOutlineBlank
-    )
-    MaterialTheme {
-        HabitList(
-            habits = sampleHabits,
-            onCheck = { _, _ -> },
-            onEdit = { },
-            onAdd = { }
-        )
-    }
-}
-
-/**
- * @brief Previsualización del componente [EmptyState].
- */
-@Preview(showBackground = true, name = "EmptyState Preview")
-@Composable
-private fun EmptyStatePreview() {
-    MaterialTheme {
-        EmptyState(onAdd = {})
-    }
-}
-
-/**
- * @brief Previsualización del componente [HeaderBox].
- */
-@Preview(showBackground = true, name = "HeaderBox Preview", widthDp = 300)
-@Composable
-private fun HeaderBoxPreview() {
-    MaterialTheme {
-        HeaderBox("Título de Sección")
-    }
-}

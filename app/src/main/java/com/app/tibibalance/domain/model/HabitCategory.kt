@@ -20,16 +20,16 @@ package com.app.tibibalance.domain.model
  */
 enum class HabitCategory(val display: String) {
     /** @brief Categoría para hábitos relacionados con la salud física (ejercicio, dieta, etc.). */
-    SALUD("Salud"),
+    SALUD("SALUD"),
 
     /** @brief Categoría para hábitos enfocados en mejorar la eficiencia y el rendimiento (trabajo, estudio, etc.). */
-    PRODUCTIVIDAD("Productividad"),
+    PRODUCTIVIDAD("PRODUCTIVIDAD"),
 
     /** @brief Categoría para hábitos centrados en el bienestar mental y emocional (meditación, lectura, hobbies, etc.). */
-    BIENESTAR("Bienestar"),
+    BIENESTAR("BIENESTAR"),
 
     /** @brief Categoría genérica o por defecto para hábitos que no encajan en las otras o creados libremente por el usuario. */
-    PERSONALIZADA("Personalizada");
+    PERSONALIZADA("PERSONALIZADA");
 
     /**
      * @brief Objeto compañero que contiene métodos estáticos asociados a [HabitCategory].

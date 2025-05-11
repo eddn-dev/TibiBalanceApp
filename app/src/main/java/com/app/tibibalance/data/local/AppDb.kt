@@ -49,7 +49,7 @@ import com.app.tibibalance.data.local.mapper.NotifConverters
         HabitEntity::class,
         HabitTemplateEntity::class
     ],
-    version = 3, // Incrementa si cambias el esquema
+    version = 4, // Incrementa si cambias el esquema
     exportSchema = true // Recomendado para control de versiones del esquema
 )
 @TypeConverters(

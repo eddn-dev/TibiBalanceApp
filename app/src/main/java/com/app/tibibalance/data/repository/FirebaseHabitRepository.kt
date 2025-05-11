@@ -28,6 +28,7 @@ import com.app.tibibalance.domain.model.Habit
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -114,7 +115,9 @@ class FirebaseHabitRepository @Inject constructor(
 
     /** Se engancha al cambio de sesión para reconectar el listener. */
     init {
-        auth.addAuthStateListener { fb -> scope.launch { reconnect(fb.uid) } }
+        auth.addAuthStateListener { fb ->
+            scope.launch { reconnect(fb.uid) }
+        }
         scope.launch { reconnect(auth.uid) }
     }
 
@@ -123,25 +126,38 @@ class FirebaseHabitRepository @Inject constructor(
         stop(); stop = {}
         if (uid == null) { dao.clear(); return }
 
-        stop = db.userHabits(uid).addSnapshotListener { snaps, err ->
-            if (err != null) { err.printStackTrace(); return@addSnapshotListener }
-            snaps?.documentChanges?.forEach { dc ->
-                val habit = dc.document.toHabit()
-                scope.launch {
-                    when (dc.type) {
-                        DocumentChange.Type.REMOVED -> dao.delete(habit.id)
-                        else                        -> dao.upsert(habit.toEntity())
+        // bootstrap: trae toda la colección solo una vez
+        scope.launch {
+            db.userHabits(uid).get().await()
+                .documents.forEach { snap ->
+                    dao.upsert(snap.toHabit().toEntity())
+                }
+        }
+
+        // listener: escucha deltas (incluye confirmaciones offline)
+        stop = db.userHabits(uid)
+            .addSnapshotListener(MetadataChanges.INCLUDE) { snaps, err ->
+                if (err != null) { err.printStackTrace(); return@addSnapshotListener }
+                snaps?.documentChanges?.forEach { dc ->
+                    scope.launch {
+                        when (dc.type) {
+                            DocumentChange.Type.REMOVED -> dao.delete(dc.document.id)
+                            else                        -> dao.upsert(dc.document.toHabit().toEntity())
+                        }
                     }
                 }
-            }
-        }::remove
+            }::remove
     }
 
     /* ─────────── Extensión conveniente ─────────── */
 
     /** @return Referencia a `profiles/{uid}/habits`. */
+    /* dentro de FirebaseHabitRepository */
     private fun FirebaseFirestore.userHabits(uid: String) =
-        collection("profiles").document(uid).collection("habits")
+        collection("profiles")
+            .document(uid)
+            .collection("habits")
+
 
     /* ── Operación parcial (solo checkedToday) ── */
 

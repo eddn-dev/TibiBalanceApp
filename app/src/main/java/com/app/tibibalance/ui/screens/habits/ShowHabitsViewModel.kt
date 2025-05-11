@@ -37,6 +37,7 @@ package com.app.tibibalance.ui.screens.habits
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.tibibalance.data.repository.HabitRepository   // ← Import necesario cuando se use el repo real
+import com.app.tibibalance.domain.model.HabitCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -55,7 +56,8 @@ import javax.inject.Inject
 data class HabitUi(
     val id      : String,
     val name    : String,
-    val icon    : String,       // nombre Material, ej. "LocalDrink"
+    val icon    : String,
+    val category: String,
     val checked : Boolean = false
 )
 
@@ -102,7 +104,7 @@ sealed interface HabitsEvent {
  */
 @HiltViewModel
 class ShowHabitsViewModel @Inject constructor(
-    repo: HabitRepository // Inyección del repositorio (actualmente no usado por el mock)
+    private val repo: HabitRepository // Asegúrate que sea HabitRepository, no una simulación
 ) : ViewModel() {
 
     /** Flujo mutable interno para emitir eventos one-shot. */
@@ -111,39 +113,19 @@ class ShowHabitsViewModel @Inject constructor(
     val events: SharedFlow<HabitsEvent> = _events.asSharedFlow()
 
     /**
-     * @brief Flujo simulado que emite una lista de hábitos.
-     * @details **Reemplazar con `repo.observeHabits().map { domainList -> domainList.map { it.toHabitUi() } }`**
-     * en una implementación real. Actualmente, solo emite una lista vacía.
-     * Se incluye un comentario con código para simular un estado cargado tras un delay.
-     */
-    private val habitsMock: Flow<List<HabitUi>> = flow {
-        emit(emptyList<HabitUi>())            // Estado inicial: lista vacía.
-        // Para probar estado cargado, descomentar y añadir datos:
-        // kotlinx.coroutines.delay(1000)
-        // emit(listOf(
-        //     HabitUi("h1", "Beber 2L Agua", "LocalDrink", false),
-        //     HabitUi("h2", "Dormir 8h", "Bedtime", true)
-        // ))
-    }
-
-    /**
      * @brief Flujo de estado ([StateFlow]) que expone el [HabitsUiState] actual a la UI.
      * @details Transforma el flujo de datos (`habitsMock` o el flujo real del repositorio)
      * en el estado de UI correspondiente (Empty, Loaded, Error). Se manejan errores
      * del flujo fuente y se inicia con el estado `Loading`.
      */
     val ui: StateFlow<HabitsUiState> =
-        habitsMock // <- Reemplazar con el flujo del repositorio mapeado a List<HabitUi>
-            .map<List<HabitUi>, HabitsUiState> { habitList -> // Mapea la lista a un estado
-                if (habitList.isEmpty()) HabitsUiState.Empty // Si está vacía -> Empty
-                else HabitsUiState.Loaded(habitList) // Si tiene datos -> Loaded
+        repo.observeHabits()
+            .map { list ->
+                val uiList = list.map { it.toUi() }
+                if (uiList.isEmpty()) HabitsUiState.Empty
+                else HabitsUiState.Loaded(uiList)
             }
-            .catch { throwable -> // Captura errores del flujo fuente
-                emit(HabitsUiState.Error(throwable.message ?: "Error desconocido al cargar hábitos"))
-            }
-            // Convierte el Flow en un StateFlow, compartiendo la última emisión
-            // y manteniendo el estado mientras haya suscriptores (Eagerly inicia la colección inmediatamente).
-            // El valor inicial mientras se establece la conexión/carga es Loading.
+            .catch { e -> emit(HabitsUiState.Error(e.message ?: "Error")) }
             .stateIn(viewModelScope, SharingStarted.Eagerly, HabitsUiState.Loading)
 
     /**

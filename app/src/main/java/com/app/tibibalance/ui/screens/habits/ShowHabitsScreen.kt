@@ -92,15 +92,18 @@ fun ShowHabitsScreen(
             HabitsUiState.Loading -> Centered("Cargando…") // Muestra "Cargando..."
             is HabitsUiState.Error -> Centered(currentState.msg) // Muestra el mensaje de error.
             HabitsUiState.Empty -> EmptyState(onAdd = vm::onAddClicked) // Muestra estado vacío con botón para añadir.
-            is HabitsUiState.Loaded -> HabitList( // Muestra la lista de hábitos.
-                habits  = currentState.data, // Pasa la lista de datos.
-                // TODO: Implementar la lógica para marcar/desmarcar un hábito.
-                onCheck = { /* habit, isChecked -> vm.toggleHabit(habit.id, isChecked) */ } as (HabitUi, Boolean) -> Unit,
-                // TODO: Implementar la lógica para editar un hábito (navegar a pantalla/modal de edición).
-                onEdit  = { /* habit -> vm.onEditHabitClicked(habit.id) */ },
-                // Acción para el botón FAB o similar dentro de HabitList.
+            is HabitsUiState.Loaded -> HabitList(
+                habits  = currentState.data,
+
+                // ✔  lambda con los 2 parámetros
+                onCheck = { _, _ -> /* TODO */ },
+
+                onEdit  = { habit ->
+                    /* TODO: navegación a edición */
+                },
                 onAdd   = vm::onAddClicked
             )
+
         }
     }
 
