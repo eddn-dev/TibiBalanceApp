@@ -89,9 +89,9 @@ fun PrimaryButton(
         modifier = modifier.height(48.dp), // Altura fija (ajustada a 48dp)
         shape = RoundedCornerShape(12.dp), // Bordes redondeados
         colors = ButtonDefaults.buttonColors( // Colores del botón
-            containerColor         = container, // Fondo normal
+            containerColor         = Color(0xFF3EA8FE), // Fondo normal
             contentColor           = contentColor, // Contenido normal
-            disabledContainerColor = container.copy(alpha = 0.5f), // Fondo deshabilitado (más transparente)
+            disabledContainerColor = Color(0xFF3EA8FE).copy(alpha = 0.5f), // Fondo deshabilitado (más transparente)
             disabledContentColor   = contentColor.copy(alpha = 0.5f) // Contenido deshabilitado
         ),
         contentPadding = PaddingValues(horizontal = 24.dp) // Padding interno

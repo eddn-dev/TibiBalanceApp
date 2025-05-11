@@ -95,8 +95,10 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation(libs.kotlinx.datetime)
 
-    /* ──────────────── Lottie Animation ────────────────*/
+    /* ──────────────── Animations  ────────────────*/
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
+
+    implementation ("com.github.commandiron:SpinWheelCompose:1.1.1")
 }
 
 allprojects {
