@@ -17,6 +17,7 @@
  */
 package com.app.tibibalance.data.repository
 
+import android.util.Log
 import com.app.tibibalance.data.local.dao.HabitDao
 import com.app.tibibalance.data.local.entity.HabitEntity
 import com.app.tibibalance.data.local.mapper.toDomain
@@ -88,12 +89,35 @@ class FirebaseHabitRepository @Inject constructor(
     /**
      * @copydoc HabitRepository.updateHabit
      */
-    override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
+    /*override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
         val uid = auth.uid ?: return@withContext
+        val map = habit.toFirestoreMap()
+        Log.d("FIREBASE_MAP", map.toString()) // 👈 Aquí imprimimos el mapa completo
         db.userHabits(uid).document(habit.id)
             .set(habit.toFirestoreMap(), SetOptions.merge()).await()
         dao.upsert(habit.toEntity())
+    }*/
+
+    override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
+        val uid = auth.uid ?: return@withContext
+
+        // Obtener el mapa serializado base
+        val firestoreMap = habit.toFirestoreMap().toMutableMap()
+
+        // Asegurar que notifConfig.enabled esté incluido
+        val notifMap = (firestoreMap["notifConfig"] as? MutableMap<String, Any?>)?.toMutableMap()
+            ?: mutableMapOf()
+        notifMap["enabled"] = habit.notifConfig.enabled
+        firestoreMap["notifConfig"] = notifMap
+
+        Log.d("FIREBASE_MAP_FIXED", firestoreMap.toString()) // Confirmar que enabled está presente
+
+        db.userHabits(uid).document(habit.id)
+            .set(firestoreMap, SetOptions.merge()).await()
+
+        dao.upsert(habit.toEntity())
     }
+
 
     /**
      * @copydoc HabitRepository.deleteHabit

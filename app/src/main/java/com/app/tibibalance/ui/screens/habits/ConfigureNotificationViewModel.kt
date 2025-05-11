@@ -29,6 +29,13 @@ class ConfigureNotificationViewModel @Inject constructor(
                 _ui.value = emptyList()
             }
             .onEach { habitList ->
+                habitList.forEach { habit ->
+                    android.util.Log.d(
+                        "VM",
+                        "Habit: ${habit.name}, Times: ${habit.notifConfig.timesOfDay}, Msg: '${habit.notifConfig.message}', Days: ${habit.notifConfig.weekDays.days}, Mode: ${habit.notifConfig.mode}, Vibrate: ${habit.notifConfig.vibrate}"
+                    )
+                }
+
                 _ui.value = habitList
             }
             .launchIn(viewModelScope)
@@ -36,13 +43,25 @@ class ConfigureNotificationViewModel @Inject constructor(
 
     fun toggleNotification(habit: Habit) {
         val updated = habit.copy(
-            notifConfig = habit.notifConfig.copy(
-                enabled = !habit.notifConfig.enabled
-            )
+            notifConfig = habit.notifConfig.copy(enabled = !habit.notifConfig.enabled)
         )
         viewModelScope.launch {
             repo.updateHabit(updated)
         }
     }
+
+
+/*
+    private val _selectedHabit = MutableStateFlow<Habit?>(null)
+    val selectedHabit: StateFlow<Habit?> = _selectedHabit.asStateFlow()
+
+    fun selectHabit(habit: Habit) {
+        _selectedHabit.value = habit
+    }
+
+    fun clearSelectedHabit() {
+        _selectedHabit.value = null
+    }
+*/
 }
 

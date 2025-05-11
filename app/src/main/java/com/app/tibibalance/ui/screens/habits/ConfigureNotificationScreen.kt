@@ -1,5 +1,6 @@
 package com.app.tibibalance.ui.screens.habits
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.texts.Subtitle
-import com.app.tibibalance.ui.components. buttons.IconButton
+import com.app.tibibalance.ui.components.buttons.IconButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -21,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.text.style.TextAlign
+import com.app.tibibalance.domain.model.NotifMode
+
 
 @Composable
 fun ConfigureNotificationScreen(
@@ -30,7 +33,7 @@ fun ConfigureNotificationScreen(
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
-    var showModal by remember { mutableStateOf(false) }
+    //var showModal by remember { mutableStateOf(false) }
     val habitList = viewModel.ui.collectAsState().value
 
     Box(
@@ -89,6 +92,8 @@ fun ConfigureNotificationScreen(
                 Subtitle(text = "No tienes hábitos aún.")
             } else {
                 habitList.forEach { habit ->
+
+
                     FormContainer(
                         backgroundColor = Color.White,
                         modifier = Modifier.padding(bottom = 15.dp)
@@ -97,11 +102,11 @@ fun ConfigureNotificationScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            ImageContainer(
-                                resId = R.drawable.iconwaterimage, // puedes cambiar esto luego por el icono real
+                            /*ImageContainer(
+                                resId = "",//getHabitIconRes(habit.icon), // puedes cambiar esto luego por el icono real
                                 contentDescription = null,
                                 modifier = Modifier.size(38.dp)
-                            )
+                            )*/
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Subtitle(text = habit.name)
                             }
@@ -110,13 +115,13 @@ fun ConfigureNotificationScreen(
                             IconButton(
                                 resId = if (habit.notifConfig.enabled) R.drawable.iconbellswitch_on else R.drawable.iconbellswitch_off,
                                 contentDescription = if (habit.notifConfig.enabled) "Notificación activada" else "Notificación desactivada",
-                                onClick = { }//viewModel.toggleNotification(habit) }
+                                onClick = { viewModel.toggleNotification(habit)}
                             )
 
                             IconButton(
                                 resId = R.drawable.icon_edit_blue,
                                 contentDescription = "Editar notificación",
-                                onClick = { showModal = true }
+                                onClick = { }//viewModel.selectHabit(habit)  }
                             )
                         }
                     }
@@ -134,18 +139,80 @@ fun ConfigureNotificationScreen(
         )
 
         /*** MODAL DE CONFIGURACIÓN ***/
-        if (showModal) {
+/*
+        val selectedHabit by viewModel.selectedHabit.collectAsState()
+
+        if (selectedHabit != null) {
+            val notif = selectedHabit!!.notifConfig
+
+            // Log para verificar qué datos estás recibiendo
+            Log.d("Modal", "Habit seleccionado: ${selectedHabit!!.name}")
+            Log.d("Modal", "Horas: ${notif.timesOfDay}")
+            Log.d("Modal", "Mensaje: ${notif.message}")
+            Log.d("Modal", "Días: ${notif.weekDays.days}")
+            Log.d("Modal", "Modo: ${notif.mode}, Vibrate: ${notif.vibrate}")
+
+
+            // Mapear Set<Int> (1–7) a Set<Day>
+            val selectedDays: Set<Day> = notif.weekDays.days.mapNotNull {
+                when (it) {
+                    1 -> Day.L
+                    2 -> Day.M
+                    3 -> Day.MI
+                    4 -> Day.J
+                    5 -> Day.V
+                    6 -> Day.S
+                    7 -> Day.D
+                    else -> null
+                }
+            }.toSet()
+
+            // Mapear NotifMode + vibrate a NotifyType
+            val notifyTypes = mutableSetOf<NotifyType>()
+            when (notif.mode) {
+                NotifMode.SILENT  -> notifyTypes.add(NotifyType.SILENT)
+                NotifMode.SOUND   -> notifyTypes.add(NotifyType.SOUND)
+                NotifMode.VIBRATE -> notifyTypes.add(NotifyType.VIBRATE)
+            }
+            //if (notif.vibrate) notifyTypes.add(NotifyType.VIBRATE)
+
             ModalConfigNotification(
-                title = "Configurar notificación",
-                initialTime = "8:00 a.m.",
-                initialMessage = "¡Hora de hacer el hábito!",
-                initialDays = emptySet(),
-                initialRepeatValue = "",
-                initialRepeatUnit = "",
-                initialTypes = emptySet(),
-                onDismissRequest = { showModal = false },
-                onSave = { _, _, _, _, _, _ -> showModal = false }
+                title              = "Editar notificación",
+                initialTime        = notif.timesOfDay.firstOrNull()?.let { convertTo12hFormat(it) } ?: "8:00 a.m.",
+                initialMessage     = notif.message,
+                initialDays        = selectedDays,
+                initialRepeatValue = notif.advanceMin.toString(),
+                initialRepeatUnit  = "min",
+                initialTypes       = notifyTypes,
+                onDismissRequest   = { viewModel.clearSelectedHabit() },
+                onSave             = { time, msg, days, repeatValue, repeatUnit, types ->
+                    // Aquí implementarás la lógica de guardado real luego
+                    viewModel.clearSelectedHabit()
+                }
             )
         }
+*/
+        /************************************************************************/
     }
 }
+/*
+fun getHabitIconRes(iconName: String): Int {
+    return when (iconName.lowercase()) {
+        "localdrink"   -> R.drawable.iconwaterimage
+        "bedtime"      -> R.drawable.iconsleepimage
+        "book"         -> R.drawable.iconbookimage
+        else           -> R.drawable.iconbookimage
+    }
+}
+
+
+fun convertTo12hFormat(time: String): String {
+    val (hourStr, minuteStr) = time.split(":")
+    val hour = hourStr.toInt()
+    val minute = minuteStr
+    val suffix = if (hour < 12) "a.m." else "p.m."
+    val hour12 = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+    return "$hour12:$minute $suffix"
+}
+
+*/

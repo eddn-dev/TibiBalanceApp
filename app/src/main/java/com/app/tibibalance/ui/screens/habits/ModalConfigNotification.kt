@@ -47,9 +47,12 @@ fun ModalConfigNotification(
     var time by remember { mutableStateOf(initialTime) }
     var message by remember { mutableStateOf(initialMessage) }
     var days by remember { mutableStateOf(initialDays) }
-    var repeatValue by remember { mutableStateOf(initialRepeatValue) }
+   var repeatValue by remember { mutableStateOf(initialRepeatValue) }
     var repeatUnit by remember { mutableStateOf(initialRepeatUnit) }
     var types by remember { mutableStateOf(initialTypes) }
+
+    
+
 
     ModalContainer(
         onDismissRequest = onDismissRequest,
