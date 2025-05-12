@@ -97,7 +97,6 @@ dependencies {
 
     /* ──────────────── Animations  ────────────────*/
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
-
     implementation ("com.github.commandiron:SpinWheelCompose:1.1.1")
 }
 

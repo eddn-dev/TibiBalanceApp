@@ -41,28 +41,6 @@ class HabitConverter {
     fun fromJson(json: String): Habit =
         Json.decodeFromString(json)
 
-    /* ─────────────── Instant ⇆ Long (epoch) ─────────────── */
-
-    /**
-     * @brief Convierte un [Instant] a milisegundos desde época.
-     *
-     * @param i Instante a convertir.
-     * @return Valor epoch en milisegundos, o `null` si *i* es `null`.
-     */
-    @TypeConverter
-    fun fromInstant(i: Instant?): Long? =
-        i?.toEpochMilliseconds()
-
-    /**
-     * @brief Convierte milisegundos epoch a [Instant].
-     *
-     * @param epoch Valor epoch en milisegundos.
-     * @return Instante equivalente, o `null` si *epoch* es `null`.
-     */
-    @TypeConverter
-    fun toInstant(epoch: Long?): Instant? =
-        epoch?.let { Instant.fromEpochMilliseconds(it) }
-
     /* ─────────────── LocalDate ⇆ String (ISO-8601) ─────────────── */
 
     /**

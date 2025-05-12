@@ -9,5 +9,6 @@
     <string name="launch_subtitle">La app que te ayuda a mantener\nun estilo de vida saludable</string>
     <string name="btn_sign_up">Registrarse</string>
     <string name="sign_up_title">Registrarse</string>
-
+    <string name="channel_habits">Hábitos</string>
+    <string name="default_reminder_body">Hora de realizar tu actividad</string>
 </resources>

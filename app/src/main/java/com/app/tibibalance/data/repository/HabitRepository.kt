@@ -38,6 +38,14 @@ interface HabitRepository {
     fun observeHabits(): Flow<List<Habit>>
 
     /**
+     * Observa un hábito individual por su ID.
+     *
+     * @param id  Identificador único del hábito.
+     * @return    [Flow] reactivo que emite el hábito o `null` si no existe.
+     */
+    fun observeHabit(id: String): Flow<Habit?>
+
+    /**
      * @brief   Inserta un nuevo hábito en la fuente de datos (local y/o remota).
      *
      * @details Persiste la instancia de [Habit] proporcionada. La implementación

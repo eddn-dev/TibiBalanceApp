@@ -1,55 +1,88 @@
 /**
  * @file    HabitFormMapper.kt
- * @ingroup data_mapper // Grupo para mappers generales (entre capas)
- * @brief   Función de extensión para convertir [HabitForm] + [NotifConfig] a [Habit].
+ * @ingroup data_mapper
+ * @brief   Conversión de [HabitForm] + [NotifConfig] a la entidad de dominio [Habit].
  *
- * @details El asistente de creación de hábitos ([com.app.tibibalance.ui.wizard.AddHabitViewModel])
- * utiliza [HabitForm] para recopilar los datos básicos y de seguimiento, y
- * [NotifConfig] para los ajustes específicos de notificación. Esta función
- * de extensión actúa como un constructor final, fusionando ambos objetos
- * para crear la entidad de dominio [Habit] que será persistida por el
- * repositorio ([com.app.tibibalance.data.repository.HabitRepository]).
+ * @details
+ * Incluye el cálculo de `nextTrigger` (próximo disparo de notificación) para
+ * los presets DIARIO y SEMANAL.  Si el usuario desactiva las notificaciones,
+ * el resultado es `null` y el Scheduler simplemente no programa nada.
  *
- * Es importante notar que el campo `id` del [Habit] resultante se inicializa
- * como una cadena vacía (`""`). El ID real será asignado por el repositorio
- * durante la operación de inserción (e.g., `FirebaseHabitRepository.addHabit()`
- * obtendrá el `docId` de Firestore o generará un UUID si es necesario).
- * El campo `createdAt` se establece automáticamente al momento de la conversión
- * usando `Clock.System.now()`. El campo `nextTrigger` se deja `null` inicialmente,
- * ya que su cálculo y actualización son responsabilidad de la lógica de
- * programación de notificaciones.
+ * El algoritmo:
+ *  1.  Toma la lista de horas definidas en `cfg.timesOfDay` (`"HH:mm"`).
+ *  2.  Selecciona la próxima hora válida dentro de hoy; si ya pasó, busca mañana
+ *      o el siguiente día marcado en `weekDays` cuando el preset es SEMANAL.
+ *  3.  Devuelve un `Instant` en la zona horaria del dispositivo.
  */
 package com.app.tibibalance.data.mapper
 
-import com.app.tibibalance.domain.model.* // Importa todos los modelos necesarios
-import kotlinx.datetime.Clock
+import com.app.tibibalance.domain.model.*
+import kotlinx.datetime.*
+
+/* ────────────────────────── API pública ────────────────────────── */
 
 /**
- * @brief Fusiona los datos de un [HabitForm] y una [NotifConfig] para crear un objeto [Habit].
+ * Fusiona el [HabitForm] con la configuración [NotifConfig] y produce un
+ * [Habit] listo para persistir y programar con [HabitAlertScheduler].
  *
- * @receiver La instancia de [HabitForm] que contiene los datos básicos y de seguimiento
- * recopilados del usuario a través del asistente de creación/edición.
- * @param cfg La instancia de [NotifConfig] que contiene los ajustes específicos
- * de notificación elegidos por el usuario.
- * @return Una instancia completa del modelo de dominio [Habit], lista para ser
- * persistida. El `id` estará vacío y `createdAt` se establecerá al momento actual.
+ * @receiver   Información básica y de seguimiento procedente del wizard.
+ * @param cfg  Configuración de notificaciones elegida por el usuario.
+ * @return     Entidad [Habit] con `nextTrigger` calculado (o `null`).
  */
-fun HabitForm.toHabit(cfg: NotifConfig): Habit =
-    Habit(
-        id           = "", // El ID real será asignado por el repositorio al guardar.
-        name         = this.name,
-        description  = this.desc,
-        category     = this.category,
-        icon         = this.icon,
-        // Construye el objeto Session anidado
-        session      = Session(qty = this.sessionQty, unit = this.sessionUnit),
-        repeatPreset = this.repeatPreset,
-        // Construye el objeto Period anidado
-        period       = Period(qty = this.periodQty, unit = this.periodUnit),
-        // Asigna la configuración de notificación completa
+fun HabitForm.toHabit(cfg: NotifConfig): Habit {
+    val zone  = TimeZone.currentSystemDefault()
+    val now   = Clock.System.now().toLocalDateTime(zone)
+
+    return Habit(
+        id           = "",
+        name         = name.trim(),
+        description  = desc.trim(),
+        category     = category,
+        icon         = icon,
+        session      = Session(sessionQty, sessionUnit),
+        repeatPreset = repeatPreset,
+        period       = Period(periodQty, periodUnit),
         notifConfig  = cfg,
-        challenge    = this.challenge,
-        // Establece la marca de tiempo de creación ahora mismo
-        createdAt    = Clock.System.now()
-        // nextTrigger, challengeFrom, challengeTo se dejan null por defecto
+        challenge    = challenge,
+        createdAt    = Clock.System.now(),
+        nextTrigger  = computeNextTrigger(now, cfg, repeatPreset, weekDays, zone)
     )
+}
+
+/* ───────────── Helpers privados ───────────── */
+
+private fun Set<Int>.toDayOfWeek(): Set<DayOfWeek> =
+    mapNotNull { DayOfWeek.values().getOrNull((it - 1).coerceIn(0,6)) }
+        .toSet()
+
+private fun computeNextTrigger(
+    now: LocalDateTime,
+    cfg: NotifConfig,
+    preset: RepeatPreset,
+    weekDaysInt: Set<Int>,          // ← llega como Ints
+    zone: TimeZone
+): Instant? {
+    if (!cfg.enabled) return null
+
+    val dayTimes = cfg.timesOfDay.map(LocalTime::parse).sorted()
+
+    val todayNext = dayTimes.firstOrNull { it > now.time }
+        ?.let { LocalDateTime(now.date, it) }
+
+    val weekDays = weekDaysInt.toDayOfWeek()         // ← convertimos aquí
+
+    fun nextValidDate(base: LocalDate): LocalDate {
+        if (preset != RepeatPreset.SEMANAL) return base
+        var d = base
+        while (d.dayOfWeek !in weekDays) {
+            d = d.plus(1, DateTimeUnit.DAY)
+        }
+        return d
+    }
+
+    val triggerLdt = todayNext ?: run {
+        val date = nextValidDate(now.date.plus(1, DateTimeUnit.DAY))
+        LocalDateTime(date, dayTimes.first())
+    }
+    return triggerLdt.toInstant(zone)
+}

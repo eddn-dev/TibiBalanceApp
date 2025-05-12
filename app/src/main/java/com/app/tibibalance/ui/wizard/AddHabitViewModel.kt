@@ -48,6 +48,7 @@ import com.app.tibibalance.data.mapper.toHabit // Mapper para convertir HabitFor
 import com.app.tibibalance.data.repository.HabitRepository
 import com.app.tibibalance.di.IoDispatcher
 import com.app.tibibalance.domain.model.*
+import com.app.tibibalance.domain.service.HabitService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -69,7 +70,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AddHabitViewModel @Inject constructor(
-    private val habitRepo: HabitRepository,
+    private val habitService: HabitService,
     @IoDispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -296,7 +297,8 @@ class AddHabitViewModel @Inject constructor(
             try {
                 val habit = form.toHabit(cfg) // Convierte el formulario y config a un objeto Habit.
                 // Ejecuta la operación de repositorio en el dispatcher de IO.
-                withContext(io) { habitRepo.addHabit(habit) }
+                Log.i("AddHabitVM", "➡️ guardando ${habit.name} con trigger=${habit.nextTrigger}")
+                withContext(io) { habitService.add(habit) }
 
                 // Transiciona a estado de éxito.
                 _ui.value = AddHabitUiState.Saved(

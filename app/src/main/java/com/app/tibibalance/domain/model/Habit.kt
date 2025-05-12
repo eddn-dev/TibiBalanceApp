@@ -97,5 +97,7 @@ data class Habit(
     // Asumiendo que nextTrigger se calcula y actualiza externamente, o se maneja su serialización
     // de otra forma (e.g., como Long en el Map de Firestore). Si se serializara directamente
     // como Instant?, necesitaría el @Serializable(with=...)
-    val nextTrigger  : Instant?     = null // Null por defecto
+    @Serializable(with = InstantEpochMillisSerializer::class)
+    val nextTrigger  : Instant?     = null, // Null por defecto
+    val challengeConfig: ChallengeConfig? = null
 )
