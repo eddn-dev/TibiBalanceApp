@@ -10,19 +10,19 @@
  *
  * Funcionalidades Clave:
  * - **Paginación:** Emplea un [HorizontalPager] para presentar los diferentes pasos
- * del asistente ([SuggestionStep], [BasicInfoStep], [TrackingStep], [NotificationStep]).
+ *   del asistente ([SuggestionStep], [BasicInfoStep], [TrackingStep], [NotificationStep]).
  * - **Gestión de Estado:** Observa el [AddHabitUiState] del [AddHabitViewModel] para
- * determinar qué paso mostrar y cómo configurar los controles de navegación.
+ *   determinar qué paso mostrar y cómo configurar los controles de navegación.
  * - **Navegación por Pasos:** Sincroniza el [PagerState] con el estado de la UI (`page`)
- * y proporciona botones ("Atrás", "Siguiente", "Guardar", etc.) en una barra inferior
- * cuyas acciones y etiquetas cambian dinámicamente según el paso actual y la validez
- * del formulario. Incluye un [PagerIndicator].
+ *   y proporciona botones ("Atrás", "Siguiente", "Guardar", etc.) en una barra inferior
+ *   cuyas acciones y etiquetas cambian dinámicamente según el paso actual y la validez
+ *   del formulario. Incluye un [PagerIndicator].
  * - **Carga de Plantillas:** Utiliza la función helper [rememberTemplates] (con Hilt EntryPoint)
- * para obtener la lista de [HabitTemplate]s para el `SuggestionStep`.
+ *   para obtener la lista de [HabitTemplate]s para el `SuggestionStep`.
  * - **Diálogos Auxiliares:** Muestra [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog]s para comunicar estados finales
- * o confirmaciones, como `Saved`, `Error`, o `ConfirmDiscard`.
+ *   o confirmaciones, como `Saved`, `Error`, o `ConfirmDiscard`.
  * - **Restricción de Altura:** Limita la altura máxima del modal para adaptarse a diferentes
- * tamaños de pantalla usando `LocalConfiguration`.
+ *   tamaños de pantalla usando `LocalConfiguration`.
  *
  * @see AddHabitViewModel ViewModel que gestiona la lógica y el estado de este asistente.
  * @see AddHabitUiState Sealed interface que define los estados/pasos del asistente.
@@ -43,7 +43,9 @@ package com.app.tibibalance.ui.wizard
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
@@ -94,16 +96,14 @@ fun AddHabitModal(
             is AddHabitUiState.BasicInfo    -> 1
             is AddHabitUiState.Tracking     -> 2
             is AddHabitUiState.Notification -> 3
-            // Para otros estados (Saving, Saved, Error, ConfirmDiscard), permanece en la página 0 o la última válida.
-            // Podría ajustarse si se quisiera que el Pager refleje esos estados. Aquí se mantiene simple.
-            else                            -> 0 // O podríamos mantener la página anterior si tuviéramos acceso a ella.
+            else                            -> 0 // o podríamos mantener la página anterior
         }
     }
-    // Estado del Pager, sincronizado con el 'page' derivado del uiState.
-    val pager = rememberPagerState(initialPage = page) { 4 } // 4 páginas en total.
-    // Efecto para animar el Pager a la página correcta cuando 'page' cambia.
+    // Estado del Pager, sincronizado con el 'page'.
+    val pager = rememberPagerState(initialPage = page) { 4 }
+    // Efecto para animar el Pager cuando cambia la página.
     LaunchedEffect(page) {
-        if (pager.currentPage != page) { // Evita animar si ya está en la página correcta
+        if (pager.currentPage != page) {
             pager.animateScrollToPage(page)
         }
     }
@@ -111,54 +111,49 @@ fun AddHabitModal(
     // Calcula la altura máxima del modal como un 85% de la altura de la pantalla.
     val maxH = LocalConfiguration.current.screenHeightDp.dp * .85f
 
-    // Contenedor modal base.
     ModalContainer(
         onDismissRequest = onDismissRequest,
-        // Limita la altura máxima del modal.
-        modifier           = Modifier.heightIn(max = maxH),
-        closeButtonEnabled = true // Muestra el botón 'X' para cerrar.
+        modifier = Modifier.heightIn(max = maxH),
+        closeButtonEnabled = true
     ) {
-        // Columna principal que organiza el Pager y la barra inferior.
         Column(Modifier.fillMaxSize()) {
 
             /* -------- Contenido Paginado -------- */
             HorizontalPager(
-                state             = pager, // Vinculado al estado del Pager.
-                userScrollEnabled = false, // Deshabilita el desplazamiento manual entre páginas.
-                modifier          = Modifier
-                    .weight(1f) // Ocupa el espacio vertical restante.
+                state = pager,
+                userScrollEnabled = false,
+                modifier = Modifier
+                    .weight(1f)
                     .fillMaxWidth(),
-                pageSize          = PageSize.Fill // Cada página ocupa todo el ancho.
-            ) { pageIndex -> // El índice de la página a renderizar.
-                // Renderiza el Composable del paso correspondiente al índice.
+                pageSize = PageSize.Fill
+            ) { pageIndex ->
                 when (pageIndex) {
                     0 -> SuggestionStep(
-                        templates    = rememberTemplates(), // Obtiene las plantillas.
-                        onSuggestion = vm::pickTemplate // Callback para seleccionar plantilla.
+                        templates = rememberTemplates(),
+                        onSuggestion = vm::pickTemplate
                     )
-                    1 -> (ui as? AddHabitUiState.BasicInfo)?.let { currentState -> // Muestra si el estado es BasicInfo.
+                    1 -> (ui as? AddHabitUiState.BasicInfo)?.let { currentState ->
                         BasicInfoStep(
-                            initial      = currentState.form, // Pasa el formulario actual.
-                            errors       = currentState.errors, // Pasa los errores de validación.
-                            onFormChange = vm::updateBasic, // Callback para actualizar el form en el VM.
-                            onBack       = vm::back // Callback para ir atrás.
+                            initial = currentState.form,
+                            errors = currentState.errors,
+                            onFormChange = vm::updateBasic,
+                            onBack = vm::back
                         )
                     }
-                    2 -> (ui as? AddHabitUiState.Tracking)?.let { currentState -> // Muestra si el estado es Tracking.
+                    2 -> (ui as? AddHabitUiState.Tracking)?.let { currentState ->
                         TrackingStep(
-                            initial      = currentState.form,
-                            errors       = currentState.errors,
+                            initial = currentState.form,
+                            errors = currentState.errors,
                             onFormChange = vm::updateTracking,
-                            onBack       = vm::back
+                            onBack = vm::back
                         )
                     }
-                    3 -> (ui as? AddHabitUiState.Notification)?.let { currentState -> // Muestra si el estado es Notification.
+                    3 -> (ui as? AddHabitUiState.Notification)?.let { currentState ->
                         NotificationStep(
-                            // Usa el nombre del hábito como título, o "Notificación" si está vacío.
-                            title       = currentState.form.name.ifBlank { "Notificación" },
-                            initialCfg  = currentState.cfg, // Pasa la configuración de notificación.
-                            onCfgChange = vm::updateNotif, // Callback para actualizar la config.
-                            onBack      = vm::back
+                            title = currentState.form.name.ifBlank { "Notificación" },
+                            initialCfg = currentState.cfg,
+                            onCfgChange = vm::updateNotif,
+                            onBack = vm::back
                         )
                     }
                 }
@@ -166,105 +161,99 @@ fun AddHabitModal(
 
             Spacer(Modifier.height(4.dp))
 
-            /* -------- Barra Inferior con Botones y PagerIndicator -------- */
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp), // Padding de la barra.
-                horizontalArrangement = Arrangement.SpaceBetween // Espacia los botones.
-            ) {
-                // Botón "Atrás" (visible solo si no estamos en la primera página).
-                if (page > 0) {
-                    SecondaryButton("Atrás", onClick = vm::back)
-                } else {
-                    // Spacer para ocupar el espacio del botón "Atrás" y mantener el botón principal a la derecha.
-                    Spacer(Modifier.width(120.dp)) // Ajusta el ancho si SecondaryButton tiene un ancho fijo
+            /* -------- Barra Inferior -------- */
+            if (ui is AddHabitUiState.Suggestions) {
+                // Opción de centrar el botón de sugerencias
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    PrimaryButton(
+                        text = "Crear mi propio hábito",
+                        onClick = vm::startBlankForm,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(48.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
                 }
+            } else {
+                // Barra original para los demás pasos
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (page > 0) {
+                        SecondaryButton("Atrás", onClick = vm::back)
+                    } else {
+                        Spacer(Modifier.width(120.dp))
+                    }
 
+                    Spacer(Modifier.width(8.dp))
 
-                Spacer(Modifier.width(8.dp)) // Espacio entre botones.
-
-                // Botón principal (derecha), cuya acción y texto dependen del estado/paso actual.
-                when (val currentState = ui) { // Evalúa el estado actual de la UI.
-                    is AddHabitUiState.Suggestions -> PrimaryButton(
-                        text     = "Crear mi propio hábito",
-                        onClick  = vm::startBlankForm // Inicia el formulario vacío.
-                    )
-
-                    is AddHabitUiState.BasicInfo -> PrimaryButton(
-                        text     = "Siguiente",
-                        // Habilita el botón solo si no hay errores de validación.
-                        enabled  = currentState.errors.isEmpty(),
-                        onClick  = vm::nextFromBasic // Avanza al siguiente paso.
-                    )
-
-                    is AddHabitUiState.Tracking -> PrimaryButton(
-                        // El texto cambia a "Guardar" si no se configuran notificaciones.
-                        text     = if (currentState.form.notify && currentState.form.repeatPreset != RepeatPreset.INDEFINIDO)
-                            "Siguiente" else "Guardar",
-                        enabled  = currentState.errors.isEmpty(), // Habilitado si no hay errores.
-                        // Llama a la función que decide si ir a Notificaciones o guardar directamente.
-                        onClick  = { vm.nextFromTracking(onDismissRequest) }
-                    )
-
-                    is AddHabitUiState.Notification -> PrimaryButton(
-                        text    = "Guardar",
-                        // Llama a la función final para guardar el hábito y cerrar el modal.
-                        onClick = { vm.finish(onDismissRequest) }
-                    )
-
-                    // No muestra botón principal en otros estados (Saving, Saved, Error, etc.).
-                    else -> Unit
+                    when (val currentState = ui) {
+                        is AddHabitUiState.BasicInfo -> PrimaryButton(
+                            text = "Siguiente",
+                            enabled = currentState.errors.isEmpty(),
+                            onClick = vm::nextFromBasic
+                        )
+                        is AddHabitUiState.Tracking -> PrimaryButton(
+                            text = if (currentState.form.notify && currentState.form.repeatPreset != RepeatPreset.INDEFINIDO)
+                                "Siguiente" else "Guardar",
+                            enabled = currentState.errors.isEmpty(),
+                            onClick = { vm.nextFromTracking(onDismissRequest) }
+                        )
+                        is AddHabitUiState.Notification -> PrimaryButton(
+                            text = "Guardar",
+                            onClick = { vm.finish(onDismissRequest) }
+                        )
+                        else -> Unit
+                    }
                 }
             }
 
-            // Indicador de página actual.
             PagerIndicator(
-                pagerState = pager, // Vinculado al estado del Pager.
-                pageCount  = 4, // Número total de páginas/pasos.
-                modifier   = Modifier
-                    .align(Alignment.CenterHorizontally) // Centrado horizontalmente.
-                    .padding(bottom = 4.dp) // Padding inferior.
+                pagerState = pager,
+                pageCount = 4,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp)
             )
         }
     }
 
-    /* -------- Diálogos Auxiliares (Informativos/Confirmación) -------- */
-    // Muestra diálogos modales basados en el estado de la UI.
+    /* -------- Diálogos Auxiliares -------- */
     when (val currentState = ui) {
-        // Muestra diálogo de éxito al guardar.
         is AddHabitUiState.Saved -> ModalInfoDialog(
             visible = true,
             icon = Icons.Default.Check,
             title = currentState.title,
             message = currentState.message
-            // Se cierra automáticamente por el flujo del ViewModel (delay + onFinish).
         )
-
-        // Muestra diálogo de error general.
         is AddHabitUiState.Error -> ModalInfoDialog(
             visible = true,
             icon = Icons.Default.Error,
             iconColor = MaterialTheme.colorScheme.error,
             title = "Ups…",
             message = currentState.msg,
-            // Botón para volver al inicio del formulario vacío.
             primaryButton = DialogButton("Entendido") { vm.startBlankForm() }
         )
-
-        // Muestra diálogo para confirmar si se descartan cambios al seleccionar una plantilla.
         is AddHabitUiState.ConfirmDiscard -> ModalInfoDialog(
             visible = true,
             icon = Icons.Default.Warning,
             iconColor = MaterialTheme.colorScheme.primary,
             title = "¿Sobrescribir cambios?",
             message = "Ya comenzaste a crear un hábito. ¿Quieres reemplazarlo con la plantilla seleccionada?",
-            // Botones para confirmar o cancelar el descarte.
             primaryButton = DialogButton("Continuar") { vm.confirmDiscard(true) },
             secondaryButton = DialogButton("Cancelar") { vm.confirmDiscard(false) }
         )
-
-        // No muestra diálogos adicionales en otros estados.
         else -> Unit
     }
 }
@@ -279,20 +268,17 @@ fun AddHabitModal(
  */
 @Composable
 private fun rememberTemplates(): List<HabitTemplate> {
-    // Obtiene el repositorio a través del EntryPoint de Hilt.
     val repo = EntryPointAccessors.fromApplication(
         LocalContext.current.applicationContext,
         TemplateRepoEntryPoint::class.java
     ).templateRepo()
-    // Colecta el flujo de plantillas como estado de Compose.
     return repo.templates.collectAsState(initial = emptyList()).value
 }
 
 /**
  * @brief Interfaz Hilt EntryPoint para acceder al [HabitTemplateRepository] desde Composables.
- * @details Define un punto de entrada para que Hilt proporcione la instancia singleton
+ * @details Defiene un punto de entrada para que Hilt proporcione la instancia singleton
  * del repositorio. Necesario porque `rememberTemplates` no puede usar inyección de constructor.
- * Se instala en [SingletonComponent] para acceder a la instancia a nivel de aplicación.
  */
 @EntryPoint
 @InstallIn(SingletonComponent::class)

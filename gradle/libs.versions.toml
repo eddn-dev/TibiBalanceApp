@@ -15,6 +15,11 @@ kotlinx-serialization = "1.7.3"
 room                  = "2.7.1"          # 23-Abr-25 release :contentReference[oaicite:4]{index=4}
 coil                  = "3.1.0"
 kotlinx-datetime      = "0.6.2"
+core-ktx = "1.16.0"
+junit = "4.13.2"
+junit-version = "1.2.1"
+espresso-core = "3.6.1"
+lifecycle-runtime-ktx = "2.8.7"
 
 [plugins]
 android-application     = { id = "com.android.application",            version.ref = "agp" }
@@ -54,6 +59,15 @@ coil-compose           = { group = "io.coil-kt.coil3", name = "coil-compose",  v
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version = "3.1.0" }
 
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit-version" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+ui = { group = "androidx.compose.ui", name = "ui" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 
 [bundles]
 compose = [

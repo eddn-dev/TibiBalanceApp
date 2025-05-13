@@ -23,4 +23,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TibiBalance"
 include(":app")
- 
+include(":wear")

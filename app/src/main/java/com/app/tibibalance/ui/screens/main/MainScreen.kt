@@ -47,6 +47,7 @@ import androidx.navigation.compose.*
 import com.app.tibibalance.ui.components.navigation.BottomNavBar
 import com.app.tibibalance.ui.components.navigation.bottomItems
 import com.app.tibibalance.ui.navigation.Screen
+import com.app.tibibalance.ui.screens.conection.ConnectedDeviceScreen_Preview_Empty
 import com.app.tibibalance.ui.screens.emotional.EmotionalCalendarScreen
 import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.*
@@ -196,7 +197,7 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
         state          = uiState,                     // Pasa el estado actual de la UI de ajustes.
         onNavigateUp   = rootNav::navigateUp,         // Acción para el botón Atrás (usa el NavController global).
         onEditPersonal = { /* TODO: Navegar a pantalla de edición */ },
-        onDevices      = { /* TODO: Navegar a pantalla de dispositivos */ },
+        onDevices      = { rootNav.navigate("connected_devices") },
         onAchievements = { /* TODO: Navegar a pantalla de logros */ },
         onSignOut      = mainVm::signOut,             // Acción de cierre de sesión (manejada por MainViewModel).
         onDelete       = { /* TODO: Implementar borrado de cuenta */ },

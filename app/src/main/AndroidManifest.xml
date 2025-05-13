@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
+    <uses-permission android:name="android.permission.health.READ_CALORIES_EXPENDED" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+
     <application
         android:name=".TibibalanceApp"
         android:allowBackup="true"

@@ -1,6 +1,6 @@
 /**
  * @file    HomeScreen.kt
- * @ingroup ui_screens_home // Grupo específico para la pantalla principal/Home
+ * @ingroup ui_screens_home
  * @brief   Composable principal para la pantalla de inicio (Home/Dashboard) de la aplicación.
  *
  * @details
@@ -10,259 +10,189 @@
  * Componentes y Secciones Principales:
  * - **Encabezado:** Muestra el título "Resumen de Hoy" y un botón secundario para acceder al "Historial".
  * - **Métricas Diarias:** Presenta tarjetas ([AchievementContainer]) para:
- * - Pasos dados.
- * - Minutos de ejercicio.
- * - Calorías quemadas (Kcal).
- * - Frecuencia cardíaca (bpm).
- * Cada tarjeta muestra un icono, el valor numérico y una barra de progreso indicando el avance hacia una meta (implícita).
- * - **Meta de Pasos:** Una sección dedicada que visualiza el progreso actual de pasos del usuario
- * contra una meta diaria (ej. 8,000 pasos), utilizando una barra de progreso lineal personalizada.
+ *   - Pasos dados.
+ *   - Minutos de ejercicio.
+ *   - Calorías quemadas (Kcal).
+ *   - Frecuencia cardíaca (bpm).
+ *   Cada tarjeta muestra un icono, el valor numérico y una barra de progreso indicando el avance hacia una meta (implícita).
+ * - **Meta de Pasos:** Sección que visualiza el progreso actual de pasos del usuario
+ *   contra una meta diaria (ej. 8,000 pasos), utilizando una barra de progreso lineal personalizada.
  * - **Actividad Reciente:** Lista las últimas actividades o hábitos registrados por el usuario
- * (e.g., "Caminata rápida", "Yoga"), mostrando detalles como duración y hora, utilizando [HabitContainer].
+ *   (e.g., "Caminata rápida", "Yoga"), mostrando detalles como duración y hora, utilizando [HabitContainer].
  *
  * La pantalla utiliza un fondo degradado consistente con otras partes de la aplicación y
  * organiza su contenido en una [Column] desplazable verticalmente. Los datos mostrados
- * son actualmente estáticos/ejemplos y deberían ser proporcionados por un ViewModel
- * en una implementación real.
+ * se obtienen dinámicamente desde el [HomeViewModel].
  *
  * @see AchievementContainer Componente reutilizable para mostrar métricas/logros con progreso.
  * @see HabitContainer Componente reutilizable para mostrar filas de hábitos/actividades.
- * @see ImageContainer Usado internamente por AchievementContainer y HabitContainer para los iconos.
- * @see Title, Description Componentes de texto reutilizables.
- * @see SecondaryButton Botón utilizado para la acción "Historial".
- * @see ProgressBar Componente utilizado dentro de AchievementContainer.
- * @see R.drawable Contiene los recursos de iconos para las métricas y actividades.
+ * @see HomeViewModel ViewModel que provee las métricas en tiempo real.
  */
 package com.app.tibibalance.ui.screens.home
+
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import java.util.Locale
 import com.app.tibibalance.R
-import com.app.tibibalance.ui.components.* // Importa componentes base como ImageContainer
+import com.app.tibibalance.ui.components.*
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
-import com.app.tibibalance.ui.components.containers.AchievementContainer // Import específico
-import com.app.tibibalance.ui.components.containers.HabitContainer // Import específico
+import com.app.tibibalance.ui.components.containers.AchievementContainer
+import com.app.tibibalance.ui.components.containers.HabitContainer
 import com.app.tibibalance.ui.components.texts.Description
 import com.app.tibibalance.ui.components.texts.Title
 
+
 /**
- * @brief Composable que define la interfaz de usuario para la pantalla principal (Home).
+ * @brief Composable que muestra el panel principal con métricas y actividad reciente.
  *
- * @details Muestra un resumen de la actividad diaria del usuario, incluyendo métricas
- * de pasos, ejercicio, calorías y ritmo cardíaco, el progreso hacia la meta de pasos,
- * y las actividades recientes. El contenido es desplazable verticalmente y tiene un
- * fondo degradado.
+ * @param viewModel Instancia de [HomeViewModel] inyectada con Hilt.
  */
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    // Recolecta los estados desde el ViewModel
+    val steps by viewModel.steps.collectAsState()
+    val calories by viewModel.calories.collectAsState()
+    val exercise by viewModel.exerciseMinutes.collectAsState()
+    val heartRate by viewModel.heartRate.collectAsState()
 
-    /* ───── Gradiente de fondo compartido ───── */
-    // Define el pincel de degradado vertical usado como fondo.
+    // Gradiente de fondo
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
 
-    // Contenedor principal que ocupa toda la pantalla y aplica el fondo.
     Box(
-        modifier = Modifier
+        Modifier
             .fillMaxSize()
-            .background(gradient)                 // Aplica el fondo degradado.
+            .background(gradient)
     ) {
-        /* Contenido desplazable verticalmente */
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())   // Permite el desplazamiento.
-                .padding(16.dp), // Padding general del contenido.
-            verticalArrangement = Arrangement.spacedBy(24.dp) // Espacio vertical entre secciones.
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-
-            /* ---------- Encabezado de la pantalla ---------- */
+            // Encabezado
             Row(
-                modifier = Modifier.fillMaxWidth(), // Ocupa el ancho.
-                horizontalArrangement = Arrangement.SpaceBetween, // Espacio entre título y botón.
-                verticalAlignment = Alignment.CenterVertically // Alinea verticalmente.
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Título de la pantalla.
-                Title(
-                    text = "Resumen de Hoy",
-                    modifier = Modifier.weight(1f), // Permite que el título ocupe el espacio restante.
-                    textAlign = TextAlign.Start // Alinea el texto a la izquierda.
-                )
-                // Botón para navegar al historial (acción pendiente).
+                Title(text = "Resumen de Hoy", modifier = Modifier.weight(1f))
                 SecondaryButton(
                     text = "Historial",
-                    onClick = { /* TODO: Implementar navegación al historial */ },
-                    modifier = Modifier
-                        .width(120.dp) // Ancho fijo para el botón.
-                        .height(40.dp) // Altura fija para el botón.
+                    onClick = { /* TODO */ },
+                    modifier = Modifier.size(width = 120.dp, height = 40.dp)
                 )
             }
 
-            /* ---------- Sección de Métricas ---------- */
-            // Columna para agrupar las filas de métricas.
+            // Métricas diarias
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                // Primera fila de métricas (Pasos y Ejercicio).
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp) // Espacio entre tarjetas.
-                ) {
-                    // Tarjeta para Pasos.
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AchievementContainer(
-                        icon = { // Slot para el icono.
-                            ImageContainer(
-                                resId = R.drawable.iconstepsimage,
-                                contentDescription = "Pasos",
-                                modifier = Modifier.size(40.dp)
-                            )
-                        },
-                        title = "5,230", // Valor actual (ejemplo).
-                        description = "Pasos", // Etiqueta.
-                        percent = 65, // Porcentaje de progreso (ejemplo).
-                        modifier = Modifier.weight(1f) // Ocupa la mitad del espacio.
+                        icon = { ImageContainer(R.drawable.iconstepsimage, "Pasos", Modifier.size(40.dp)) },
+                        title = "$steps",
+                        description = "Pasos",
+                        percent = (steps * 100 / 8000).toInt().coerceIn(0, 100),
+                        modifier = Modifier.weight(1f)
                     )
-                    // Tarjeta para Minutos de Ejercicio.
                     AchievementContainer(
-                        icon = {
-                            ImageContainer(
-                                resId = R.drawable.iconclockimage,
-                                contentDescription = "Minutos de ejercicio",
-                                modifier = Modifier.size(40.dp)
-                            )
-                        },
-                        title = "35",
-                        description = "min de ejercicio",
-                        percent = 70,
+                        icon = { ImageContainer(R.drawable.iconclockimage, "Ejercicio", Modifier.size(40.dp)) },
+                        title = "$exercise",
+                        description = "min ejercicio",
+                        percent = (exercise * 100 / 60).toInt().coerceIn(0, 100),
                         modifier = Modifier.weight(1f)
                     )
                 }
-                // Segunda fila de métricas (Calorías y Ritmo Cardíaco).
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Tarjeta para Calorías Quemadas.
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AchievementContainer(
-                        icon = {
-                            ImageContainer(
-                                resId = R.drawable.iconfireimage,
-                                contentDescription = "Calorías quemadas",
-                                modifier = Modifier.size(40.dp)
-                            )
-                        },
-                        title = "450",
-                        description = "Kcal quemadas",
-                        percent = 55,
+                        icon = { ImageContainer(R.drawable.iconfireimage, "Calorías", Modifier.size(40.dp)) },
+                        title = String.format(Locale.getDefault(), "%.0f", calories),
+                        description = "Kcal",
+                        percent = (calories * 100 / 2000).toInt().coerceIn(0, 100),
                         modifier = Modifier.weight(1f)
                     )
-                    // Tarjeta para Frecuencia Cardíaca.
                     AchievementContainer(
-                        icon = {
-                            ImageContainer(
-                                resId = R.drawable.iconheartimage,
-                                contentDescription = "Frecuencia cardiaca",
-                                modifier = Modifier.size(40.dp)
-                            )
-                        },
-                        title = "78",
+                        icon = { ImageContainer(R.drawable.iconheartimage, "FC", Modifier.size(40.dp)) },
+                        title = String.format(Locale.getDefault(), "%.0f", heartRate),
                         description = "bpm",
-                        percent = 78, // Usado para la barra, no necesariamente un % real de meta.
+                        percent = heartRate.toInt().coerceIn(0, 100),
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
 
-            /* ---------- Sección Meta de Pasos ---------- */
-            Title(text = "Meta de pasos") // Título de la sección.
-            // Contenedor Surface para la barra de progreso de pasos.
+            // Meta de pasos
+            Title(text = "Meta de pasos")
             Surface(
-                shape = RoundedCornerShape(16.dp), // Bordes redondeados.
-                color = Color(0xFFF5FBFD), // Color de fondo específico.
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFFF5FBFD),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp) // Altura fija.
+                    .height(64.dp)
             ) {
-                // Columna interna para organizar la barra y el texto.
                 Column(
                     Modifier
                         .fillMaxSize()
-                        .padding(12.dp), // Padding interno.
-                    verticalArrangement = Arrangement.SpaceBetween // Espacio entre barra y texto.
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Barra de progreso personalizada (fondo gris).
                     Box(
                         Modifier
                             .fillMaxWidth()
                             .height(12.dp)
-                            .background(
-                                color = Color(0xFFE0E0E0), // Color del track.
-                                shape = RoundedCornerShape(6.dp) // Bordes redondeados.
-                            )
+                            .background(Color(0xFFE0E0E0), RoundedCornerShape(6.dp))
                     ) {
-                        // Barra de progreso real (azul).
+                        val progress = (steps / 8000f).coerceIn(0f, 1f)
                         Box(
                             Modifier
                                 .fillMaxHeight()
-                                // Ancho proporcional al progreso (5230 de 8000).
-                                .fillMaxWidth(5230f / 8000f)
-                                .background(
-                                    color = Color(0xFF3EA8FE), // Color del progreso.
-                                    shape = RoundedCornerShape(6.dp)
-                                )
+                                .fillMaxWidth(progress)
+                                .background(Color(0xFF3EA8FE), RoundedCornerShape(6.dp))
                         )
                     }
-                    // Texto que muestra el progreso numérico.
                     Description(
-                        text = "5,230 / 8,000", // Texto de progreso vs meta.
+                        text = String.format(Locale.getDefault(), "%d / %,d", steps, 8000),
+
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center // Texto centrado.
+                        textAlign = TextAlign.Center
                     )
                 }
             }
 
-            /* ---------- Sección Actividad Reciente ---------- */
-            Title(text = "Actividad Reciente") // Título de la sección.
-            // Columna para listar las actividades recientes.
+            // Actividad reciente (estática)
+            Title(text = "Actividad Reciente")
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Contenedor para la primera actividad.
                 HabitContainer(
-                    icon = {
-                        ImageContainer(
-                            resId = R.drawable.iconwalkingimage,
-                            contentDescription = "Caminata rápida",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    },
-                    text = "Caminata rápida • 20 min • 10 a.m.", // Detalles de la actividad.
+                    icon = { ImageContainer(R.drawable.iconwalkingimage, "Caminata", Modifier.size(32.dp)) },
+                    text = "Caminata rápida • 20 min • 10 a.m.",
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { /* TODO: Implementar navegación a detalle de actividad */ }
+                    onClick = { /* TODO */ }
                 )
-                // Contenedor para la segunda actividad.
                 HabitContainer(
-                    icon = {
-                        ImageContainer(
-                            resId = R.drawable.iconyogaimage,
-                            contentDescription = "Yoga",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    },
+                    icon = { ImageContainer(R.drawable.iconyogaimage, "Yoga", Modifier.size(32.dp)) },
                     text = "Yoga • 30 min • 7:30 a.m.",
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { /* TODO: Implementar navegación a detalle de actividad */ }
+                    onClick = { /* TODO */ }
                 )
-                // Aquí se añadirían más HabitContainer si hubiera más actividades.
             }
-        } // Fin Column principal scrollable
-    } // Fin Box principal
+        }
+    }
 }

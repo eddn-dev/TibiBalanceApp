@@ -98,6 +98,16 @@ dependencies {
     /* ──────────────── Animations  ────────────────*/
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
     implementation ("com.github.commandiron:SpinWheelCompose:1.1.1")
+
+    /* ────────────────Connection with smartwatch  ────────────────*/
+    implementation ("com.google.android.gms:play-services-fitness:21.1.0")
+    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
+    implementation ("com.google.firebase:firebase-firestore-ktx:24.8.1")
+    implementation ("com.google.firebase:firebase-auth-ktx:22.1.1")
+    implementation ("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation ("androidx.health:health-connect-client:1.0.0-alpha07")
+
+
 }
 
 allprojects {

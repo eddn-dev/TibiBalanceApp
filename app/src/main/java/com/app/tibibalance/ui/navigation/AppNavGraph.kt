@@ -39,6 +39,7 @@ import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
+import com.app.tibibalance.ui.screens.conection.ConnectedDeviceScreen
 
 /**
  * @brief Configura y muestra el [NavHost] principal que gestiona la navegación entre las diferentes pantallas de la aplicación.
@@ -72,6 +73,21 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
         // Asocia la ruta "main" con el Composable MainScreen (que probablemente contiene su propio NavHost o Pager)
         composable(Screen.Main.route)        { MainScreen(navController) }
+
+        // Ruta para la pantalla de conexión de dispositivos
+        composable("connected_devices") {
+            ConnectedDeviceScreen(
+                pairedDevices    = emptyList(), // TODO: sustituir por tu ViewModel
+                isDialogOpen     = false,
+                availableDevices = emptyList(),
+                onConnect        = {},
+                onDisconnect     = {},
+                onRemove         = {},
+                onAddClick       = {},
+                onDialogDismiss  = {},
+                onPair           = {}
+            )
+        }
 
         // Aquí se podrían añadir más destinos (pantallas) a medida que la aplicación crezca.
         // Por ejemplo:
