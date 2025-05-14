@@ -30,6 +30,8 @@ import java.time.LocalDate
  */
 interface AuthRepository {
 
+    suspend fun deleteAccount()
+
     /**
      * @brief Flujo reactivo que indica si hay un usuario actualmente autenticado.
      * @return [Flow] que emite `true` si existe una sesión activa, `false` en caso contrario.

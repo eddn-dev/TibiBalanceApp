@@ -18,7 +18,7 @@
  *
  * @see Habit Modelo de dominio final.
  * @see HabitTemplate Modelo de plantilla para precargar valores.
- * @see com.app.tibibalance.ui.wizard.AddHabitViewModel ViewModel que probablemente gestiona este formulario.
+ * @see com.app.tibibalance.ui.wizard.createHabit.AddHabitViewModel ViewModel que probablemente gestiona este formulario.
  * @see com.app.tibibalance.data.mapper.HabitFormMapper Mapper que convierte este formulario a Habit.
  */
 package com.app.tibibalance.domain.model

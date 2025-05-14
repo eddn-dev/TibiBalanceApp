@@ -19,7 +19,7 @@
  * del formulario. Incluye un [PagerIndicator].
  * - **Carga de Plantillas:** Utiliza la función helper [rememberTemplates] (con Hilt EntryPoint)
  * para obtener la lista de [HabitTemplate]s para el `SuggestionStep`.
- * - **Diálogos Auxiliares:** Muestra [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog]s para comunicar estados finales
+ * - **Diálogos Auxiliares:** Muestra [ModalInfoDialog]s para comunicar estados finales
  * o confirmaciones, como `Saved`, `Error`, o `ConfirmDiscard`.
  * - **Restricción de Altura:** Limita la altura máxima del modal para adaptarse a diferentes
  * tamaños de pantalla usando `LocalConfiguration`.
@@ -31,7 +31,7 @@
  * @see PagerState Estado que gestiona el Pager.
  * @see PagerIndicator Indicador visual de la página actual.
  * @see SuggestionStep, BasicInfoStep, TrackingStep, NotificationStep Composables para cada paso del asistente.
- * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Componente para mostrar diálogos de información/error/confirmación.
+ * @see ModalInfoDialog Componente para mostrar diálogos de información/error/confirmación.
  * @see HabitTemplate Modelo de dominio para las plantillas de hábitos.
  * @see rememberTemplates Función helper para obtener las plantillas.
  * @see TemplateRepoEntryPoint Hilt EntryPoint para acceder al repositorio de plantillas.
@@ -39,7 +39,7 @@
  */
 @file:OptIn(ExperimentalFoundationApi::class) // Necesario para PagerState y HorizontalPager
 
-package com.app.tibibalance.ui.wizard
+package com.app.tibibalance.ui.wizard.createHabit
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -64,7 +64,10 @@ import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.dialogs.DialogButton
 import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
-import com.app.tibibalance.ui.wizard.step.* // Importa los Composables de cada paso
+import com.app.tibibalance.ui.wizard.createHabit.step.BasicInfoStep
+import com.app.tibibalance.ui.wizard.createHabit.step.NotificationStep
+import com.app.tibibalance.ui.wizard.createHabit.step.SuggestionStep
+import com.app.tibibalance.ui.wizard.createHabit.step.TrackingStep
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -133,32 +136,32 @@ fun AddHabitModal(
                 // Renderiza el Composable del paso correspondiente al índice.
                 when (pageIndex) {
                     0 -> SuggestionStep(
-                        templates    = rememberTemplates(), // Obtiene las plantillas.
+                        templates = rememberTemplates(), // Obtiene las plantillas.
                         onSuggestion = vm::pickTemplate // Callback para seleccionar plantilla.
                     )
                     1 -> (ui as? AddHabitUiState.BasicInfo)?.let { currentState -> // Muestra si el estado es BasicInfo.
                         BasicInfoStep(
-                            initial      = currentState.form, // Pasa el formulario actual.
-                            errors       = currentState.errors, // Pasa los errores de validación.
+                            initial = currentState.form, // Pasa el formulario actual.
+                            errors = currentState.errors, // Pasa los errores de validación.
                             onFormChange = vm::updateBasic, // Callback para actualizar el form en el VM.
-                            onBack       = vm::back // Callback para ir atrás.
+                            onBack = vm::back // Callback para ir atrás.
                         )
                     }
                     2 -> (ui as? AddHabitUiState.Tracking)?.let { currentState -> // Muestra si el estado es Tracking.
                         TrackingStep(
-                            initial      = currentState.form,
-                            errors       = currentState.errors,
+                            initial = currentState.form,
+                            errors = currentState.errors,
                             onFormChange = vm::updateTracking,
-                            onBack       = vm::back
+                            onBack = vm::back
                         )
                     }
                     3 -> (ui as? AddHabitUiState.Notification)?.let { currentState -> // Muestra si el estado es Notification.
                         NotificationStep(
                             // Usa el nombre del hábito como título, o "Notificación" si está vacío.
-                            title       = currentState.form.name.ifBlank { "Notificación" },
-                            initialCfg  = currentState.cfg, // Pasa la configuración de notificación.
+                            title = currentState.form.name.ifBlank { "Notificación" },
+                            initialCfg = currentState.cfg, // Pasa la configuración de notificación.
                             onCfgChange = vm::updateNotif, // Callback para actualizar la config.
-                            onBack      = vm::back
+                            onBack = vm::back
                         )
                     }
                 }
@@ -176,9 +179,6 @@ fun AddHabitModal(
                 // Botón "Atrás" (visible solo si no estamos en la primera página).
                 if (page > 0) {
                     SecondaryButton("Atrás", onClick = vm::back)
-                } else {
-                    // Spacer para ocupar el espacio del botón "Atrás" y mantener el botón principal a la derecha.
-                    Spacer(Modifier.width(120.dp)) // Ajusta el ancho si SecondaryButton tiene un ancho fijo
                 }
 
 
@@ -188,7 +188,10 @@ fun AddHabitModal(
                 when (val currentState = ui) { // Evalúa el estado actual de la UI.
                     is AddHabitUiState.Suggestions -> PrimaryButton(
                         text     = "Crear mi propio hábito",
-                        onClick  = vm::startBlankForm // Inicia el formulario vacío.
+                        modifier = Modifier
+                            .fillMaxWidth()   // o .weight(1f)
+                            .heightIn(min = 48.dp),
+                        onClick  = vm::startBlankForm
                     )
 
                     is AddHabitUiState.BasicInfo -> PrimaryButton(

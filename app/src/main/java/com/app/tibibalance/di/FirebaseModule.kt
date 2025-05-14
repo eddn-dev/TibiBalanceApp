@@ -46,6 +46,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MemoryCacheSettings
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.storage.FirebaseStorage
 
 
 /* ────────────────────────────────────────────────────────────── */
@@ -155,4 +156,8 @@ object FirebaseModule {
         auth: FirebaseAuth,   // Inyecta FirebaseAuth
         @IoDispatcher io: CoroutineDispatcher // Inyecta el dispatcher IO
     ): ProfileRepository = FirebaseProfileRepository(svc, dao, auth, io) // Crea y devuelve la implementación
+
+    @Provides
+    @Singleton
+    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 }

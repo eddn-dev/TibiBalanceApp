@@ -16,11 +16,11 @@
  *
  * @see AddHabitModal Composable principal del asistente que observa estos estados.
  * @see AddHabitViewModel ViewModel que gestiona la lógica y emite estos estados.
- * @see com.app.tibibalance.domain.model.HabitForm Modelo de datos para el formulario del hábito.
- * @see com.app.tibibalance.domain.model.NotifConfig Modelo de datos para la configuración de notificaciones.
- * @see com.app.tibibalance.domain.model.HabitTemplate Modelo de datos para las plantillas de hábitos.
+ * @see HabitForm Modelo de datos para el formulario del hábito.
+ * @see NotifConfig Modelo de datos para la configuración de notificaciones.
+ * @see HabitTemplate Modelo de datos para las plantillas de hábitos.
  */
-package com.app.tibibalance.ui.wizard
+package com.app.tibibalance.ui.wizard.createHabit
 
 import com.app.tibibalance.domain.model.*
 
@@ -47,7 +47,11 @@ sealed interface AddHabitUiState {
      * @property errors Lista de [String] que contiene mensajes de error de validación
      * para los campos de este paso. Vacía si no hay errores.
      */
-    data class BasicInfo  (val form: HabitForm, val errors: List<String> = emptyList()) : AddHabitUiState
+    data class BasicInfo(
+        val form: HabitForm,
+        val errors: List<BasicError> = emptyList(),
+        val nameTouched: Boolean = false      // ⬅ NUEVO
+    ) : AddHabitUiState
 
     /**
      * @brief Estado para la configuración de los parámetros de seguimiento del hábito
@@ -110,3 +114,5 @@ sealed interface AddHabitUiState {
      */
     data class Error(val msg: String) : AddHabitUiState
 }
+
+sealed interface BasicError { data object NameRequired : BasicError }

@@ -17,17 +17,17 @@
  * por categoría para la renderización. Utiliza componentes reutilizables como [Title],
  * [Subtitle], y [SuggestionRow] para construir la interfaz.
  *
- * @see com.app.tibibalance.ui.wizard.AddHabitViewModel ViewModel que probablemente gestiona el estado y la lógica de este asistente.
- * @see com.app.tibibalance.domain.model.HabitTemplate Modelo de dominio para las plantillas de hábitos.
+ * @see com.app.tibibalance.ui.wizard.createHabit.AddHabitViewModel ViewModel que probablemente gestiona el estado y la lógica de este asistente.
+ * @see HabitTemplate Modelo de dominio para las plantillas de hábitos.
  * @see com.app.tibibalance.domain.model.HabitCategory Enum para las categorías de hábitos.
  * @see SuggestionRow Composable privado para renderizar cada fila de sugerencia.
  * @see SettingItem Componente base reutilizado por SuggestionRow.
  * @see Title, Subtitle Componentes de texto reutilizables.
  * @see RoundedIconButton Componente para el botón de añadir.
- * @see com.app.tibibalance.ui.components.inputs.iconByName Helper para obtener el ImageVector del icono.
+ * @see iconByName Helper para obtener el ImageVector del icono.
  */
 /* ui/wizard/step/SuggestionStep.kt */
-package com.app.tibibalance.ui.wizard.step
+package com.app.tibibalance.ui.wizard.createHabit.step
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

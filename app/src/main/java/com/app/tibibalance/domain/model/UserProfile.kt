@@ -34,7 +34,10 @@ package com.app.tibibalance.domain.model
  * Por defecto es `null`.
  */
 data class UserProfile(
-    val uid      : String,         // Identificador único, no nulo.
-    val userName : String? = null, // Nombre visible, puede ser null. Default null.
-    val photoUrl : String? = null  // URL de la foto, puede ser null. Default null.
+    val uid      : String,
+    val userName : String?,
+    val email    : String?,
+    val birthDate: String?,
+    val photoUrl : String?
 )
+

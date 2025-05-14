@@ -10,6 +10,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.app.tibibalance.data.local.entity.HabitEntity
+import com.app.tibibalance.domain.model.Habit
 import kotlinx.coroutines.flow.Flow
 
 @Dao

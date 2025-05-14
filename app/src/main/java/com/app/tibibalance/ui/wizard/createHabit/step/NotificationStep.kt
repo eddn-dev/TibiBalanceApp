@@ -22,19 +22,19 @@
  * dentro de un `LaunchedEffect`. Se utilizan diálogos modales para los selectores de hora y fecha.
  * Requiere `ExperimentalMaterial3Api` debido al uso de `TimePicker` y `rememberTimePickerState`.
  *
- * @see com.app.tibibalance.ui.wizard.AddHabitViewModel ViewModel que gestiona el estado global del asistente.
- * @see com.app.tibibalance.domain.model.NotifConfig Data class que representa la configuración de notificación.
- * @see com.app.tibibalance.ui.components.modals.ModalDatePickerDialog Diálogo personalizado para seleccionar fechas.
- * @see androidx.compose.material3.TimePicker Composable estándar para seleccionar la hora.
- * @see androidx.compose.material3.AlertDialog Contenedor para el TimePicker.
- * @see com.app.tibibalance.ui.components.inputs.InputText Componente para la entrada de texto (mensaje, antelación).
- * @see com.app.tibibalance.ui.components.inputs.InputSelect Componente para seleccionar el modo.
- * @see com.app.tibibalance.ui.components.SwitchToggle Componente para el interruptor de vibración.
- * @see com.app.tibibalance.ui.components.texts.Title Componente para el título de la pantalla.
+ * @see com.app.tibibalance.ui.wizard.createHabit.AddHabitViewModel ViewModel que gestiona el estado global del asistente.
+ * @see NotifConfig Data class que representa la configuración de notificación.
+ * @see ModalDatePickerDialog Diálogo personalizado para seleccionar fechas.
+ * @see TimePicker Composable estándar para seleccionar la hora.
+ * @see AlertDialog Contenedor para el TimePicker.
+ * @see InputText Componente para la entrada de texto (mensaje, antelación).
+ * @see InputSelect Componente para seleccionar el modo.
+ * @see SwitchToggle Componente para el interruptor de vibración.
+ * @see Title Componente para el título de la pantalla.
  * @see kotlinx.datetime.LocalDate Tipo de dato para las fechas.
  */
 /* ui/wizard/step/NotificationStep.kt */
-package com.app.tibibalance.ui.wizard.step
+package com.app.tibibalance.ui.wizard.createHabit.step
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -49,6 +49,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.domain.model.NotifConfig
 import com.app.tibibalance.domain.model.NotifMode
@@ -244,7 +245,7 @@ fun NotificationStep(
             },
             placeholder     = "0", // Placeholder para indicar 0 minutos.
             // Configura el teclado numérico.
-            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier        = Modifier.width(120.dp) // Ancho fijo para el campo.
         )
     }

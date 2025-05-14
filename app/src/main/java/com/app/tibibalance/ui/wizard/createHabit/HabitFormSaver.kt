@@ -21,16 +21,16 @@
  * se guardan utilizando su propiedad `name` (String) y se restauran usando `Enum.valueOf()`.
  * El conjunto `weekDays` ([Set]<[Int]>) se convierte a un `IntArray` para la serialización.
  *
- * @see androidx.compose.runtime.saveable.Saver
+ * @see Saver
  * @see androidx.compose.runtime.saveable.rememberSaveable
- * @see androidx.compose.runtime.saveable.mapSaver
- * @see com.app.tibibalance.domain.model.HabitForm
- * @see com.app.tibibalance.domain.model.HabitCategory
- * @see com.app.tibibalance.domain.model.SessionUnit
- * @see com.app.tibibalance.domain.model.RepeatPreset
- * @see com.app.tibibalance.domain.model.PeriodUnit
+ * @see mapSaver
+ * @see HabitForm
+ * @see HabitCategory
+ * @see SessionUnit
+ * @see RepeatPreset
+ * @see PeriodUnit
  */
-package com.app.tibibalance.ui.wizard
+package com.app.tibibalance.ui.wizard.createHabit
 
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver

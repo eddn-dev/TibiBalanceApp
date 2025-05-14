@@ -20,22 +20,20 @@
  * Recibe una lista de errores (`errors`) del ViewModel para mostrar feedback de validación
  * específico del campo (actualmente solo para el nombre).
  *
- * @see com.app.tibibalance.ui.wizard.AddHabitViewModel ViewModel que probablemente gestiona el estado y la lógica de este asistente.
- * @see com.app.tibibalance.domain.model.HabitForm Data class que representa el estado del formulario.
- * @see com.app.tibibalance.ui.wizard.HabitFormSaver Saver para preservar el estado de HabitForm.
+ * @see com.app.tibibalance.ui.wizard.createHabit.AddHabitViewModel ViewModel que probablemente gestiona el estado y la lógica de este asistente.
+ * @see HabitForm Data class que representa el estado del formulario.
+ * @see HabitFormSaver Saver para preservar el estado de HabitForm.
  * @see InputIcon Componente para seleccionar el icono.
  * @see InputText Componente reutilizable para campos de texto (nombre, descripción).
  * @see InputSelect Componente reutilizable para el selector de categoría.
  * @see Title Componente para el título de la pantalla.
  * @see HabitCategory Enum que define las categorías disponibles.
  */
-package com.app.tibibalance.ui.wizard.step
+package com.app.tibibalance.ui.wizard.createHabit.step
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme // No usado directamente, pero sí por los componentes internos
-import androidx.compose.material3.Text // No usado directamente
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -46,8 +44,9 @@ import com.app.tibibalance.domain.model.HabitForm
 import com.app.tibibalance.domain.model.HabitCategory
 import com.app.tibibalance.ui.components.inputs.*
 import com.app.tibibalance.ui.components.texts.Title
-import com.app.tibibalance.ui.wizard.HabitFormSaver
+import com.app.tibibalance.ui.wizard.createHabit.HabitFormSaver
 import com.app.tibibalance.ui.components.inputs.InputIcon
+import com.app.tibibalance.ui.wizard.createHabit.BasicError
 
 /**
  * @brief Composable que define la interfaz de usuario para el paso de "Información básica" del asistente de hábitos.
@@ -65,7 +64,7 @@ import com.app.tibibalance.ui.components.inputs.InputIcon
 @Composable
 fun BasicInfoStep(
     initial      : HabitForm,
-    errors       : List<String>,
+    errors       : List<BasicError>,
     onFormChange : (HabitForm) -> Unit,
     onBack       : () -> Unit = {} // Callback onBack definido pero no usado internamente
 ) {
@@ -79,7 +78,7 @@ fun BasicInfoStep(
     /* ---------- Flags de Error ---------- */
     // Determina si hay un error relacionado con el campo 'nombre' en la lista 'errors'.
     val nameErr = remember(errors) { // Remember para evitar recálculo innecesario
-        errors.any { it.contains("nombre", ignoreCase = true) }
+        errors.contains(BasicError.NameRequired)
     }
 
     // Columna principal que permite desplazamiento vertical y aplica padding.

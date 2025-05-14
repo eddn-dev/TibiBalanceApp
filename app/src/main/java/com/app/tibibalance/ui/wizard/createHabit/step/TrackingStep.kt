@@ -24,7 +24,7 @@
  * solo si se ha definido una frecuencia de repetición).
  * - "Modo reto": Un [SwitchToggle] para activar/desactivar el modo reto. Este modo
  * requiere que se definan la repetición y el periodo. Un [com.app.tibibalance.ui.components.buttons.IconButton] con un
- * icono de información ([Icons.Default.Info]) abre un [com.app.tibibalance.ui.components.dialogs.ModalInfoDialog]
+ * icono de información ([Icons.Default.Info]) abre un [ModalInfoDialog]
  * explicando las condiciones del modo reto.
  *
  * El estado del formulario ([HabitForm]) se gestiona localmente con `rememberSaveable`
@@ -33,19 +33,19 @@
  * sus requisitos de repetición o periodo dejan de cumplirse.
  * Los errores de validación recibidos se utilizan para marcar los campos correspondientes.
  *
- * @see com.app.tibibalance.ui.wizard.AddHabitViewModel ViewModel que gestiona el estado global del asistente.
- * @see com.app.tibibalance.domain.model.HabitForm Data class que representa el estado del formulario.
- * @see com.app.tibibalance.ui.wizard.HabitFormSaver Saver para la persistencia del estado de HabitForm.
- * @see com.app.tibibalance.domain.model.SessionUnit Enum para las unidades de duración de sesión.
- * @see com.app.tibibalance.domain.model.RepeatPreset Enum para los presets de repetición.
- * @see com.app.tibibalance.domain.model.PeriodUnit Enum para las unidades del periodo total.
+ * @see com.app.tibibalance.ui.wizard.createHabit.AddHabitViewModel ViewModel que gestiona el estado global del asistente.
+ * @see HabitForm Data class que representa el estado del formulario.
+ * @see HabitFormSaver Saver para la persistencia del estado de HabitForm.
+ * @see SessionUnit Enum para las unidades de duración de sesión.
+ * @see RepeatPreset Enum para los presets de repetición.
+ * @see PeriodUnit Enum para las unidades del periodo total.
  * @see InputNumber, InputSelect, SwitchToggle Componentes de entrada reutilizables.
  * @see Title Componente para el título de la pantalla.
- * @see com.app.tibibalance.ui.components.dialogs.ModalInfoDialog Diálogo para mostrar información sobre el modo reto.
- * @see androidx.compose.foundation.ExperimentalFoundationApi Requerido por FlowRow.
- * @see androidx.compose.foundation.layout.FlowRow Layout experimental para la cuadrícula de días.
+ * @see ModalInfoDialog Diálogo para mostrar información sobre el modo reto.
+ * @see ExperimentalFoundationApi Requerido por FlowRow.
+ * @see FlowRow Layout experimental para la cuadrícula de días.
  */
-package com.app.tibibalance.ui.wizard.step
+package com.app.tibibalance.ui.wizard.createHabit.step
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -68,7 +68,7 @@ import com.app.tibibalance.ui.components.dialogs.DialogButton
 import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 import com.app.tibibalance.ui.components.inputs.* // Importa InputNumber, InputSelect
 import com.app.tibibalance.ui.components.texts.Title
-import com.app.tibibalance.ui.wizard.HabitFormSaver
+import com.app.tibibalance.ui.wizard.createHabit.HabitFormSaver
 
 
 /**

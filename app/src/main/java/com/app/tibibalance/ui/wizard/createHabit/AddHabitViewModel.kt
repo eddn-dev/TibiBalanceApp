@@ -39,9 +39,10 @@
  * @see IoDispatcher Calificador para el CoroutineDispatcher de IO.
  * @see HiltViewModel Anotación para la inyección de dependencias con Hilt.
  */
-package com.app.tibibalance.ui.wizard
+package com.app.tibibalance.ui.wizard.createHabit
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.tibibalance.data.mapper.toHabit // Mapper para convertir HabitForm a Habit
@@ -70,6 +71,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AddHabitViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val habitService: HabitService,
     @IoDispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
@@ -142,16 +144,20 @@ class AddHabitViewModel @Inject constructor(
     /**
      * @brief Actualiza el estado de la UI con el [HabitForm] modificado desde el paso `BasicInfo`.
      *
-     * Cada vez que el usuario modifica un campo en [com.app.tibibalance.ui.wizard.step.BasicInfoStep],
+     * Cada vez que el usuario modifica un campo en [com.app.tibibalance.ui.wizard.createHabit.step.BasicInfoStep],
      * este método es llamado. Revalida el formulario y actualiza el estado.
      *
      * @param form El [HabitForm] con los últimos cambios del usuario.
      */
-    fun updateBasic(form: HabitForm) =
-        _ui.update { // Actualiza el StateFlow de forma segura.
-            // Crea un nuevo estado BasicInfo con el formulario actualizado y los errores de validación.
-            AddHabitUiState.BasicInfo(form, validateBasic(form))
-        }
+    fun updateBasic(form: HabitForm) = _ui.update {
+        val prev = it as? AddHabitUiState.BasicInfo
+        val touched = prev?.nameTouched == true || form.name.isNotBlank()
+        AddHabitUiState.BasicInfo(
+            form        = form,
+            errors      = validateBasic(form, touched),
+            nameTouched = touched
+        )
+    }
 
     /**
      * @brief Avanza desde el paso `BasicInfo` al paso `Tracking`.
@@ -160,10 +166,12 @@ class AddHabitViewModel @Inject constructor(
      * errores de validación en el formulario actual.
      */
     fun nextFromBasic() {
-        val st = _ui.value as? AddHabitUiState.BasicInfo ?: return // Sale si el estado no es BasicInfo.
-        if (st.errors.isEmpty()) { // Si no hay errores de validación:
-            // Transiciona al estado Tracking, pasando el formulario actual y validándolo para el nuevo paso.
+        val st = _ui.value as? AddHabitUiState.BasicInfo ?: return
+        val errs = validateBasic(st.form, touched = true)     // fuerza validación final
+        if (errs.isEmpty()) {
             _ui.value = AddHabitUiState.Tracking(st.form, validateTracking(st.form))
+        } else {
+            _ui.value = st.copy(errors = errs)                // muestra error sin avanzar
         }
     }
 
@@ -172,7 +180,7 @@ class AddHabitViewModel @Inject constructor(
     /**
      * @brief Actualiza el estado de la UI con el [HabitForm] modificado desde el paso `Tracking`.
      *
-     * Se invoca cuando el usuario modifica campos en [com.app.tibibalance.ui.wizard.step.TrackingStep].
+     * Se invoca cuando el usuario modifica campos en [com.app.tibibalance.ui.wizard.createHabit.step.TrackingStep].
      * Revalida el formulario para el paso de seguimiento.
      *
      * @param form El [HabitForm] con los últimos cambios.
@@ -220,7 +228,7 @@ class AddHabitViewModel @Inject constructor(
     /**
      * @brief Actualiza el estado de la UI con la [NotifConfig] modificada desde el paso `Notification`.
      *
-     * Se invoca cuando el usuario modifica campos en [com.app.tibibalance.ui.wizard.step.NotificationStep].
+     * Se invoca cuando el usuario modifica campos en [com.app.tibibalance.ui.wizard.createHabit.step.NotificationStep].
      *
      * @param cfg La [NotifConfig] con los últimos cambios.
      */
@@ -308,7 +316,7 @@ class AddHabitViewModel @Inject constructor(
 
                 delay(1_500) // Espera 1.5 segundos para que el usuario vea el mensaje de éxito.
                 onFinish() // Llama al callback para cerrar el wizard.
-
+                reset()
             } catch (e: Exception) { // Si ocurre una excepción al guardar:
                 Log.e("AddHabitVM", "Error al guardar hábito", e) // Registra el error.
                 // Vuelve al estado de notificación (o el paso anterior si esto se llamara desde Tracking)
@@ -326,10 +334,8 @@ class AddHabitViewModel @Inject constructor(
      * @param f El [HabitForm] a validar.
      * @return Una lista de [String] con los mensajes de error. Vacía si no hay errores.
      */
-    private fun validateBasic(f: HabitForm) = buildList {
-        if (f.name.isBlank()) add("El nombre es obligatorio")
-        // Se podrían añadir más validaciones aquí (e.g., longitud máxima del nombre).
-    }
+    private fun validateBasic(f: HabitForm, touched: Boolean = true): List<BasicError> =
+        buildList { if (touched && f.name.isBlank()) add(BasicError.NameRequired) }
 
     /**
      * @brief Valida los campos del paso de "Parámetros de Seguimiento".
@@ -390,6 +396,8 @@ class AddHabitViewModel @Inject constructor(
         _ui.value = if (accept) applyTemplate(dialogState.pendingTemplate) else dialogState.previous
     }
 
+
+
     /**
      * @brief Función de extensión para [HabitForm] que determina si el usuario ha modificado
      * alguno de sus campos principales.
@@ -405,4 +413,9 @@ class AddHabitViewModel @Inject constructor(
                 repeatPreset  != RepeatPreset.INDEFINIDO || // Si el preset de repetición ya no es indefinido
                 periodUnit    != PeriodUnit.INDEFINIDO    // Si la unidad de periodo ya no es indefinida
     // Considerar también weekDays.isNotEmpty() si RepeatPreset.INDEFINIDO es el único que tiene weekDays vacío por defecto.
+
+    /** Limpia el asistente y vuelve al paso de Sugerencias. */
+    fun reset() {
+        _ui.value = AddHabitUiState.Suggestions()      // todo a cero
+    }
 }

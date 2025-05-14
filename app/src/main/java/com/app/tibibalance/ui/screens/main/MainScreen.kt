@@ -193,15 +193,20 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
 
     // Renderiza la pantalla de Ajustes.
     SettingsScreen(
-        state          = uiState,                     // Pasa el estado actual de la UI de ajustes.
-        onNavigateUp   = rootNav::navigateUp,         // Acción para el botón Atrás (usa el NavController global).
-        onEditPersonal = { /* TODO: Navegar a pantalla de edición */ },
-        onDevices      = { /* TODO: Navegar a pantalla de dispositivos */ },
-        onAchievements = { /* TODO: Navegar a pantalla de logros */ },
-        onSignOut      = mainVm::signOut,             // Acción de cierre de sesión (manejada por MainViewModel).
-        onDelete       = { /* TODO: Implementar borrado de cuenta */ },
-        onNotis        = { /* TODO: Navegar a pantalla de config. notificaciones */ }
+        state          = uiState,
+        navController  = rootNav, // ← ESTA ES LA LÍNEA CLAVE
+        onNavigateUp   = rootNav::navigateUp,
+        onEditPersonal = { rootNav.navigate(Screen.EditPersonal.route) },
+        onDevices      = { /* TODO */ },
+        onAchievements = { /* TODO */ },
+        onSignOut      = mainVm::signOut,
+        onDelete = {
+            vm.deleteAccount()
+            mainVm.signOut()
+        },
+        onNotis        = { rootNav.navigate(Screen.NotificationSettings.route) }
     )
+
 }
 
 /**

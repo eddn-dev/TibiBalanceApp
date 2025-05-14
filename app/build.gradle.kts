@@ -54,7 +54,7 @@ room {
 
 
 dependencies {
-
+    implementation("io.coil-kt:coil-compose:2.4.0")
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)            // Material-3, Nav, Icons, Activity
@@ -98,6 +98,9 @@ dependencies {
     /* ──────────────── Animations  ────────────────*/
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
     implementation ("com.github.commandiron:SpinWheelCompose:1.1.1")
+
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
 }
 
 allprojects {
