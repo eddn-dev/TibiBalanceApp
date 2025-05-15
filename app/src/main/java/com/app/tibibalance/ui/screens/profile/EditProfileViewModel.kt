@@ -1,3 +1,4 @@
+//EditProfileViewModel.kt
 package com.app.tibibalance.ui.screens.profile
 
 import android.content.Context
@@ -31,6 +32,7 @@ class EditProfileViewModel @Inject constructor(
     private val _state = MutableStateFlow(EditProfileUiState())
     val state: StateFlow<EditProfileUiState> = _state
 
+
     suspend fun loadInitialProfile(): UserProfile? {
         return try {
             profileRepository.profile.first()
@@ -40,13 +42,14 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
+
     fun updateProfile(name: String?, birthDate: String?) {
         viewModelScope.launch {
             try {
                 profileRepository.update(
-                    name = name.takeIf { it?.isNotBlank() == true },
+                    name = name.takeIf { it.isNullOrBlank().not() },
                     photo = null,
-                    birthDate = birthDate
+                    birthDate = birthDate.takeIf { it.isNullOrBlank().not() }
                 )
                 _state.value = _state.value.copy(success = true)
             } catch (e: Exception) {
@@ -58,14 +61,20 @@ class EditProfileViewModel @Inject constructor(
     fun updateProfilePhoto(uri: Uri, context: Context) {
         viewModelScope.launch {
             try {
-                val user = auth.currentUser ?: throw Exception("Usuario no autenticado")
+                val user = FirebaseAuth.getInstance().currentUser
+                    ?: throw Exception("Usuario no autenticado")
 
                 val inputStream = context.contentResolver.openInputStream(uri)
                     ?: throw Exception("No se pudo acceder al archivo")
 
-                val photoUrl = storageService.uploadProfileImage(inputStream, user.uid)
-                profileRepository.update(photo = Uri.parse(photoUrl))
-
+                // 1) subo a Storage y obtengo URL
+                val downloadUrl = storageService.uploadProfileImage(inputStream, user.uid)
+                // 2) actualizo sólo la foto en Firestore
+                profileRepository.update(
+                    name = null,
+                    photo = Uri.parse(downloadUrl),
+                    birthDate = null
+                )
                 _state.value = _state.value.copy(success = true)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(error = "Error al subir imagen: ${e.message}")

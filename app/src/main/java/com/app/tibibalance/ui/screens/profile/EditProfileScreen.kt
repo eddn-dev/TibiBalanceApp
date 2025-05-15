@@ -1,3 +1,4 @@
+//EditProfileScreen.kt
 package com.app.tibibalance.ui.screens.profile
 
 import android.Manifest
@@ -42,6 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
@@ -52,54 +54,58 @@ fun EditProfileScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    // Estados editables
     var username by rememberSaveable { mutableStateOf("") }
     var originalUsername by rememberSaveable { mutableStateOf("") }
     var birthDate by rememberSaveable { mutableStateOf("") }
     var originalBirthDate by rememberSaveable { mutableStateOf("") }
+
+    // Preview de foto y URI pendiente
     var photoUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val email = Firebase.auth.currentUser?.email.orEmpty()
 
-    // Galería: selector de imagen
+    // 1) Launcher para abrir galería
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            viewModel.updateProfilePhoto(it, context)
-            photoUrl = it.toString()
+            pendingPhotoUri = it
+            photoUrl = it.toString()  // preview inmediato
         }
     }
 
-    // Permiso de galería dinámico
+    // 2) Launcher para pedir permiso
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
+    ) { granted ->
+        if (granted) {
             imagePickerLauncher.launch("image/*")
         } else {
             Toast.makeText(context, "Permiso denegado", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun requestGalleryPermission() {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+    // Función helper
+    fun openGallery() {
+        val perm = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
             Manifest.permission.READ_MEDIA_IMAGES
         else
             Manifest.permission.READ_EXTERNAL_STORAGE
-
-        permissionLauncher.launch(permission)
+        permissionLauncher.launch(perm)
     }
 
+    // Carga inicial de datos
     LaunchedEffect(Unit) {
         viewModel.loadInitialProfile()?.let { profile ->
-            username = profile.userName.orEmpty()
-            originalUsername = username
-            birthDate = profile.birthDate.orEmpty()
-            originalBirthDate = birthDate
+            username = profile.userName.orEmpty().also { originalUsername = it }
+            birthDate = profile.birthDate.orEmpty().also { originalBirthDate = it }
             photoUrl = profile.photoUrl
         }
     }
 
+    // Configuración del DatePicker
     val (d0, m0, y0) = birthDate.split("/").takeIf { it.size == 3 }
         ?.let { (d, m, y) -> Triple(d.toInt(), m.toInt() - 1, y.toInt()) }
         ?: Triple(1, 0, Calendar.getInstance().get(Calendar.YEAR) - 18)
@@ -115,6 +121,7 @@ fun EditProfileScreen(
         }
     }
 
+    // Validaciones
     val todayMs = Calendar.getInstance().timeInMillis
     val cal18 = Calendar.getInstance().apply { add(Calendar.YEAR, -18) }
     val selMs = runCatching {
@@ -127,34 +134,44 @@ fun EditProfileScreen(
 
     val dateChanged = birthDate != originalBirthDate
     val dateValid = !dateChanged || (birthDate.isNotBlank() && selMs <= cal18.timeInMillis && selMs <= todayMs)
-    val hasChanges = (username != originalUsername) || dateChanged
+    val hasTextChanges = username != originalUsername || dateChanged
+    val hasChanges = hasTextChanges || pendingPhotoUri != null
 
+    // Al pulsar "Guardar"
     fun onSave() {
         scope.launch {
-            val newBirth = if (dateChanged) birthDate else null
-            viewModel.updateProfile(username, newBirth)
+            // 1) actualizar nombre/fecha
+            viewModel.updateProfile(
+                name = username.takeIf { it.isNotBlank() },
+                birthDate = birthDate.takeIf { dateChanged }
+            )
+            // 2) subir foto si se seleccionó una
+            pendingPhotoUri?.let { viewModel.updateProfilePhoto(it, context) }
+            // 3) actualizar displayName en FirebaseAuth
             Firebase.auth.currentUser
                 ?.updateProfile(userProfileChangeRequest { displayName = username })
                 ?.await()
+            // 4) volver atrás
             navController.popBackStack()
         }
     }
 
+    // UI
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .background(Brush.verticalGradient(listOf(Color(0xFFC3E2FA), Color.White)))
         ) {
             item {
                 Header("Editar información personal")
-
                 Column(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Avatar con clic para abrir galería
                     AsyncImage(
                         model = ImageRequest.Builder(context)
                             .data(photoUrl ?: R.drawable.imagenprueba)
@@ -166,18 +183,20 @@ fun EditProfileScreen(
                             .size(120.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surface)
-                            .clickable { requestGalleryPermission() }
+                            .clickable { openGallery() }
                     )
-                    Spacer(Modifier.height(5.dp))
+                    Spacer(Modifier.height(10.dp))
+
+                    // Botón alternativo (opcional)
                     SecondaryButton(
                         text = "CAMBIAR FOTO",
-                        onClick = { requestGalleryPermission() },
+                        onClick = { openGallery() },
                         modifier = Modifier
                             .width(170.dp)
                             .height(38.dp)
                     )
 
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(20.dp))
                     Subtitle("Nombre de usuario", Modifier.align(Alignment.Start))
                     OutlinedTextField(
                         value = username,
@@ -195,17 +214,17 @@ fun EditProfileScreen(
                     Subtitle("Correo electrónico", Modifier.align(Alignment.Start))
                     OutlinedTextField(
                         value = email,
-                        onValueChange = {},
+                        onValueChange = { /* no hacemos nada porque es readonly */ },
                         readOnly = true,
                         enabled = false,
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.White,
-                            disabledBorderColor = MaterialTheme.colorScheme.outline
+                            focusedContainerColor    = Color.White,
+                            unfocusedContainerColor  = Color.White,
+                            disabledContainerColor   = Color.White,
+                            disabledBorderColor      = MaterialTheme.colorScheme.outline
                         ),
                         supportingText = {
                             Text(
@@ -216,50 +235,62 @@ fun EditProfileScreen(
                         }
                     )
 
+
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Fecha de nacimiento", Modifier.align(Alignment.Start))
-                    Column(Modifier.fillMaxWidth()) {
-                        OutlinedTextField(
-                            value = birthDate,
-                            onValueChange = {},
-                            readOnly = true,
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            trailingIcon = {
-                                IconButton(onClick = { datePicker.show() }) {
-                                    Icon(Icons.Default.CalendarToday, null)
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
-                            )
+                    OutlinedTextField(
+                        value = birthDate,
+                        onValueChange = {},
+                        readOnly = true,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            IconButton(onClick = { datePicker.show() }) {
+                                Icon(Icons.Default.CalendarToday, null)
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
                         )
-                        Text(
-                            text = "Debes tener al menos 18 años",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (dateValid) MaterialTheme.colorScheme.onSurfaceVariant
-                            else MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                        )
-                    }
+                    )
+                    Text(
+                        text = "Debes tener al menos 18 años",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (dateValid) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
 
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Contraseña", Modifier.align(Alignment.Start))
-                    OutlinedTextField(
-                        value = "••••••••",
-                        onValueChange = {},
-                        readOnly = true,
-                        enabled = false,
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        trailingIcon = { Icon(Icons.Default.Lock, null) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            disabledContainerColor = Color.White
-                        )
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .clickable {
+                                navController.navigate("changePassword")
+                            }
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "••••••••",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = "Cambiar contraseña",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
                     Spacer(Modifier.height(20.dp))
                     Row(
@@ -284,9 +315,10 @@ fun EditProfileScreen(
             }
         }
 
-        if (state.error != null) {
-            LaunchedEffect(state.error) {
-                Toast.makeText(context, state.error, Toast.LENGTH_LONG).show()
+        // Mostrar errores
+        state.error?.let { errorMsg ->
+            LaunchedEffect(errorMsg) {
+                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
                 viewModel.consumeError()
             }
         }

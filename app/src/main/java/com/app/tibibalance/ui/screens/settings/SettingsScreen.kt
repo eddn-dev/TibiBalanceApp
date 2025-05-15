@@ -145,11 +145,6 @@ private fun ReadyContent(
                 .clip(CircleShape)
         )
 
-
-
-
-
-
         Title(profile.userName ?: "Sin nombre")
 
         FormContainer(

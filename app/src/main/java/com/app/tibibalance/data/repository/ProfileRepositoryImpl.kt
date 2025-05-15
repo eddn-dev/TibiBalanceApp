@@ -1,3 +1,4 @@
+//ProfileRepositoryImpl.kt
 package com.app.tibibalance.data.repository
 
 import android.net.Uri
@@ -65,7 +66,7 @@ class ProfileRepositoryImpl @Inject constructor(
         // 2) Foto (impleméntalo más adelante)
         photo?.let {
             // sube la Uri a Storage, obtén la URL y:
-            // updates["photoUrl"] = laUrl
+            updates["photoUrl"] = it.toString()
         }
 
         // 3) Fecha de nacimiento
