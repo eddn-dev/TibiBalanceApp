@@ -3,7 +3,7 @@ package com.app.tibibalance.ui.screens.habits
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.tibibalance.data.repository.HabitRepository
-import com.app.tibibalance.domain.model.Habit
+import com.app.tibibalance.domain.model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,7 +15,10 @@ class ConfigureNotificationViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow<List<Habit>>(emptyList())
-    val ui: StateFlow<List<Habit>> = _ui.asStateFlow()
+    val ui: StateFlow<List<Habit>> = _ui.asStateFlow()  //Lista de habitos
+
+    private val _selectedHabit = MutableStateFlow<Habit?>(null)
+    val selectedHabit: StateFlow<Habit?> = _selectedHabit.asStateFlow()
 
     init {
         observeHabits()
@@ -24,7 +27,6 @@ class ConfigureNotificationViewModel @Inject constructor(
     private fun observeHabits() {
         repo.observeHabits()
             .catch { e ->
-                // Puedes usar un logger o emitir un estado vacío
                 e.printStackTrace()
                 _ui.value = emptyList()
             }
@@ -35,7 +37,6 @@ class ConfigureNotificationViewModel @Inject constructor(
                         "Habit: ${habit.name}, Times: ${habit.notifConfig.timesOfDay}, Msg: '${habit.notifConfig.message}', Days: ${habit.notifConfig.weekDays.days}, Mode: ${habit.notifConfig.mode}, Vibrate: ${habit.notifConfig.vibrate}"
                     )
                 }
-
                 _ui.value = habitList
             }
             .launchIn(viewModelScope)
@@ -49,11 +50,14 @@ class ConfigureNotificationViewModel @Inject constructor(
             repo.updateHabit(updated)
         }
     }
-
-
-/*
-    private val _selectedHabit = MutableStateFlow<Habit?>(null)
-    val selectedHabit: StateFlow<Habit?> = _selectedHabit.asStateFlow()
+    fun forceUpdateMessage(habit: Habit, newMessage: String) {
+        val updated = habit.copy(
+            notifConfig = habit.notifConfig.copy(message = newMessage)
+        )
+        viewModelScope.launch {
+            repo.updateHabit(updated)
+        }
+    }
 
     fun selectHabit(habit: Habit) {
         _selectedHabit.value = habit
@@ -62,6 +66,44 @@ class ConfigureNotificationViewModel @Inject constructor(
     fun clearSelectedHabit() {
         _selectedHabit.value = null
     }
-*/
+
+    fun updateNotificationConfig(
+        habit: Habit,
+        time: String,
+        message: String,
+        days: Set<Day>,
+        mode: NotifMode,
+        vibrate: Boolean,
+        repeatPreset: RepeatPreset
+    ) {
+        val updatedHabit = habit.copy(
+            repeatPreset = repeatPreset,
+            notifConfig = habit.notifConfig.copy(
+                message = message,
+                timesOfDay = listOf(convertTo24hFormat(time)),
+                weekDays = WeekDays(
+                    days.map {
+                        when (it) {
+                            Day.L  -> 1
+                            Day.M  -> 2
+                            Day.MI -> 3
+                            Day.J  -> 4
+                            Day.V  -> 5
+                            Day.S  -> 6
+                            Day.D  -> 7
+                        }
+                    }.toSet()
+                ),
+                mode = mode,
+                vibrate=vibrate
+            )
+        )
+
+        viewModelScope.launch {
+            repo.updateHabit(updatedHabit)
+            clearSelectedHabit()
+        }
+    }
 }
+
 

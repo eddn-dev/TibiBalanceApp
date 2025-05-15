@@ -14,6 +14,7 @@
  */
 package com.app.tibibalance.domain.model
 
+import com.app.tibibalance.ui.screens.habits.Day
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline // Import necesario para JvmInline
 
@@ -54,5 +55,25 @@ value class WeekDays(val days: Set<Int>) {
          * @details Útil como valor por defecto o para indicar que no aplica selección de días.
          */
         val NONE = WeekDays(emptySet())
+
+        /*fun fromDays(days: Set<Day>): WeekDays {
+            val dayInts = days.mapNotNull {
+                when (it) {
+                    Day.L  -> 1
+                    Day.M  -> 2
+                    Day.MI -> 3
+                    Day.J  -> 4
+                    Day.V  -> 5
+                    Day.S  -> 6
+                    Day.D  -> 7
+                }
+            }.toSet()
+            return WeekDays(dayInts)
+        }*/
+
+
+
+
+
     }
 }

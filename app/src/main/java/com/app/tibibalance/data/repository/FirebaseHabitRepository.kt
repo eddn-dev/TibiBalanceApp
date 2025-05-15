@@ -89,6 +89,10 @@ class FirebaseHabitRepository @Inject constructor(
     /**
      * @copydoc HabitRepository.updateHabit
      */
+
+
+
+
     /*override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
         val uid = auth.uid ?: return@withContext
         val map = habit.toFirestoreMap()
@@ -98,7 +102,7 @@ class FirebaseHabitRepository @Inject constructor(
         dao.upsert(habit.toEntity())
     }*/
 
-    override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
+   /* override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
         val uid = auth.uid ?: return@withContext
 
         // Obtener el mapa serializado base
@@ -110,13 +114,39 @@ class FirebaseHabitRepository @Inject constructor(
         notifMap["enabled"] = habit.notifConfig.enabled
         firestoreMap["notifConfig"] = notifMap
 
-        Log.d("FIREBASE_MAP_FIXED", firestoreMap.toString()) // Confirmar que enabled está presente
+        //Log.d("FIREBASE_MAP_FIXED", firestoreMap.toString()) // Confirmar que enabled está presente
+
+        db.userHabits(uid).document(habit.id)
+            .set(firestoreMap, SetOptions.merge()).await()
+
+        dao.upsert(habit.toEntity())
+    }*/
+
+    override suspend fun updateHabit(habit: Habit): Unit = withContext(io) {
+        val uid = auth.uid ?: return@withContext
+
+        // Obtener el mapa serializado base
+        val firestoreMap = habit.toFirestoreMap().toMutableMap()
+
+        // Asegurar que notifConfig tenga los campos críticos
+        val notifMap = (firestoreMap["notifConfig"] as? MutableMap<String, Any?>)?.toMutableMap()
+            ?: mutableMapOf()
+
+        // Forzar campos importantes para Firestore
+        notifMap["enabled"] = habit.notifConfig.enabled
+        notifMap["vibrate"] = habit.notifConfig.vibrate
+        notifMap["mode"] = habit.notifConfig.mode.name // por si Firestore requiere string
+
+        firestoreMap["notifConfig"] = notifMap
+
+        Log.d("FIREBASE_MAP_FIXED", firestoreMap.toString())
 
         db.userHabits(uid).document(habit.id)
             .set(firestoreMap, SetOptions.merge()).await()
 
         dao.upsert(habit.toEntity())
     }
+
 
 
     /**
