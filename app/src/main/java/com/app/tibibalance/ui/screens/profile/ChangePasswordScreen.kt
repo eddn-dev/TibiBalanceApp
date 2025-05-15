@@ -119,7 +119,7 @@ fun ChangePasswordScreen(
                     )
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 // 1) Contraseña actual
                 InputPassword(
                     value = current,
@@ -131,6 +131,8 @@ fun ChangePasswordScreen(
                     isError = false,
                     supportingText = null
                 )
+                Spacer(Modifier.height(8.dp))
+
                 // 2) Nueva contraseña
                 InputPassword(
                     value = newPass,
@@ -142,6 +144,8 @@ fun ChangePasswordScreen(
                     isError = strengthError != null,
                     supportingText = strengthError
                 )
+                Spacer(Modifier.height(8.dp))
+
                 // 3) Confirmar contraseña
                 InputPassword(
                     value = confirm,
@@ -155,14 +159,19 @@ fun ChangePasswordScreen(
                 )
             }
 
-
-
             Spacer(Modifier.height(32.dp))
+
+            // --- Aquí calculamos cuándo habilitar "Guardar" ---
+            val saveEnabled =
+                !ui.isLoading &&
+                        current.isNotBlank() &&
+                        strengthError == null &&
+                        mismatchError == null
 
             PrimaryButton(
                 text = if (ui.isLoading) "Cambiando..." else "Guardar",
                 onClick = { viewModel.changePassword(current, newPass, confirm) },
-                enabled = !ui.isLoading,
+                enabled = saveEnabled,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -187,16 +196,14 @@ fun ChangePasswordScreen(
 
         // Modal de éxito
         ModalInfoDialog(
-            visible       = showSuccessDialog,
-            message       = dialogMsg,
+            visible = showSuccessDialog,
+            message = dialogMsg,
             primaryButton = DialogButton("Aceptar") {
                 showSuccessDialog = false
-
+                // doble pop para volver a SettingsScreen
                 navController.popBackStack()
-
                 navController.popBackStack()
             }
         )
-
     }
 }
