@@ -135,7 +135,7 @@ private fun ReadyContent(
         LaunchedEffect(Unit) {
             println("DEBUG - photoUrl: ${profile.photoUrl}")
         }
-
+        /* Lo dejo para que quin haga la pantalla de perfil pueda guiarse de este
         AsyncImage(
             model = profile.photoUrl?.takeIf { it.isNotBlank() } ?: R.drawable.imagenprueba,
             contentDescription = "Foto de perfil de ${profile.userName}",
@@ -146,7 +146,7 @@ private fun ReadyContent(
         )
 
         Title(profile.userName ?: "Sin nombre")
-
+    */
         FormContainer(
             backgroundColor = Color(0xFFD8EAF1),
             contentPadding = PaddingValues(20.dp)
@@ -166,19 +166,21 @@ private fun ReadyContent(
                 text = "Configurar notificaciones",
                 onClick = onNotis
             )
-            SettingItem(
-                leadingIcon = { Icon24(Icons.Default.Visibility) },
-                text = "Ver logros",
-                onClick = onAchievements
-            )
         }
 
-        FormContainer(
-            backgroundColor = Color(0xFFFFEAEA),
-            contentPadding = PaddingValues(20.dp)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            DangerButton("Cerrar sesión", onSignOut)
-            Spacer(Modifier.height(12.dp))
+            DangerButton(
+                text = "Cerrar sesión",
+                onClick = onSignOut,
+                modifier = Modifier
+                    .weight(1f)
+            )
             DangerButton(
                 text = "Eliminar cuenta",
                 onClick = {
@@ -190,14 +192,14 @@ private fun ReadyContent(
                         ?.set("isGoogleUser", isGoogleUser)
 
                     navController.navigate("delete_account/$isGoogleUser")
-
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 8.dp)
+                    .weight(1f)
             )
-
         }
+
+
+
     }
 }
 
