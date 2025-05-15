@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextAlign
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 
 @Composable
 fun ConfigureNotificationScreen(
@@ -30,6 +34,8 @@ fun ConfigureNotificationScreen(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
     var showModal by remember { mutableStateOf(false) }
+    //Variable para el saber mas
+    var showNotificationsHelp by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -246,11 +252,10 @@ fun ConfigureNotificationScreen(
                 }
                 /************************************************************************************/
 
+                Spacer(Modifier.height(0.dp))
 
-                Spacer(Modifier.height(10.dp))
-
-
-
+                // Enlace “SABER MÁS ?”
+                TextButtonLink("SABER MÁS ?", onClick = { showNotificationsHelp = true })
             }
 
         }
@@ -280,7 +285,18 @@ fun ConfigureNotificationScreen(
         )
     }
 
-
+    //Código para el mensaje de Saber mas
+    if (showNotificationsHelp) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "¿Cómo usar esta sección?",
+            message  = "Recuerda que los mensajes personalizados son esa frase motivadora que diste de alta junto con tu hábito.\n" +
+                    "\n" +
+                    "Puedes activar o desactivar las notificaciones de tus hábitos, sin alterar su configuración.",
+            primaryButton = DialogButton("Entendido") { showNotificationsHelp = false }
+        )
+    }
 }
 
 @Preview(showBackground = true, widthDp = 412, heightDp = 915)
