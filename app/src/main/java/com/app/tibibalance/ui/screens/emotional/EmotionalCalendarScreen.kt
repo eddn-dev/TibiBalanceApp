@@ -56,6 +56,9 @@ fun EmotionalCalendarScreen(
     var showPastInfo    by remember { mutableStateOf(false) }
     var showFutureInfo  by remember { mutableStateOf(false) }
     var errorMessage    by remember { mutableStateOf<String?>(null) }
+    //Variable para el saber mas
+    var showEmotionsHelp by remember { mutableStateOf(false) }
+
 
     // 3) Escuchar eventos one-shot
     LaunchedEffect(Unit) {
@@ -129,7 +132,7 @@ fun EmotionalCalendarScreen(
                     )
 
                     // Enlace “SABER MÁS ?”
-                    TextButtonLink("SABER MÁS ?", onClick = { /* TODO */ })
+                    TextButtonLink("SABER MÁS ?", onClick = { showEmotionsHelp = true })
 
                     // Emoción más repetida
                     Text(
@@ -201,6 +204,17 @@ fun EmotionalCalendarScreen(
             )
         }
     }
+    //Código para el mensaje de Saber mas
+    if (showEmotionsHelp) {
+        ModalInfoDialog(
+            visible  = true,
+            icon     = Icons.Default.Info,
+            title    = "¿Cómo usar esta sección?",
+            message  = "Esta sección está dedicada a tus emociones, un espacio para registrar y llevar el control de cómo te sientes día a día. Para comenzar, toca el recuadro del día de hoy para registrar cómo te sientes. Recuerda que la constancia es clave para construir este hábito y lograr un mejor monitoreo de tu bienestar emocional. ¡Haz tu registro diario!",
+            primaryButton = DialogButton("Entendido") { showEmotionsHelp = false }
+        )
+    }
+
 }
 
 /** Traduce el recurso drawable a nombre legible. */
