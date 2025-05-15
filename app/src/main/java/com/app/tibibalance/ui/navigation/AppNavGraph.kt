@@ -1,4 +1,5 @@
 // ui/navigation/AppNavGraph.kt
+
 package com.app.tibibalance.ui.navigation
 
 import androidx.compose.runtime.Composable
@@ -15,9 +16,9 @@ import com.app.tibibalance.ui.screens.habits.ConfigureNotificationScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
 import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
-import com.app.tibibalance.ui.screens.settings.ChangePasswordScreenPreviewOnly
+
+import com.app.tibibalance.ui.screens.settings.ChangePasswordScreen
 import com.app.tibibalance.ui.screens.settings.DeleteAccountScreen
-import com.google.firebase.auth.FirebaseAuth
 
 
 /**
@@ -74,8 +75,9 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
             EditProfileScreen(navController)
         }
         //Direcciona a la pantalla de cambiar contraseña
-        composable("changePassword") {
-            ChangePasswordScreenPreviewOnly(navController = navController)
+        // Cambiar contraseña — ahora apuntamos a la pantalla real
+        composable(Screen.ChangePassword.route) {
+            ChangePasswordScreen(navController)
         }
 
         composable("delete_account/{isGoogleUser}") { backStackEntry ->

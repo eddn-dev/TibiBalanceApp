@@ -50,6 +50,8 @@ fun EditProfileScreen(
     navController: NavHostController,
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
+    val canChange by viewModel.canChangePassword.collectAsState()
+
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -155,6 +157,7 @@ fun EditProfileScreen(
             navController.popBackStack()
         }
     }
+
 
     // UI
     Box(Modifier.fillMaxSize()) {
@@ -264,32 +267,36 @@ fun EditProfileScreen(
 
                     Spacer(Modifier.height(10.dp))
                     Subtitle("Contraseña", Modifier.align(Alignment.Start))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White)
-                            .clickable {
-                                navController.navigate("changePassword")
-                            }
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
+
+                    if (canChange) {
+                        // Caja clickeable para cambiar contraseña
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White)
+                                .clickable { navController.navigate("changePassword") }
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
                         ) {
-                            Text(
-                                text = "••••••••",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Cambiar contraseña",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("••••••••", style = MaterialTheme.typography.bodyLarge)
+                                Icon(Icons.Default.Lock, contentDescription = "Cambiar contraseña")
+                            }
                         }
+                    } else {
+                        // Mensaje para usuarios con Google
+                        Text(
+                            text = "Tu cuenta se autentica con Google; no puedes cambiar contraseña aquí.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        )
                     }
 
                     Spacer(Modifier.height(20.dp))

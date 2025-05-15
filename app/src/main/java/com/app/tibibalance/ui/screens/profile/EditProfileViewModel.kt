@@ -25,12 +25,32 @@ class EditProfileViewModel @Inject constructor(
     private val storageService: StorageService
 ) : ViewModel() {
 
+    // 1) Declara auth _antes_ del init
     private val auth = FirebaseAuth.getInstance()
-    private val firestore = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
 
+    // Estado para permitir o no cambiar contraseña
+    private val _canChangePassword = MutableStateFlow(false)
+    val canChangePassword: StateFlow<Boolean> = _canChangePassword
+
+    // Otros clientes Firebase
+    private val firestore = FirebaseFirestore.getInstance()
+    private val storage   = FirebaseStorage.getInstance()
+
+    // Estado para operaciones de perfil
     private val _state = MutableStateFlow(EditProfileUiState())
     val state: StateFlow<EditProfileUiState> = _state
+
+    init {
+        // Ahora auth ya existe
+        checkPasswordProvider()
+    }
+
+    private fun checkPasswordProvider() {
+        val user = auth.currentUser
+        val hasPassword = user?.providerData
+            ?.any { it.providerId == EmailAuthProvider.PROVIDER_ID } == true
+        _canChangePassword.value = hasPassword
+    }
 
 
     suspend fun loadInitialProfile(): UserProfile? {
@@ -41,6 +61,7 @@ class EditProfileViewModel @Inject constructor(
             null
         }
     }
+
 
 
     fun updateProfile(name: String?, birthDate: String?) {
