@@ -22,4 +22,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "TibiBalance"
 include(":app")
- 
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") } // ← aquí va el repo de Coil alpha
+    }
+}

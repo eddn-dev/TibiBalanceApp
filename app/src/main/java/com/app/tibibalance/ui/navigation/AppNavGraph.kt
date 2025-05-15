@@ -15,6 +15,7 @@ import com.app.tibibalance.ui.screens.habits.ConfigureNotificationScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
 import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
+import com.app.tibibalance.ui.screens.settings.ChangePasswordScreenPreviewOnly
 
 /**
  * @brief Configura y muestra el [NavHost] principal que gestiona la navegación entre las diferentes pantallas de la aplicación.
@@ -63,6 +64,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         //Direcciona a la pantalla de editar perfil
         composable(Screen.EditPersonal.route) {
             EditProfileScreen(navController)
+        }
+        //Direcciona a la pantalla de cambiar contraseña
+        composable("changePassword") {
+            ChangePasswordScreenPreviewOnly(navController = navController)
         }
 
     }

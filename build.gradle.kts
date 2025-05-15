@@ -13,3 +13,5 @@ plugins {
     alias(libs.plugins.hilt)            apply false        // Hilt 2.56.2 :contentReference[oaicite:2]{index=2}
     alias(libs.plugins.ksp)             apply false        // KSP 2.2.0-Beta2-2.0.1 :contentReference[oaicite:3]{index=3}
 }
+
+

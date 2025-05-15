@@ -55,17 +55,17 @@ room {
 
 dependencies {
 
-    implementation("io.coil-kt:coil-compose:2.3.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     /* ──────────────── UI (Compose) ──────────────── */
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)            // Material-3, Nav, Icons, Activity
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
+    //implementation(libs.coil.compose)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
+    //implementation(libs.coil.network.okhttp)
     implementation("androidx.compose.foundation:foundation")   // versión la pone tu compose-bom
-
 
     /* ──────────────── Persistencia local (Room) ──────────────── */
     implementation(libs.room.runtime)
@@ -99,13 +99,12 @@ dependencies {
 
     /* ──────────────── Lottie Animation ────────────────*/
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
-    implementation("com.airbnb.android:lottie-compose:6.0.0")
 
 
 }
 
-allprojects {
+/*allprojects {
     repositories {
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/*") }
     }
-}
+}*/
