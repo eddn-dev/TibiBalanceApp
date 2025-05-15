@@ -43,7 +43,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
  * Es ideal para encerrar secciones de un formulario o la totalidad de formularios cortos.
  *
  * @param modifier Un [Modifier] opcional que se aplica al [Card] contenedor principal.
- * Por defecto, ocupa el ancho máximo (`fillMaxWidth`).
+ * Por defecto, ocupa el ancho máximo (`afillMaxWidth`).
  * @param backgroundColor El [Color] de fondo para la [Card]. Por defecto es un azul pálido (`0xFFC8DEFA`).
  * @param cornerRadiusDp El radio de las esquinas redondeadas de la [Card] en Dp. Por defecto `16`.
  * @param tonalElevation La elevación tonal ([Dp]) de la [Card], que controla la intensidad de la sombra.

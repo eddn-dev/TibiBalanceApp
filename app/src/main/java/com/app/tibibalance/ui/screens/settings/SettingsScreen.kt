@@ -31,6 +31,14 @@ import androidx.compose.foundation.shape.CircleShape
 import coil.compose.AsyncImage
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+
 
 
 
@@ -135,6 +143,19 @@ private fun ReadyContent(
         LaunchedEffect(Unit) {
             println("DEBUG - photoUrl: ${profile.photoUrl}")
         }
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.settignslogo),
+                contentDescription = "Descripción",
+                modifier = Modifier.size(200.dp) // o el tamaño que necesites
+            )
+        }
         /* Lo dejo para que quin haga la pantalla de perfil pueda guiarse de este
         AsyncImage(
             model = profile.photoUrl?.takeIf { it.isNotBlank() } ?: R.drawable.imagenprueba,
@@ -201,6 +222,7 @@ private fun ReadyContent(
 
 
     }
+
 }
 
 @Composable

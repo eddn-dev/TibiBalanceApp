@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import com.app.tibibalance.ui.navigation.Screen
 import androidx.compose.runtime.*
@@ -102,7 +104,22 @@ fun ChangePasswordScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            FormContainer {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        clip = false
+                    )
+                    .background(
+                        color = Color(0xFFdeedf4),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
                 // 1) Contraseña actual
                 InputPassword(
                     value = current,
@@ -138,6 +155,8 @@ fun ChangePasswordScreen(
                 )
             }
 
+
+
             Spacer(Modifier.height(32.dp))
 
             PrimaryButton(
@@ -172,9 +191,9 @@ fun ChangePasswordScreen(
             message       = dialogMsg,
             primaryButton = DialogButton("Aceptar") {
                 showSuccessDialog = false
-                // 1º pop: cierra ChangePasswordScreen → vuelve a EditProfileScreen
+
                 navController.popBackStack()
-                // 2º pop: cierra EditProfileScreen → vuelve a SettingsScreen
+
                 navController.popBackStack()
             }
         )
