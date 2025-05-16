@@ -1,4 +1,4 @@
-//EditProfileViewModel.kt
+// EditProfileViewModel.kt
 package com.app.tibibalance.ui.screens.profile
 
 import android.content.Context
@@ -9,18 +9,17 @@ import androidx.lifecycle.viewModelScope
 import com.app.tibibalance.data.remote.firebase.StorageService
 import com.app.tibibalance.data.repository.ProfileRepository
 import com.app.tibibalance.domain.model.UserProfile
-import com.google.firebase.auth.*
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
-
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
@@ -28,26 +27,26 @@ class EditProfileViewModel @Inject constructor(
     private val storageService: StorageService
 ) : ViewModel() {
 
-    // 1) Declara auth _antes_ del init
-    private val auth = FirebaseAuth.getInstance()
+    // FirebaseAuth instance
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // Estado para permitir o no cambiar contraseña
+    // State: can the user change password?
     private val _canChangePassword = MutableStateFlow(false)
     val canChangePassword: StateFlow<Boolean> = _canChangePassword
 
-    // Otros clientes Firebase
-    private val firestore = FirebaseFirestore.getInstance()
-    private val storage   = FirebaseStorage.getInstance()
-
-    // Estado para operaciones de perfil
+    // UI state: error / success flags
     private val _state = MutableStateFlow(EditProfileUiState())
-    val state: StateFlow<EditProfileUiState> = _state
+    val state: StateFlow<EditProfileUiState> = _state.asStateFlow()
+
+    // Event: photo successfully updated
+    private val _photoUpdatedEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val photoUpdatedEvent: SharedFlow<Unit> = _photoUpdatedEvent.asSharedFlow()
 
     init {
-        // Ahora auth ya existe
         checkPasswordProvider()
     }
 
+    /** Check if the current user has an email/password provider */
     private fun checkPasswordProvider() {
         val user = auth.currentUser
         val hasPassword = user?.providerData
@@ -55,135 +54,142 @@ class EditProfileViewModel @Inject constructor(
         _canChangePassword.value = hasPassword
     }
 
-
+    /** Load initial profile data */
     suspend fun loadInitialProfile(): UserProfile? {
         return try {
             profileRepository.profile.first()
         } catch (e: Exception) {
-            _state.value = _state.value.copy(error = "No se pudo cargar el perfil")
+            _state.update { it.copy(error = "No se pudo cargar el perfil") }
             null
         }
     }
 
-
-
+    /** Update name and/or birth date */
     fun updateProfile(name: String?, birthDate: String?) {
         viewModelScope.launch {
             try {
                 profileRepository.update(
-                    name = name.takeIf { it.isNullOrBlank().not() },
+                    name = name,
                     photo = null,
-                    birthDate = birthDate.takeIf { it.isNullOrBlank().not() }
+                    birthDate = birthDate
                 )
-                _state.value = _state.value.copy(success = true)
+                _state.update { it.copy(success = true) }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(error = "Error al actualizar: ${e.message}")
+                _state.update { it.copy(error = "Error al actualizar: ${e.message}") }
             }
         }
     }
 
+    /**
+     * Upload a new profile photo, update in Firestore
+     * and emit an event on success.
+     */
     fun updateProfilePhoto(uri: Uri, context: Context) {
         viewModelScope.launch {
             try {
                 val user = auth.currentUser
                     ?: throw Exception("Usuario no autenticado")
 
+                // Open input stream
                 val inputStream = context.contentResolver
                     .openInputStream(uri)
                     ?: throw Exception("No se pudo abrir el stream de la URI")
                 Log.d("EditProfileVM", "Stream abierto correctamente")
 
+                // Upload to Storage
                 val downloadUrl = storageService
                     .uploadProfileImage(inputStream, user.uid)
                 Log.d("EditProfileVM", "Foto subida correctamente: $downloadUrl")
 
+                // Update Firestore
                 profileRepository.update(photo = Uri.parse(downloadUrl))
                 Log.d("EditProfileVM", "Firestore actualizado con photoUrl")
 
-                _state.value = _state.value.copy(success = true)
+                // Emit photo-updated event
+                _photoUpdatedEvent.tryEmit(Unit)
+
             } catch (e: CancellationException) {
-                // IMPORTANTE: repropaga las cancelaciones legítimas
+                // Re-throw coroutine cancellations
                 throw e
             } catch (e: Exception) {
                 Log.e("EditProfileVM", "Error en updateProfilePhoto", e)
-                _state.value = _state.value.copy(
-                    error = "Error al subir imagen: ${e.message}"
-                )
+                _state.update { it.copy(error = "Error al subir imagen: ${e.message}") }
             }
         }
     }
 
-
-
+    /** Delete entire user account (Firestore doc, Storage image, FirebaseAuth) */
     fun deleteUserAccount() {
-        val user = FirebaseAuth.getInstance().currentUser ?: return
+        val user = auth.currentUser ?: return
         val uid = user.uid
-        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/$uid.jpg")
         val firestore = FirebaseFirestore.getInstance()
+        val storageRef = FirebaseStorage.getInstance()
+            .reference.child("profile_images/$uid.jpg")
 
         viewModelScope.launch {
             try {
-                // Elimina datos en Firestore
+                // Delete Firestore document
                 firestore.collection("users").document(uid).delete().await()
 
-                // Verifica si el archivo existe antes de intentar eliminarlo
+                // Delete storage file if exists
                 try {
-                    storageRef.metadata.await() // Si no lanza excepción, existe
+                    storageRef.metadata.await()
                     storageRef.delete().await()
-                } catch (e: Exception) {
-                    // Archivo no existe, no hacemos nada
+                } catch (_: Exception) {
+                    // Ignore if file does not exist
                 }
 
-                // Elimina la cuenta del usuario
+                // Delete FirebaseAuth user
                 user.delete().await()
 
-                _state.value = _state.value.copy(success = true)
+                _state.update { it.copy(success = true) }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(error = "Error al eliminar cuenta: ${e.message}")
+                _state.update { it.copy(error = "Error al eliminar cuenta: ${e.message}") }
             }
         }
     }
 
-
+    /** Re-authenticate with email/password */
     fun reauthenticateUserWithPassword(password: String) {
         viewModelScope.launch {
-            val user = auth.currentUser
             try {
-                if (user == null || user.email.isNullOrBlank())
-                    throw Exception("Usuario no válido")
-
-                val credential = EmailAuthProvider.getCredential(user.email!!, password)
+                val user = auth.currentUser
+                    ?: throw Exception("Usuario no válido")
+                val email = user.email
+                    ?: throw Exception("Usuario sin email")
+                val credential = EmailAuthProvider
+                    .getCredential(email, password)
                 user.reauthenticate(credential).await()
-
-                _state.value = _state.value.copy(success = true)
+                _state.update { it.copy(success = true) }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(error = "Error al reautenticar: ${e.message}")
+                _state.update { it.copy(error = "Error al reautenticar: ${e.message}") }
             }
         }
     }
 
+    /** Re-authenticate with Google ID token */
     fun reauthenticateUserWithGoogle(idToken: String) {
         viewModelScope.launch {
-            val user = auth.currentUser
             try {
-                if (user == null)
-                    throw Exception("Usuario no válido")
-
-                val credential = GoogleAuthProvider.getCredential(idToken, null)
+                val user = auth.currentUser
+                    ?: throw Exception("Usuario no válido")
+                val credential = GoogleAuthProvider
+                    .getCredential(idToken, null)
                 user.reauthenticate(credential).await()
-
-                _state.value = _state.value.copy(success = true)
+                _state.update { it.copy(success = true) }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(error = "Error al reautenticar: ${e.message}")
+                _state.update { it.copy(error = "Error al reautenticar: ${e.message}") }
             }
         }
     }
 
+    /** Clear current error from state */
     fun consumeError() {
-        _state.value = _state.value.copy(error = null)
+        _state.update { it.copy(error = null) }
     }
 
+    /** Clear success flag (used after showing dialogs) */
     fun clearSuccess() {
-        _state.value = _state.value.copy(success = false)
+        _state.update { it.copy(success = false) }
     }
 }
