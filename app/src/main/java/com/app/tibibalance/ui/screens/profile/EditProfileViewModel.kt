@@ -3,6 +3,7 @@ package com.app.tibibalance.ui.screens.profile
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.tibibalance.data.remote.firebase.StorageService
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
@@ -82,26 +85,35 @@ class EditProfileViewModel @Inject constructor(
     fun updateProfilePhoto(uri: Uri, context: Context) {
         viewModelScope.launch {
             try {
-                val user = FirebaseAuth.getInstance().currentUser
+                val user = auth.currentUser
                     ?: throw Exception("Usuario no autenticado")
 
-                val inputStream = context.contentResolver.openInputStream(uri)
-                    ?: throw Exception("No se pudo acceder al archivo")
+                val inputStream = context.contentResolver
+                    .openInputStream(uri)
+                    ?: throw Exception("No se pudo abrir el stream de la URI")
+                Log.d("EditProfileVM", "Stream abierto correctamente")
 
-                // 1) subo a Storage y obtengo URL
-                val downloadUrl = storageService.uploadProfileImage(inputStream, user.uid)
-                // 2) actualizo sólo la foto en Firestore
-                profileRepository.update(
-                    name = null,
-                    photo = Uri.parse(downloadUrl),
-                    birthDate = null
-                )
+                val downloadUrl = storageService
+                    .uploadProfileImage(inputStream, user.uid)
+                Log.d("EditProfileVM", "Foto subida correctamente: $downloadUrl")
+
+                profileRepository.update(photo = Uri.parse(downloadUrl))
+                Log.d("EditProfileVM", "Firestore actualizado con photoUrl")
+
                 _state.value = _state.value.copy(success = true)
+            } catch (e: CancellationException) {
+                // IMPORTANTE: repropaga las cancelaciones legítimas
+                throw e
             } catch (e: Exception) {
-                _state.value = _state.value.copy(error = "Error al subir imagen: ${e.message}")
+                Log.e("EditProfileVM", "Error en updateProfilePhoto", e)
+                _state.value = _state.value.copy(
+                    error = "Error al subir imagen: ${e.message}"
+                )
             }
         }
     }
+
+
 
     fun deleteUserAccount() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
