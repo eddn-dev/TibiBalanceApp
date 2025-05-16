@@ -340,6 +340,18 @@ fun EditProfileScreen(
             }
         }
 
+        // Spinner semitransparente mientras sube la foto
+        if (uiState.uploadingPhoto) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
         // Errores unificados
         uiState.error?.let { err ->
             LaunchedEffect(err) {

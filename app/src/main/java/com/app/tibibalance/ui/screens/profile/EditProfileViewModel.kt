@@ -86,6 +86,9 @@ class EditProfileViewModel @Inject constructor(
      */
     fun updateProfilePhoto(uri: Uri, context: Context) {
         viewModelScope.launch {
+            // 1) Arrancamos el spinner
+            _state.update { it.copy(uploadingPhoto = true) }
+
             try {
                 val user = auth.currentUser
                     ?: throw Exception("Usuario no autenticado")
@@ -109,14 +112,20 @@ class EditProfileViewModel @Inject constructor(
                 _photoUpdatedEvent.tryEmit(Unit)
 
             } catch (e: CancellationException) {
-                // Re-throw coroutine cancellations
+                // Re-throw para que las corrutinas canceladas no se atrapen como error
                 throw e
+
             } catch (e: Exception) {
                 Log.e("EditProfileVM", "Error en updateProfilePhoto", e)
                 _state.update { it.copy(error = "Error al subir imagen: ${e.message}") }
+
+            } finally {
+                // 2) Siempre paramos el spinner
+                _state.update { it.copy(uploadingPhoto = false) }
             }
         }
     }
+
 
     /** Delete entire user account (Firestore doc, Storage image, FirebaseAuth) */
     fun deleteUserAccount() {
