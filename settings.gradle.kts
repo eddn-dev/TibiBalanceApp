@@ -10,6 +10,10 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven { url = uri("https://jitpack.io") }
+        maven {
+            // URL oficial de Health Connect (alpha/beta) en Google Maven
+            url = uri("https://androidx.dev/health/connect")
+        }
     }
 }
 dependencyResolutionManagement {
@@ -23,4 +27,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TibiBalance"
 include(":app")
- 
+include(":wear")

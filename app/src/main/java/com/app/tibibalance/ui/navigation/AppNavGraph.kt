@@ -17,7 +17,7 @@ import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
 import com.app.tibibalance.ui.screens.settings.ChangePasswordScreenPreviewOnly
 import com.app.tibibalance.ui.screens.settings.DeleteAccountScreen
-import com.google.firebase.auth.FirebaseAuth
+import com.app.tibibalance.ui.screens.conection.ConnectedDeviceRoute
 
 
 /**
@@ -66,6 +66,10 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         //     DetailsScreen(navController, itemId)
         // }
 
+        //Direcciona a la pantalla de Administrar dispositivos
+        composable(Screen.ManageDevices.route) {
+            ConnectedDeviceRoute(navController = navController)
+        }
 
         //Direcciona a la pantalla de norificaciones
         composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }

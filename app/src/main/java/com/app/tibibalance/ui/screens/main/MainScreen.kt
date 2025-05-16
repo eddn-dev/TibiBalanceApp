@@ -50,7 +50,8 @@ import com.app.tibibalance.ui.navigation.Screen
 import com.app.tibibalance.ui.screens.emotional.EmotionalCalendarScreen
 import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.*
-import com.app.tibibalance.ui.screens.habits.ShowHabitsScreen   // ← nuevo
+import com.app.tibibalance.ui.screens.habits.ShowHabitsScreen
+import com.app.tibibalance.ui.screens.conection.ConnectedDeviceScreen
 import kotlinx.coroutines.launch
 
 /**
@@ -194,10 +195,10 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
     // Renderiza la pantalla de Ajustes.
     SettingsScreen(
         state          = uiState,
-        navController  = rootNav, // ← ESTA ES LA LÍNEA CLAVE
+        navController  = rootNav,
         onNavigateUp   = rootNav::navigateUp,
         onEditPersonal = { rootNav.navigate(Screen.EditPersonal.route) },
-        onDevices      = { /* TODO */ },
+        onDevices      = { rootNav.navigate(Screen.ManageDevices.route) },
         onAchievements = { /* TODO */ },
         onSignOut      = mainVm::signOut,
         onDelete = {

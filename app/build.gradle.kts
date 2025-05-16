@@ -20,7 +20,7 @@ android {
     compileSdk  = 35            // OK: Android 15 Preview (ajusta a 34 si tu CI usa solo estables)
     defaultConfig {
         applicationId         = "com.app.tibibalance"
-        minSdk                = 26
+        minSdk                = 30
         targetSdk             = 35
         versionCode           = 1
         versionName           = "1.0"
@@ -101,7 +101,18 @@ dependencies {
 
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
+
+    /* ────────────────Connection with smartwatch  ────────────────*/
+    implementation ("com.google.android.gms:play-services-fitness:21.1.0")
+    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
+    implementation ("com.google.firebase:firebase-firestore-ktx:24.8.1")
+    implementation ("com.google.firebase:firebase-auth-ktx:22.1.1")
+    implementation ("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation("androidx.health:health-services-client:1.1.0-alpha05")
+
+
 }
+
 
 allprojects {
     repositories {
