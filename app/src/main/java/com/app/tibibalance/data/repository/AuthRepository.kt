@@ -20,6 +20,7 @@
  */
 package com.app.tibibalance.data.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -70,6 +71,7 @@ interface AuthRepository {
      */
     suspend fun signUp(email: String, pass: String) // La implementación devuelve FirebaseUser
 
+    suspend fun signUpWithoutVerification(email: String, password: String, ): FirebaseUser
     /**
      * @brief Envía un correo electrónico al usuario especificado para que pueda restablecer su contraseña.
      * @param email El correo electrónico asociado a la cuenta.

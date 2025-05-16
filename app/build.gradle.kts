@@ -13,6 +13,9 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+
+    //id("com.android.application")
+    //id("com.google.gms.google-services")
 }
 
 android {
@@ -99,6 +102,10 @@ dependencies {
     implementation ("com.airbnb.android:lottie-compose:6.6.4")
 
     implementation ("com.github.commandiron:SpinWheelCompose:1.1.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 allprojects {

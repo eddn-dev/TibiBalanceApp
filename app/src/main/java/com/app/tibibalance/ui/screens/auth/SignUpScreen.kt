@@ -77,7 +77,9 @@ import com.app.tibibalance.ui.components.inputs.InputPassword
 import com.app.tibibalance.ui.components.inputs.InputText
 import com.app.tibibalance.ui.navigation.Screen
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -167,25 +169,22 @@ fun SignUpScreen(
 
     /* -------- Efecto para navegación según estado de la UI -------- */
     // Se ejecuta cuando `uiState` cambia.
+    // Detectar cambios en el estado de la UI
     LaunchedEffect(uiState) {
-        when (val currentState = uiState) { // Captura el estado actual para evitar concurrencia
-            is SignUpUiState.Success -> { // Registro con formulario exitoso
-                // Navega a la pantalla de verificación de correo.
+        when (val currentState = uiState) {
+            is SignUpUiState.VerificationEmailSent -> {
+                // Navega automáticamente a la pantalla de verificación de correo
                 nav.navigate(Screen.VerifyEmail.route) {
-                    // Limpia la pila hasta SignUpScreen (inclusive) para evitar volver a ella.
                     popUpTo(Screen.SignUp.route) { inclusive = true }
                 }
-                vm.dismissSuccess() // Indica al VM que el mensaje de éxito fue procesado.
+                vm.dismissSuccess() // Limpia el estado
             }
-            SignUpUiState.GoogleSuccess -> { // Registro/inicio con Google exitoso
-                // Navega a la pantalla principal de la aplicación.
-                nav.navigate(Screen.Main.route) {
-                    // Limpia la pila hasta LaunchScreen (inclusive) para un flujo limpio post-login.
-                    popUpTo(Screen.Launch.route) { inclusive = true }
+            is SignUpUiState.Error -> {
+                scope.launch {
+                    snackbar.showSnackbar(currentState.message)
                 }
-                vm.dismissSuccess() // Indica al VM que el estado fue procesado.
             }
-            else -> Unit // No se requiere acción de navegación para otros estados.
+            else -> Unit // No hacer nada para otros estados
         }
     }
 
@@ -344,25 +343,21 @@ fun SignUpScreen(
                 text = stringResource(R.string.btn_sign_up), // Texto del botón.
                 enabled = !isLoading, // Deshabilitado si está cargando.
                 onClick = { // Acción al pulsar:
-                    // 1. Inicia el registro en el ViewModel.
-                    vm.signUp(
+                    vm.signUpAndSendEmail(
                         userName = username,
                         birthDate = birthDate,
                         email = email,
                         password = pass1,
-                        confirm = pass2
-                    )
-                    // 2. (Opcional) Intenta guardar la contraseña en el Administrador de Credenciales de Android.
-                    scope.launch {
-                        try {
-                            cm.createCredential(
-                                activity,
-                                CreatePasswordRequest(id = username, password = pass1)
-                            )
-                        } catch (_: Exception) {
-                            // Ignora excepciones aquí (e.g., usuario cancela, no soportado).
+                        confirm = pass2,
+                        onSuccess = {
+                            nav.navigate(Screen.VerifyEmail.route)
+                        },
+                        onError = { error ->
+                            scope.launch {
+                                snackbar.showSnackbar(error)
+                            }
                         }
-                    }
+                    )
                 }
             )
 

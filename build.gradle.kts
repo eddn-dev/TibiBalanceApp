@@ -11,5 +11,7 @@ plugins {
     // --- Servicios de Google & DI ---
     alias(libs.plugins.google.services) apply false        // google-services 4.4.2 :contentReference[oaicite:1]{index=1}
     alias(libs.plugins.hilt)            apply false        // Hilt 2.56.2 :contentReference[oaicite:2]{index=2}
-    alias(libs.plugins.ksp)             apply false        // KSP 2.2.0-Beta2-2.0.1 :contentReference[oaicite:3]{index=3}
+    alias(libs.plugins.ksp)             apply false
+
+    //id("com.google.gms.google-services") version "4.4.2" apply false
 }

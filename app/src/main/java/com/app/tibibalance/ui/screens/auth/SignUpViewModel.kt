@@ -29,6 +29,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
+import org.json.JSONObject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -174,6 +179,68 @@ class SignUpViewModel @Inject constructor(
      * @param password Contraseña.
      * @param confirm Confirmación de la contraseña.
      */
+
+    fun signUpAndSendEmail(
+        userName: String,
+        birthDate: LocalDate?,
+        email: String,
+        password: String,
+        confirm: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                _ui.value = SignUpUiState.Loading
+
+                // Validar y registrar
+                signUp(userName, birthDate, email, password, confirm)
+
+                // Envía el correo de verificación
+                val success = sendVerificationEmail(email)
+                if (success) {
+                    _ui.value = SignUpUiState.VerificationEmailSent(email)
+                    onSuccess()
+                } else {
+                    onError("Error enviando el correo de verificación")
+                }
+            } catch (e: Exception) {
+                onError("Error: ${e.message}")
+            }
+        }
+    }
+
+    // Método suspendido para enviar el correo
+    suspend fun sendVerificationEmail(email: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL("http://localhost:3000/send-confirmation")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doOutput = true
+
+                // Cuerpo de la solicitud JSON
+                val json = JSONObject().apply {
+                    put("email", email)
+                }
+
+                connection.outputStream.use {
+                    it.write(json.toString().toByteArray())
+                }
+
+                val responseCode = connection.responseCode
+                connection.disconnect()
+
+                responseCode == 200
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
+
     fun signUp(userName: String, birthDate: LocalDate?,
                email: String, password: String, confirm: String) {
 

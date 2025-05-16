@@ -33,6 +33,9 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.net.HttpURLConnection
+import java.net.URL
+import org.json.JSONObject
 
 /**
  * @class  FirebaseAuthRepository
@@ -167,16 +170,35 @@ class FirebaseAuthRepository @Inject constructor(
      * @note Aunque la interfaz [AuthRepository] documenta un retorno [FirebaseUser],
      * esta implementación actual no lo devuelve explícitamente.
      */
+
+    // AuthService.kt
+    override suspend fun signUpWithoutVerification(email: String, password: String): FirebaseUser {
+        val auth = FirebaseAuth.getInstance()
+        val userCredential = auth.createUserWithEmailAndPassword(email, password).await()
+        val user = userCredential.user ?: throw Exception("Error al registrar usuario")
+
+        // NO enviar correo de verificación automáticamente
+        // user.sendEmailVerification() // ELIMINADO
+
+        return user
+    }
+
     override suspend fun signUpEmail(
         email    : String,
         pass     : String,
         userName : String,
         birthDate: LocalDate
     ) {
-        val user = service.signUpAndVerify(email, pass) // Registra y pide verificación
+        val user = signUpWithoutVerification(email, pass) // Registra y pide verificación
         // Crea el perfil con los datos adicionales si no existe
         createProfileIfAbsent(user, userName, birthDate)
+
+        val emailSent = sendVerificationEmailBackend(email)
+        if (!emailSent) {
+            throw Exception("Error enviando correo de verificación desde el backend")
+        }
     }
+
 
     /* ─────────── Helper privado ─────────── */
 
@@ -212,7 +234,7 @@ class FirebaseAuthRepository @Inject constructor(
                 // Usa timestamp del servidor para la fecha de creación
                 "createdAt" to FieldValue.serverTimestamp(),
                 // Guarda el estado de verificación actual
-                "verified"  to user.isEmailVerified,
+                "verified"  to false,
                 // Incluye userName si no es nulo
                 "userName"  to userName,
                 // Convierte LocalDate a String ISO si no es nulo
@@ -227,4 +249,39 @@ class FirebaseAuthRepository @Inject constructor(
             // Log.d("AuthRepo", "Documento de perfil ya existe para ${user.uid}")
         }
     }
+
+    private suspend fun sendVerificationEmailBackend(email: String): Boolean = withContext(io) {
+        try {
+            val url = URL("https://tibiserver.onrender.com/send-confirmation") // Cambia a tu dominio en producción
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.doOutput = true
+
+            // Cuerpo de la solicitud JSON
+            val json = JSONObject().apply {
+                put("email", email)
+            }
+
+            connection.outputStream.use {
+                it.write(json.toString().toByteArray())
+            }
+
+            val responseCode = connection.responseCode
+            val responseMessage = connection.inputStream.bufferedReader().use { it.readText() }
+            connection.disconnect()
+
+            if (responseCode == 200) {
+                Log.i("AuthRepo", "Correo de verificación enviado correctamente para $email")
+                return@withContext true
+            } else {
+                Log.e("AuthRepo", "Error enviando correo de verificación: Código $responseCode - $responseMessage")
+                throw Exception("Error enviando correo de verificación: Código $responseCode - $responseMessage")
+            }
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Error enviando correo de verificación al backend: ${e.message}", e)
+            throw Exception("Error enviando correo de verificación al backend: ${e.message}")
+        }
+    }
+
 }

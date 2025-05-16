@@ -88,6 +88,11 @@ sealed interface SignUpUiState {
     data class Success(val email: String)  : SignUpUiState       // vía formulario
 
     /**
+     * @brief Estado que indica que el correo de verificación fue enviado correctamente.
+     */
+    data class VerificationEmailSent(val email: String) : SignUpUiState
+
+    /**
      * @brief Estado de éxito tras completar el registro o inicio de sesión mediante Google One-Tap.
      * @details Indica que la autenticación con Google fue exitosa. Dado que las cuentas de Google
      * se consideran verificadas, la UI típicamente navegará directamente a la pantalla principal
