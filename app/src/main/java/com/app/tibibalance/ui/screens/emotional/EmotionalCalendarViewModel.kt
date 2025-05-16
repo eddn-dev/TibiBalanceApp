@@ -12,58 +12,63 @@ import java.time.YearMonth
 import javax.inject.Inject
 
 /**
- * @file    EmotionalCalendarViewModel.kt
- * @ingroup ui_screens_emotional
- * @brief   ViewModel para la pantalla de calendario emocional.
- *
- * @details
- * - Expone `val ui: StateFlow<EmotionalUiState>` con estados Loading/Empty/Loaded/Error
- *   generados por un flujo de registros de emociones transformado con `map`, `catch` y `stateIn`.
- * - Emite eventos one-shot (`EmotionalEvent.RegisterClicked`) a través de `val events: SharedFlow<…>`,
- *   usando un `MutableSharedFlow` interno.
+ * Eventos one-shot que emite el ViewModel.
+ * Aquí solo tenemos dos:
+ * - RegisterClicked: para abrir el modal de registro de fecha.
+ * - ErrorOccurred: para notificar un fallo.
  */
+sealed class EmotionalEvent {
+    data class RegisterClicked(val date: LocalDate) : EmotionalEvent()
+    data class ErrorOccurred(val message: String)   : EmotionalEvent()
+}
+
 @HiltViewModel
 class EmotionalCalendarViewModel @Inject constructor(
     private val repository: EmotionalRepository
 ) : ViewModel() {
 
-    // Eventos one-shot al clicar un día
+    // 1) Eventos exposables
     private val _events = MutableSharedFlow<EmotionalEvent>()
     val events: SharedFlow<EmotionalEvent> = _events.asSharedFlow()
 
-    // Estados de UI: Loading → Empty → Loaded → Error
+    // 2) UI state exposes
     val ui: StateFlow<EmotionalUiState> = repository
         .observeEmotions()
-        .map<List<EmotionRecord>, EmotionalUiState> { records ->
+        .map { records ->
             val ym = YearMonth.now()
-            val totalDays = ym.lengthOfMonth()
+            val daysInMonth = ym.lengthOfMonth()
             val byDay = records.associateBy { it.date.dayOfMonth }
-
-            val daysUi = (1..totalDays).map { day ->
+            val daysUi = (1..daysInMonth).map { day ->
                 val rec = byDay[day]
                 EmotionDayUi(
-                    day = day,
-                    iconRes = rec?.iconRes,
-                    isRegistered = rec != null
+                    day         = day,
+                    iconRes     = rec?.iconRes,
+                    isRegistered= rec != null
                 )
             }
-
             if (records.isEmpty()) EmotionalUiState.Empty
-            else                      EmotionalUiState.Loaded(daysUi)
+            else                   EmotionalUiState.Loaded(daysUi)
         }
         .catch { e ->
-            emit(EmotionalUiState.Error(e.message ?: "Error desconocido"))
+            emit(EmotionalUiState.Error(e.message ?: "Ocurrió un error"))
         }
         .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            scope        = viewModelScope,
+            started      = SharingStarted.Eagerly,
             initialValue = EmotionalUiState.Loading
         )
 
-    /** Lanza el evento para que la UI abra el modal de registro de `date`. */
-    fun onDayClicked(date: LocalDate) {
-        viewModelScope.launch {
-            _events.emit(EmotionalEvent.RegisterClicked(date))
+    /** Abre el modal de registro para `date`. */
+    fun onDayClicked(date: LocalDate) = viewModelScope.launch {
+        _events.emit(EmotionalEvent.RegisterClicked(date))
+    }
+
+    /** Guarda un registro (Room + Firestore). */
+    fun saveEmotion(record: EmotionRecord) = viewModelScope.launch {
+        try {
+            repository.saveEmotion(record)
+        } catch (e: Exception) {
+            _events.emit(EmotionalEvent.ErrorOccurred(e.message ?: "Error guardando"))
         }
     }
 }

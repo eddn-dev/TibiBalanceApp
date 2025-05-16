@@ -10,4 +10,5 @@ import kotlinx.coroutines.flow.Flow
 interface EmotionalRepository {
     /** Devuelve los registros (puede venir de BD, red, mocks, etc.) */
     fun observeEmotions(): Flow<List<EmotionRecord>>
+    suspend fun saveEmotion(record: EmotionRecord)
 }

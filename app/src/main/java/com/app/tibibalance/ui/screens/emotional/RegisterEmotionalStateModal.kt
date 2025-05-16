@@ -122,7 +122,7 @@ fun RegisterEmotionalStateModal(
                 text    = "LISTO",
                 enabled = selectedEmotion != null,
                 onClick = {
-                    selectedEmotion?.let(onConfirm)
+                    selectedEmotion?.let { emotion -> onConfirm(emotion) }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

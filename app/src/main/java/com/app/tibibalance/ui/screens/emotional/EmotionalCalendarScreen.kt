@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.CalendarGrid
@@ -163,9 +162,20 @@ fun EmotionalCalendarScreen(
         showModalFor?.let { date ->
             RegisterEmotionalStateModal(
                 date      = date,
-                onConfirm = { /* TODO: enviar al repo */ showModalFor = null },
+                onConfirm = { emotion ->
+                    // 1) Construye el registro con fecha y drawable
+                    val record = EmotionRecord(
+                        date    = date,
+                        iconRes = emotion.drawableRes
+                    )
+                    // 2) Lanza el guardado en ViewModel
+                    vm.saveEmotion(record)
+                    // 3) Oculta el modal
+                    showModalFor = null
+                },
                 onDismiss = { showModalFor = null }
             )
+
         }
 
         // Modales informativos de fecha

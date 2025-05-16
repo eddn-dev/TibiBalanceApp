@@ -101,6 +101,9 @@ dependencies {
 
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
 }
 
 allprojects {

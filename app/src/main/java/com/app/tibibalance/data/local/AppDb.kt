@@ -23,7 +23,8 @@ import com.app.tibibalance.data.local.mapper.NotifConverters
         UserProfileEntity::class   ,
         HabitEntity::class         ,
         HabitTemplateEntity::class ,
-        HabitActivityEntity::class      // 🆕 registra ALERT/COMPLETED/SKIPPED
+        HabitActivityEntity::class ,     // 🆕 registra ALERT/COMPLETED/SKIPPED
+        EmotionEntity::class
     ],
     version = 5,                  // 🆕  incrementa al añadir entidad nueva
     exportSchema = true
@@ -39,4 +40,5 @@ abstract class AppDb : RoomDatabase() {
     abstract fun habitDao()         : HabitDao
     abstract fun habitTemplateDao() : HabitTemplateDao
     abstract fun habitActivityDao() : HabitActivityDao      // 🆕
+    abstract fun emotionDao(): EmotionDao
 }
