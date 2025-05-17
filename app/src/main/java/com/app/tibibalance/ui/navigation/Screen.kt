@@ -37,6 +37,8 @@ package com.app.tibibalance.ui.navigation
 sealed class Screen(val route: String) {
     /* auth flow: Pantallas relacionadas con el proceso de autenticación. */
 
+    /** @brief Pantalla Modal Onboarding para tutorial de inicio */
+    object Onboarding : Screen("onboarding")
     /** @brief La pantalla inicial de la aplicación, generalmente donde el usuario decide iniciar sesión o registrarse. */
     data object Launch       : Screen("launch")
     /** @brief Pantalla para que los usuarios existentes inicien sesión con sus credenciales. */

@@ -11,4 +11,13 @@
     <string name="sign_up_title">Registrarse</string>
     <string name="channel_habits">Hábitos</string>
     <string name="default_reminder_body">Hora de realizar tu actividad</string>
+
+
+    <string name="onb_title_1">Bienvenido a TibiBalance</string>
+    <string name="onb_desc_1">Monitorea tu salud física y emocional.</string>
+    <string name="onb_title_2">Registra Hábitos</string>
+    <string name="onb_desc_2">Lleva control de tus rutinas diarias.</string>
+    <string name="onb_title_3">Visualiza tu Progreso</string>
+    <string name="onb_desc_3">Gráficas y estadísticas en tiempo real.</string>
+
 </resources>

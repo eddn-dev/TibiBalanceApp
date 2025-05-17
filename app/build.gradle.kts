@@ -101,6 +101,17 @@ dependencies {
 
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
+
+    // Pager en Compose
+    implementation ("com.google.accompanist:accompanist-pager:0.30.1")
+// Lottie en Compose
+    implementation ("com.airbnb.android:lottie-compose:6.0.0")
+// DataStore (para guardar que ya viste el onboarding)
+    implementation ("androidx.datastore:datastore-preferences:1.1.0-alpha05")
+// Page Count
+    implementation ("com.google.accompanist:accompanist-pager:0.30.1")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.30.1")
+
 }
 
 allprojects {

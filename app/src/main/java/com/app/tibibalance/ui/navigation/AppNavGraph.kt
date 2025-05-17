@@ -1,89 +1,153 @@
 // ui/navigation/AppNavGraph.kt
 package com.app.tibibalance.ui.navigation
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController // Usar NavHostController específicamente
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-// Importar todas las pantallas referenciadas
+import com.app.tibibalance.R
+import com.app.tibibalance.data.preferences.OnboardingPreferences
+import com.app.tibibalance.ui.navigation.Screen
+import com.app.tibibalance.ui.screens.onboarding.OnboardingPage
+import com.app.tibibalance.ui.screens.onboarding.OnboardingScreen
 import com.app.tibibalance.ui.screens.auth.ForgotPasswordScreen
 import com.app.tibibalance.ui.screens.auth.SignInScreen
 import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
 import com.app.tibibalance.ui.screens.habits.ConfigureNotificationScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
-import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
+import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.settings.ChangePasswordScreenPreviewOnly
 import com.app.tibibalance.ui.screens.settings.DeleteAccountScreen
-import com.google.firebase.auth.FirebaseAuth
-
+import kotlinx.coroutines.launch
 
 /**
  * @brief Configura y muestra el [NavHost] principal que gestiona la navegación entre las diferentes pantallas de la aplicación.
  *
- * @details Utiliza [rememberNavController] para obtener o crear el controlador de navegación si no se proporciona uno externamente.
- * Define, mediante la función `composable`, la asociación entre cada ruta definida en [Screen]
- * (e.g., `Screen.Launch.route`) y el [Composable] de pantalla correspondiente (e.g., `LaunchScreen`).
- * La pantalla inicial del grafo se establece en [Screen.Launch]. El `navController` se pasa
- * a cada pantalla hija para permitirles iniciar acciones de navegación.
+ * @details
+ * - Utiliza [rememberNavController] para obtener o crear el controlador de navegación si no se proporciona uno externamente.
+ * - Añade un flujo de onboarding basado en Lottie + Pager Compose, que se muestra sólo la primera vez.
+ * - Define, mediante la función `composable`, la asociación entre cada ruta definida en [Screen]
+ *   (e.g., `Screen.Launch.route`) y el [Composable] de pantalla correspondiente (e.g., `LaunchScreen`).
+ * - La pantalla inicial del grafo se calcula dinámicamente según la preferencia almacenada
+ *   que indica si el usuario ya vio el onboarding.
  *
  * @param navController El [NavHostController] que gestionará la navegación dentro de este grafo.
- * Si no se proporciona uno, se creará y recordará uno automáticamente usando [rememberNavController].
+ *                      Si no se proporciona uno, se creará y recordará uno automáticamente usando [rememberNavController].
  */
 @Composable
-fun AppNavGraph(navController: NavHostController = rememberNavController()) {
-    // NavHost es el contenedor que intercambia los Composables según la ruta actual.
+fun AppNavGraph(
+    navController: NavHostController = rememberNavController()
+) {
+    // 1) Obtiene el contexto y la instancia de preferencias de onboarding
+    val context = LocalContext.current
+    val prefs = remember { OnboardingPreferences(context) }
+
+    // 2) Observa si el usuario ya completó el onboarding (default = false)
+    val hasSeenOnboarding by prefs.hasSeenOnboarding.collectAsState(initial = false)
+
+    // 3) Decide la pantalla inicial: Onboarding o Launch según la preferencia
+    val startDestination = if (hasSeenOnboarding) {
+        Screen.Launch.route
+    } else {
+        Screen.Onboarding.route
+    }
+
+    // 4) Define el NavHost con todas las rutas
     NavHost(
-        navController = navController, // El controlador que gestiona la pila de backstack
-        startDestination = Screen.Launch.route // La ruta de la pantalla inicial
+        navController = navController,
+        startDestination = startDestination
     ) {
-        // Define cada destino del grafo de navegación:
-        // Asocia la ruta "launch" con el Composable LaunchScreen
-        composable(Screen.Launch.route)      { LaunchScreen(navController) }
-        // Asocia la ruta "sign_in" con el Composable SignInScreen
-        composable(Screen.SignIn.route)      { SignInScreen(navController) }
-        // Asocia la ruta "sign_up" con el Composable SignUpScreen
-        composable(Screen.SignUp.route)      { SignUpScreen(navController) }
-        // Asocia la ruta "verify_email" con el Composable VerifyEmailScreen
-        composable(Screen.VerifyEmail.route) { VerifyEmailScreen(navController) }
-        // Asocia la ruta "forgot_pass" con el Composable ForgotPasswordScreen
-        composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
-        // Asocia la ruta "main" con el Composable MainScreen (que probablemente contiene su propio NavHost o Pager)
-        composable(Screen.Main.route) {
-            MainScreen(rootNav = navController) // <- parámetro corregido
+        // --- Onboarding ---
+        /**
+         * Ruta "onboarding": flujo de pantallas de introducción con animaciones Lottie y Pager Compose.
+         * Al completarse, marca la preferencia y navega a LaunchScreen limpiando el backstack.
+         */
+        composable(Screen.Onboarding.route) {
+            // a) Define las páginas de onboarding
+            val pages = listOf(
+                OnboardingPage(
+                    titleRes     = R.string.onb_title_1,
+                    descRes      = R.string.onb_desc_1,
+                    lottieRawRes = R.raw.anim_health
+                ),
+                OnboardingPage(
+                    titleRes     = R.string.onb_title_2,
+                    descRes      = R.string.onb_desc_2,
+                    lottieRawRes = R.raw.anim_habit
+                ),
+                OnboardingPage(
+                    titleRes     = R.string.onb_title_3,
+                    descRes      = R.string.onb_desc_3,
+                    lottieRawRes = R.raw.anim_stats
+                )
+            )
+
+            // b) Bandera para disparar el efecto de persistencia y navegación
+            var onboardingFinished by remember { mutableStateOf(false) }
+
+            // c) Lanza la UI de Onboarding; al completar, sube la bandera
+            OnboardingScreen(
+                pages = pages,
+                onComplete = { onboardingFinished = true }
+            )
+
+            // d) Una vez completado (bandera = true), guarda la preferencia y navega
+            if (onboardingFinished) {
+                LaunchedEffect(Unit) {
+                    prefs.setSeenOnboarding(true)
+                    navController.navigate(Screen.Launch.route) {
+                        popUpTo(Screen.Onboarding.route) { inclusive = true }
+                    }
+                }
+            }
         }
 
+        // --- Launch / SplashScreen ---
+        /**
+         * Ruta "launch": pantalla de entrada que puede redirigir a SignIn o al flujo principal.
+         */
+        composable(Screen.Launch.route) {
+            LaunchScreen(navController)
+        }
 
+        // --- Autenticación ---
+        composable(Screen.SignIn.route)      { SignInScreen(navController) }
+        composable(Screen.SignUp.route)      { SignUpScreen(navController) }
+        composable(Screen.VerifyEmail.route) { VerifyEmailScreen(navController) }
+        composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
 
+        // --- Pantalla principal (post-login) ---
+        /**
+         * Ruta "main": contiene el flujo principal de la app tras autenticarse.
+         */
+        composable(Screen.Main.route) {
+            MainScreen(rootNav = navController)
+        }
 
-        // Aquí se podrían añadir más destinos (pantallas) a medida que la aplicación crezca.
-        // Por ejemplo:
-        // composable(Screen.ProfileEdit.route) { EditProfileScreen(navController) }
-        // composable("details/{itemId}") { backStackEntry ->
-        //     val itemId = backStackEntry.arguments?.getString("itemId")
-        //     DetailsScreen(navController, itemId)
-        // }
-
-
-        //Direcciona a la pantalla de norificaciones
-        composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }
-        //Direcciona a la pantalla de editar perfil
+        // --- Otras pantallas de configuración y perfil ---
+        composable(Screen.NotificationSettings.route) {
+            ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() })
+        }
         composable(Screen.EditPersonal.route) {
             EditProfileScreen(navController)
         }
-        //Direcciona a la pantalla de cambiar contraseña
         composable("changePassword") {
             ChangePasswordScreenPreviewOnly(navController = navController)
         }
-
         composable("delete_account/{isGoogleUser}") { backStackEntry ->
-            val isGoogleUserArg = backStackEntry.arguments?.getString("isGoogleUser")?.toBooleanStrictOrNull() ?: false
+            val isGoogleUserArg = backStackEntry
+                .arguments
+                ?.getString("isGoogleUser")
+                ?.toBooleanStrictOrNull()
+                ?: false
 
             DeleteAccountScreen(
                 navController = navController,
-                isGoogleUser = isGoogleUserArg
+                isGoogleUser   = isGoogleUserArg
             )
         }
     }
