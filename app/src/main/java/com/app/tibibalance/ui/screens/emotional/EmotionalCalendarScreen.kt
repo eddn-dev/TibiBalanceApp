@@ -62,6 +62,8 @@ fun EmotionalCalendarScreen(
             when (ev) {
                 is EmotionalEvent.RegisterClicked ->
                     showModalFor = ev.date
+
+                is EmotionalEvent.ErrorOccurred -> TODO()
             }
         }
     }

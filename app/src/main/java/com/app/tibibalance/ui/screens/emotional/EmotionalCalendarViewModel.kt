@@ -17,10 +17,6 @@ import javax.inject.Inject
  * - RegisterClicked: para abrir el modal de registro de fecha.
  * - ErrorOccurred: para notificar un fallo.
  */
-sealed class EmotionalEvent {
-    data class RegisterClicked(val date: LocalDate) : EmotionalEvent()
-    data class ErrorOccurred(val message: String)   : EmotionalEvent()
-}
 
 @HiltViewModel
 class EmotionalCalendarViewModel @Inject constructor(

@@ -27,5 +27,9 @@ object EmotionalUiModule {
                     EmotionRecord(LocalDate.now().withDayOfMonth(5), R.drawable.iconsadimage),
                     EmotionRecord(LocalDate.now().withDayOfMonth(8), R.drawable.iconangryimage)
                 ))
+
+            override suspend fun saveEmotion(record: EmotionRecord) {
+                TODO("Not yet implemented")
+            }
         }
 }
