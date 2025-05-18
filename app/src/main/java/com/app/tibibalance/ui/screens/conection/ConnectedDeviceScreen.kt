@@ -6,14 +6,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.texts.Title
 
 /**
@@ -38,7 +38,11 @@ fun ConnectedDeviceScreen(
             .background(background),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Card(
                 shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFAED3E3)),
@@ -49,19 +53,44 @@ fun ConnectedDeviceScreen(
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Title(
-                        text = if (isConnected)
-                            "Dispositivo Conectado"
-                        else
-                            "No Conectado"
+                        text = if (isConnected) "Dispositivo Conectado" else "No Conectado"
                     )
                 }
             }
 
             Spacer(Modifier.height(24.dp))
 
-            Button(onClick = onRefreshClick) {
-                Text(text = "Refrescar Estado")
-            }
+            PrimaryButton(
+                text = "Refrescar Estado",
+                onClick = onRefreshClick,
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(48.dp)
+            )
         }
     }
+}
+
+/**
+ * @brief Preview de [ConnectedDeviceScreen] mostrando el estado conectado.
+ */
+@Preview(showBackground = true)
+@Composable
+fun ConnectedDeviceScreenPreview_Connected() {
+    ConnectedDeviceScreen(
+        isConnected = true,
+        onRefreshClick = {}
+    )
+}
+
+/**
+ * @brief Preview de [ConnectedDeviceScreen] mostrando el estado no conectado.
+ */
+@Preview(showBackground = true)
+@Composable
+fun ConnectedDeviceScreenPreview_NotConnected() {
+    ConnectedDeviceScreen(
+        isConnected = false,
+        onRefreshClick = {}
+    )
 }
