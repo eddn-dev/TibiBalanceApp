@@ -11,6 +11,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.tibibalance.ui.components.*            // HabitList, EmptyState, Centered…
 import com.app.tibibalance.ui.wizard.createHabit.AddHabitModal
 import com.app.tibibalance.ui.wizard.showHabit.ShowHabitModal
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.unit.dp
+
 
 @Composable
 fun ShowHabitsScreen(
@@ -20,6 +24,7 @@ fun ShowHabitsScreen(
     var showAddModal     by remember { mutableStateOf(false) }
     var showDetailsModal by remember { mutableStateOf(false) }
     var selectedId       by remember { mutableStateOf<String?>(null) }
+    var showHabitsHelp by remember { mutableStateOf(false) }
 
     /* ---------- OBSERVAR STATE DEL VIEWMODEL ---------- */
     val uiState by vm.ui.collectAsState()
@@ -51,12 +56,21 @@ fun ShowHabitsScreen(
             HabitsUiState.Loading -> Centered("Cargando…")
             is HabitsUiState.Error -> Centered(st.msg)
             HabitsUiState.Empty    -> EmptyState(onAdd = vm::onAddClicked)
-            is HabitsUiState.Loaded -> HabitList(
-                habits  = st.data,
-                onCheck = { _, _ -> /* TODO */ },
-                onEdit  = vm::onHabitClicked,   // ← muestra detalles
-                onAdd   = vm::onAddClicked
-            )
+            is HabitsUiState.Loaded -> {
+                Column {
+                    HabitList(
+                        habits  = st.data,
+                        onCheck = { _, _ -> /* TODO */ },
+                        onEdit  = vm::onHabitClicked,   // ← muestra detalles
+                        onAdd   = vm::onAddClicked
+                    )
+                    TextButtonLink(
+                        text = "SABER MÁS ?",
+                        onClick = { showHabitsHelp = true },
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
+            }
         }
     }
 
@@ -70,6 +84,16 @@ fun ShowHabitsScreen(
         ShowHabitModal(
             habitId          = selectedId!!,
             onDismissRequest = { showDetailsModal = false }
+        )
+    }
+
+    if (showHabitsHelp) {
+        ModalHabitsDialog(
+            visible = true,
+            icon = Icons.Default.Info,
+            title = "¿Cómo usar esta sección?",
+            message = "Los hábitos en modo reto se identifican con un 🔥",
+            onDismiss = { showHabitsHelp = false }
         )
     }
 }
