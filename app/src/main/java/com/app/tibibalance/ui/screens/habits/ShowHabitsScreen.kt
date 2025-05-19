@@ -14,7 +14,8 @@ import com.app.tibibalance.ui.wizard.showHabit.ShowHabitModal
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.unit.dp
-
+import com.app.tibibalance.ui.components.dialogs.DialogButton
+import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
 
 @Composable
 fun ShowHabitsScreen(
@@ -88,12 +89,14 @@ fun ShowHabitsScreen(
     }
 
     if (showHabitsHelp) {
-        ModalHabitsDialog(
+        ModalInfoDialog(
             visible = true,
             icon = Icons.Default.Info,
             title = "¿Cómo usar esta sección?",
-            message = "Los hábitos en modo reto se identifican con un 🔥",
-            onDismiss = { showHabitsHelp = false }
+            message = "Aquí puedes ver tus hábitos diarios, tanto de salud como personalizados. Puedes marcarlos como completados y agregar nuevos según lo necesites. Este registro te ayudará a mantener tu progreso y motivación.",
+            primaryButton = DialogButton("Entendido") {
+                showHabitsHelp = false
+            }
         )
     }
 }
