@@ -1,4 +1,4 @@
-package com.app.tibibalance.data.local.mapper
+package com.app.tibibalance.data.mapper
 
 import com.app.tibibalance.ui.screens.emotional.EmotionRecord
 import com.app.tibibalance.ui.screens.emotional.Emotion

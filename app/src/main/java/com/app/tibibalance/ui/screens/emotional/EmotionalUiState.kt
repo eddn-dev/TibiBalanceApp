@@ -54,12 +54,3 @@ sealed interface EmotionalUiState {
     data class Error(val msg: String) : EmotionalUiState
 }
 
-/**
- * Eventos one-shot que el ViewModel emite para la UI.
- * En este caso, solo registramos el clic en un día para abrir el modal.
- */
-sealed class EmotionalEvent {
-    /** Se abrió el modal de registro para la fecha indicada. */
-    data class RegisterClicked(val date: LocalDate) : EmotionalEvent()
-    data class ErrorOccurred(val message: String)   : EmotionalEvent()
-}

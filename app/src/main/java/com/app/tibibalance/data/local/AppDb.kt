@@ -26,7 +26,7 @@ import com.app.tibibalance.data.local.mapper.NotifConverters
         HabitActivityEntity::class ,     // 🆕 registra ALERT/COMPLETED/SKIPPED
         EmotionEntity::class
     ],
-    version = 5,                  // 🆕  incrementa al añadir entidad nueva
+    version = 6,                  // 🆕  incrementa al añadir entidad nueva
     exportSchema = true
 )
 @TypeConverters(

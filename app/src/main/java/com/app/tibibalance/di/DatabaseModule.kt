@@ -52,4 +52,9 @@ object DatabaseModule {
 
     /** @brief Provee el DAO que registra cada ALERT/COMPLETED/SKIPPED de un hábito. */ // 🆕
     @Provides fun provideHabitActivityDao(db: AppDb): HabitActivityDao = db.habitActivityDao() // 🆕
+
+    /** @brief Provee el DAO para el registro de emociones diarias. */
+    @Provides
+    fun provideEmotionDao(db: AppDb): EmotionDao = db.emotionDao()
+
 }
