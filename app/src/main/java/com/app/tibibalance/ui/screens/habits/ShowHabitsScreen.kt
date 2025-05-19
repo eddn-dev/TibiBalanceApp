@@ -93,7 +93,7 @@ fun ShowHabitsScreen(
             visible = true,
             icon = Icons.Default.Info,
             title = "¿Cómo usar esta sección?",
-            message = "Aquí puedes ver tus hábitos diarios, tanto de salud como personalizados. Puedes marcarlos como completados y agregar nuevos según lo necesites. Este registro te ayudará a mantener tu progreso y motivación.",
+            message = "Los hábitos en modo reto se identifican con un \uD83D\uDD25",
             primaryButton = DialogButton("Entendido") {
                 showHabitsHelp = false
             }
