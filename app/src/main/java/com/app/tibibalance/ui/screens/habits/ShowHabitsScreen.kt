@@ -16,6 +16,9 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.ui.components.dialogs.DialogButton
 import com.app.tibibalance.ui.components.dialogs.ModalInfoDialog
+import androidx.compose.ui.Alignment
+
+
 
 @Composable
 fun ShowHabitsScreen(
@@ -58,17 +61,29 @@ fun ShowHabitsScreen(
             is HabitsUiState.Error -> Centered(st.msg)
             HabitsUiState.Empty    -> EmptyState(onAdd = vm::onAddClicked)
             is HabitsUiState.Loaded -> {
-                Column {
-                    HabitList(
-                        habits  = st.data,
-                        onCheck = { _, _ -> /* TODO */ },
-                        onEdit  = vm::onHabitClicked,   // ← muestra detalles
-                        onAdd   = vm::onAddClicked
-                    )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Contenido scrollable principal
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 80.dp), // para que no tape el botón flotante
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        HabitList(
+                            habits = st.data,
+                            onCheck = { _, _ -> /* TODO */ },
+                            onEdit = vm::onHabitClicked,
+                            onAdd = vm::onAddClicked
+                        )
+                    }
+
+                    // Botón flotante abajo
                     TextButtonLink(
                         text = "SABER MÁS ?",
                         onClick = { showHabitsHelp = true },
-                        modifier = Modifier.padding(top = 16.dp)
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
                     )
                 }
             }
