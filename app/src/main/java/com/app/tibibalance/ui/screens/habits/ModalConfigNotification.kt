@@ -206,7 +206,7 @@ fun ModalConfigNotification(
                 }
             )
 
-            if (mode == NotifMode.SOUND) {
+            /*if (mode == NotifMode.SOUND) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -214,13 +214,13 @@ fun ModalConfigNotification(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Vibrar", style = MaterialTheme.typography.bodyMedium)
+                    Text("Sonido", style = MaterialTheme.typography.bodyMedium)
                     SwitchToggle(
                         checked = vibrate,
                         onCheckedChange = { vibrate = it }
                     )
                 }
-            }
+            }*/
 
 
             //Spacer(Modifier.height(8.dp))

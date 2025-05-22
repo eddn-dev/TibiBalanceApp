@@ -35,6 +35,7 @@
  */
 package com.app.tibibalance.ui.screens.home
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -49,12 +50,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.R
+import com.app.tibibalance.domain.model.RepeatPreset
 import com.app.tibibalance.ui.components.* // Importa componentes base como ImageContainer
+import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.containers.AchievementContainer // Import específico
 import com.app.tibibalance.ui.components.containers.HabitContainer // Import específico
 import com.app.tibibalance.ui.components.texts.Description
 import com.app.tibibalance.ui.components.texts.Title
+
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.window.DialogProperties
 
 /**
  * @brief Composable que define la interfaz de usuario para la pantalla principal (Home).
@@ -72,6 +82,8 @@ fun HomeScreen() {
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFF3EA8FE).copy(alpha = .25f), Color.White)
     )
+
+    var showModal by remember { mutableStateOf(false) }
 
     // Contenedor principal que ocupa toda la pantalla y aplica el fondo.
     Box(
@@ -263,6 +275,83 @@ fun HomeScreen() {
                 )
                 // Aquí se añadirían más HabitContainer si hubiera más actividades.
             }
+
+
+
+
+
+
+            PrimaryButton(
+                text = "MostrarModal",
+                onClick = {showModal = true},
+                container = Color(0xFF4285F4),
+                modifier = Modifier.weight(1f)
+            )
+
         } // Fin Column principal scrollable
+        if (showModal) {
+            val dummyCharts = listOf<@Composable () -> Unit>(
+                {
+                    Canvas(Modifier.fillMaxSize().background(Color(0xFF3EA8FE))) {
+                        drawCircle(Color.White, style = Stroke(8f))
+                    }
+                },
+                {
+                    Canvas(Modifier.fillMaxSize().background(Color(0xFFFE3E3E))) {
+                        drawLine(
+                            Color.White,
+                            start = center.copy(x = 0f, y = size.height),
+                            end = center.copy(x = size.width, y = 0f),
+                            strokeWidth = 8f
+                        )
+                    }
+                },
+                {
+                    Canvas(Modifier.fillMaxSize().background(Color(0xFF3EDE3E))) {
+                        drawRect(Color.White, style = Stroke(8f))
+                    }
+                }
+            )
+
+            ModalWithTabs(
+                onDismissRequest = { showModal = false },
+                //properties = DialogProperties(usePlatformDefaultWidth = false),
+                tabs = listOf(
+                    ModalTabItem("Semanal") {
+                        StatsTabContent(
+                            graphTitle = "Resumen semanal",
+                            charts = dummyCharts,
+                            //graphContent = { Spacer(modifier = Modifier.height(180.dp)) },// Altura simulada del gráfico},
+                            statsLabel = "Estadísticas semanales",
+                            stepsValue = "7,120",
+                            caloriesValue = "1,800",
+                            exerciseValue = "120 min",
+                            emotionLabel = "Feliz",
+                            highlightedHabitName = "Caminar diario",
+                            highlightedHabitNote = "Llevas 5 dias cumpliendolo",
+                            habitIconName = "Book"
+                            //highlightedHabitIcon = { iconByName("walking") }
+                        )
+                    },
+                    ModalTabItem("Mensual") {
+                        StatsTabContent(
+                            graphTitle = "Resumen mensual",
+                            //graphContent = { /* futura gráfica */ },
+                            charts = dummyCharts,
+                            statsLabel = "Estadísticas mensuales",
+                            stepsValue = "28,430",
+                            caloriesValue = "7,200",
+                            exerciseValue = "480 min",
+                            emotionLabel = "Motivado",
+                            highlightedHabitName = "Yoga",
+                            highlightedHabitNote = "26 dias de cumplimiento",
+                            habitIconName = "Book"
+                            //highlightedHabitIcon = { iconByName("yoga") }
+                        )
+                    }
+                )
+            )
+        }
+
     } // Fin Box principal
 }

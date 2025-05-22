@@ -27,6 +27,7 @@
  */
 package com.app.tibibalance.ui.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -44,14 +45,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.app.tibibalance.ui.components.buttons.PrimaryButton // Para preview
 import com.app.tibibalance.ui.components.texts.Description // Para preview
-import com.app.tibibalance.ui.components.texts.Title // Para preview
+import com.app.tibibalance.ui.components.texts.Title
+import com.app.tibibalance.ui.components.GraphsSlider
+import com.app.tibibalance.ui.components.buttons.IconButton
+import com.app.tibibalance.ui.components.inputs.iconByName
+import com.app.tibibalance.ui.components.texts.Subtitle
 import kotlinx.coroutines.CoroutineScope // Import necesario
 import kotlinx.coroutines.launch
 
@@ -103,12 +110,12 @@ fun ModalWithTabs(
     tabs: List<ModalTabItem>,
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(16.dp),
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = Color(0xFFDDEDF3),
     contentColor: Color = contentColorFor(containerColor),
     properties: DialogProperties = DialogProperties(),
     closeButtonEnabled: Boolean = true,
     initialTabIndex: Int = 0,
-    selectedTabColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    selectedTabColor: Color = Color(0xFFBBDEFB),
     unselectedTabColor: Color = containerColor,
     selectedTextColor: Color = contentColorFor(selectedTabColor),
     unselectedTextColor: Color = contentColorFor(unselectedTabColor).copy(alpha = 0.7f)
@@ -126,7 +133,7 @@ fun ModalWithTabs(
     // Usa ModalContainer como base para la estructura del diálogo
     ModalContainer(
         onDismissRequest = onDismissRequest,
-        modifier = modifier, // Pasa el modificador
+        modifier = modifier.then(Modifier.fillMaxWidth()), // Pasa el modificador
         shape = shape,
         containerColor = containerColor,
         contentColor = contentColor,
@@ -163,7 +170,7 @@ fun ModalWithTabs(
                             // Cambia el fondo según si está seleccionada
                             .background(if (selected) selectedTabColor else unselectedTabColor)
                             // Padding interno de la pestaña
-                            .padding(vertical = 4.dp, horizontal = 12.dp),
+                            .padding(vertical = 2.dp, horizontal = 12.dp),
                         // Contenido de la pestaña (el texto)
                         text = {
                             Text(
@@ -188,9 +195,9 @@ fun ModalWithTabs(
             ) { pageIndex -> // Lambda que define el contenido de cada página
                 // Contenedor para el contenido de la página actual
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize() // Ocupa el espacio del Pager
-                        .padding(16.dp), // Padding para el contenido interno
+                    modifier = Modifier,
+                        //.fillMaxSize(), // Ocupa el espacio del Pager
+                        //.padding(16.dp), // Padding para el contenido interno
                     contentAlignment = Alignment.TopStart // Alineación por defecto del contenido
                 ) {
                     // Renderiza el Composable asociado a la pestaña/página actual
@@ -202,9 +209,216 @@ fun ModalWithTabs(
 }
 
 
+
+@Composable
+fun StatsTabContent(
+    graphTitle: String,
+    charts: List<@Composable () -> Unit>,
+    //graphContent: @Composable () -> Unit,
+    statsLabel: String,
+    stepsValue: String,
+    caloriesValue: String,
+    exerciseValue: String,
+    emotionLabel: String,
+    highlightedHabitName: String,
+    highlightedHabitNote: String,
+    habitIconName: String
+    //highlightedHabitIcon: Int // <- agregamos este parámetro
+) {
+    Column(
+        //horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+
+
+        /***************************************************************************************************/
+
+        MaterialTheme {
+            GraphsSlider(
+                charts = charts,
+                pageHeight = 180.dp,
+                thumbSize  = 50.dp,
+                spacing    = 8.dp
+            )
+        }
+
+
+        //graphContent()
+        /***************************************************************************************************/
+        /*Text(
+            text = graphTitle,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )*/
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        //graphContent()
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        FormContainer(
+            backgroundColor = Color(0xFFD9D9D9),
+            modifier = Modifier
+                .fillMaxWidth()
+                //.padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = statsLabel,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FormContainer(
+                        backgroundColor = Color(0xFF95D0BA),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(75.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = exerciseValue, fontWeight = FontWeight.Bold)
+                            Text(text = "Ejercicio", fontSize = 12.sp)
+                        }
+                    }
+
+                    FormContainer(
+                        backgroundColor = Color(0xFFF7B074),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(75.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = caloriesValue, fontWeight = FontWeight.Bold)
+                            Text(text = "Calorías", fontSize = 12.sp)
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FormContainer(
+                        backgroundColor = Color(0xFFEEC86F),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(75.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = stepsValue, fontWeight = FontWeight.Bold)
+                            Text(text = "Pasos", fontSize = 12.sp)
+                        }
+                    }
+
+                    FormContainer(
+                        backgroundColor = Color(0xFF95B5C6),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(75.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = emotionLabel, fontWeight = FontWeight.Bold)
+                            Text(text = "Emoción dominante", fontSize = 12.sp)
+                        }
+                    }
+                }
+            }
+        }
+
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Subtitle(
+            text = "Hábito destacado",
+            modifier = Modifier,
+            textAlign = TextAlign.Start
+        )
+
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+
+        FormContainer(
+            backgroundColor = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 15.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                )
+                {
+                    IconContainer(
+                        icon = iconByName(habitIconName),
+                        contentDescription = "prueba",
+                        modifier = Modifier.size(38.dp)
+                    )
+                    Text(
+                        text = highlightedHabitName,
+                        maxLines = 2,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                }
+
+            }
+        }
+
+
+
+
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = highlightedHabitNote,
+            //fontSize = 12.sp,
+            color = Color.DarkGray
+        )
+
+    }
+}
+
+
+
+
+
 // --- Preview para ModalWithTabs con Espacio para Botón ---
 @OptIn(ExperimentalFoundationApi::class)
-@Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)")
+@Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)", heightDp = 600)
 @Composable
 private fun ModalWithTabsPreview() {
     MaterialTheme {
@@ -220,7 +434,43 @@ private fun ModalWithTabsPreview() {
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(20.dp))
-                        PrimaryButton(text = "Ver Semana", onClick = {})
+                        val dummyCharts = listOf<@Composable () -> Unit>(
+                            {
+                                Canvas(Modifier.fillMaxSize().background(Color(0xFF3EA8FE))) {
+                                    drawCircle(Color.White, style = Stroke(8f))
+                                }
+                            },
+                            {
+                                Canvas(Modifier.fillMaxSize().background(Color(0xFFFE3E3E))) {
+                                    drawLine(
+                                        Color.White,
+                                        start = center.copy(x = 0f, y = size.height),
+                                        end = center.copy(x = size.width, y = 0f),
+                                        strokeWidth = 8f
+                                    )
+                                }
+                            },
+                            {
+                                Canvas(Modifier.fillMaxSize().background(Color(0xFF3EDE3E))) {
+                                    drawRect(Color.White, style = Stroke(8f))
+                                }
+                            }
+                        )
+                        MaterialTheme {
+                            GraphsSlider(
+                                charts = dummyCharts,
+                                pageHeight = 180.dp,
+                                thumbSize  = 50.dp,
+                                spacing    = 8.dp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+
+
+
+
+
+                        //PrimaryButton(text = "Ver Semana", onClick = {})
                     }
                 },
                 ModalTabItem("Mensual") {
