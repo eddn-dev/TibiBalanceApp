@@ -9,6 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.app.tibibalance.data.repository.HabitTemplateRepository
+import com.app.tibibalance.data.repository.MetricsRepository
+import com.app.tibibalance.domain.model.DailyMetrics
 import com.app.tibibalance.ui.navigation.AppNavGraph
 import com.app.tibibalance.ui.theme.TibiBalanceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +38,7 @@ import java.time.ZoneId
  * @details
  * - Inicializa Hilt para inyección de dependencias.
  * - Configura Health Connect para lectura de datos de salud (pasos, calorías, ejercicio, frecuencia cardíaca).
+ * - Lee y guarda las métricas diarias en la base de datos Room.
  * - Carga la navegación de la app con Jetpack Compose.
  *
  * @author
@@ -46,6 +49,10 @@ class MainActivity : ComponentActivity() {
     /// Repositorio de plantillas de hábito inyectado por Hilt.
     @Inject
     lateinit var templateRepo: HabitTemplateRepository
+
+    /// Repositorio de métricas inyectado por Hilt.
+    @Inject
+    lateinit var metricsRepository: MetricsRepository
 
     /// Launcher para solicitar múltiples permisos en tiempo de ejecución.
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
@@ -84,10 +91,7 @@ class MainActivity : ComponentActivity() {
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
                 if (result.all { it.value }) {
                     Log.i("HealthConnect", "Permisos concedidos")
-                    readStepData()
-                    readCaloriesExpendedData()
-                    readExerciseSessionData()
-                    readHeartRateData()
+                    fetchAndSaveDailyMetrics()
                 } else {
                     Log.w("HealthConnect", "Permisos denegados: $result")
                 }
@@ -111,14 +115,15 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * @brief Lee y suma los registros de pasos del día.
+     * @brief Lee todas las métricas diarias (pasos, calorías activas, minutos de ejercicio,
+     *        frecuencia cardíaca promedio) y las guarda en la base de datos.
      *
-     * - Crea un ReadRecordsRequest<StepsRecord> con rango de hoy.
-     * - Llama a healthConnectClient.readRecords().
-     * - Suma `record.count` de cada registro.
-     * - Loggea el total de pasos.
+     * - Crea un ReadRecordsRequest para cada tipo de registro con rango de hoy.
+     * - Suma o procesa los datos según corresponda.
+     * - Construye un objeto DailyMetrics.
+     * - Llama a MetricsRepository.saveMetrics() para persistir los datos.
      */
-    private fun readStepData() {
+    private fun fetchAndSaveDailyMetrics() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val now = Instant.now()
@@ -127,122 +132,60 @@ class MainActivity : ComponentActivity() {
                     .atZone(ZoneId.systemDefault())
                     .toInstant()
 
-                val request = ReadRecordsRequest<StepsRecord>(
+                // --- Lectura de pasos ---
+                val stepsRequest = ReadRecordsRequest<StepsRecord>(
                     StepsRecord::class,
                     TimeRangeFilter.between(startOfDay, now)
                 )
+                val stepsResponse = healthConnectClient.readRecords(stepsRequest)
+                val totalSteps = stepsResponse.records.sumOf { it.count }
 
-                val response = healthConnectClient.readRecords(request)
-                var totalSteps = 0L
-                for (record in response.records) {
-                    totalSteps += record.count
-                }
-                Log.i("HealthConnect", "Total de pasos del día: $totalSteps")
-            } catch (e: Exception) {
-                Log.e("HealthConnect", "Error al leer los pasos", e)
-            }
-        }
-    }
-
-    /**
-     * @brief Lee y suma las calorías activas quemadas del día.
-     *
-     * - Utiliza ActiveCaloriesBurnedRecord.
-     * - Suma `record.energy.inCalories`.
-     * - Loggea el total de calorías.
-     */
-    private fun readCaloriesExpendedData() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val now = Instant.now()
-                val startOfDay = LocalDateTime
-                    .of(LocalDateTime.now().toLocalDate(), LocalTime.MIN)
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()
-
-                val request = ReadRecordsRequest<ActiveCaloriesBurnedRecord>(
+                // --- Lectura de calorías activas ---
+                val caloriesRequest = ReadRecordsRequest<ActiveCaloriesBurnedRecord>(
                     ActiveCaloriesBurnedRecord::class,
                     TimeRangeFilter.between(startOfDay, now)
                 )
+                val caloriesResponse = healthConnectClient.readRecords(caloriesRequest)
+                val totalCalories = caloriesResponse.records.sumOf { it.energy.inCalories }
 
-                val response = healthConnectClient.readRecords(request)
-                var totalCalories = 0.0
-                for (record in response.records) {
-                    totalCalories += record.energy.inCalories
-                }
-                Log.i("HealthConnect", "Calorías activas quemadas hoy: $totalCalories")
-            } catch (e: Exception) {
-                Log.e("HealthConnect", "Error al leer calorías quemadas", e)
-            }
-        }
-    }
-
-    /**
-     * @brief Lee la duración total de sesiones de ejercicio del día en minutos.
-     *
-     * - Usa ExerciseSessionRecord.
-     * - Resta endTime - startTime y convierte a minutos.
-     * - Loggea el total de minutos.
-     */
-    private fun readExerciseSessionData() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val now = Instant.now()
-                val startOfDay = LocalDateTime
-                    .of(LocalDateTime.now().toLocalDate(), LocalTime.MIN)
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()
-
-                val request = ReadRecordsRequest<ExerciseSessionRecord>(
+                // --- Lectura de ejercicio ---
+                val exerciseRequest = ReadRecordsRequest<ExerciseSessionRecord>(
                     ExerciseSessionRecord::class,
                     TimeRangeFilter.between(startOfDay, now)
                 )
+                val exerciseResponse = healthConnectClient.readRecords(exerciseRequest)
+                val totalMinutes = exerciseResponse.records
+                    .sumOf { record ->
+                        val durationMs = record.endTime.toEpochMilli() - record.startTime.toEpochMilli()
+                        durationMs / (1000 * 60)
+                    }
 
-                val response = healthConnectClient.readRecords(request)
-                var totalMinutes = 0L
-                for (record in response.records) {
-                    val durationMs = record.endTime.toEpochMilli() - record.startTime.toEpochMilli()
-                    totalMinutes += durationMs / (1000 * 60)
-                }
-                Log.i("HealthConnect", "Minutos de ejercicio hoy: $totalMinutes")
-            } catch (e: Exception) {
-                Log.e("HealthConnect", "Error al leer ejercicio", e)
-            }
-        }
-    }
-
-    /**
-     * @brief Calcula la frecuencia cardíaca promedio del día.
-     *
-     * - Usa HeartRateRecord.
-     * - Extrae todos los samples y sus `beatsPerMinute`.
-     * - Calcula el promedio y lo loggea.
-     */
-    private fun readHeartRateData() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val now = Instant.now()
-                val startOfDay = LocalDateTime
-                    .of(LocalDateTime.now().toLocalDate(), LocalTime.MIN)
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()
-
-                val request = ReadRecordsRequest<HeartRateRecord>(
+                // --- Lectura de frecuencia cardíaca ---
+                val hrRequest = ReadRecordsRequest<HeartRateRecord>(
                     HeartRateRecord::class,
                     TimeRangeFilter.between(startOfDay, now)
                 )
-
-                val response = healthConnectClient.readRecords(request)
-                val heartRates = response.records
+                val hrResponse = healthConnectClient.readRecords(hrRequest)
+                val allBeats = hrResponse.records
                     .flatMap { it.samples }
                     .map { it.beatsPerMinute }
+                val avgHeartRate = if (allBeats.isNotEmpty()) allBeats.average() else null
 
-                if (heartRates.isNotEmpty()) {
-                    val avg = heartRates.average()
-                    Log.i("HealthConnect", "Frecuencia cardíaca promedio hoy: $avg")
-                }
+                // --- Construcción del modelo y guardado ---
+                val today = LocalDateTime.now().toLocalDate().toString()
+                val daily = DailyMetrics(
+                    date = today,
+                    steps = totalSteps,
+                    activeCalories = totalCalories,
+                    exerciseMinutes = totalMinutes,
+                    avgHeartRate = avgHeartRate
+                )
+
+                metricsRepository.saveMetrics(daily)
+                Log.i("HealthConnect", "Métricas diarias guardadas: $daily")
+
             } catch (e: Exception) {
-                Log.e("HealthConnect", "Error al leer frecuencia cardíaca", e)
+                Log.e("HealthConnect", "Error al leer o guardar métricas", e)
             }
         }
     }

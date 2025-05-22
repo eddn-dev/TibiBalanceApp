@@ -1,12 +1,11 @@
-// ui/navigation/AppNavGraph.kt
+// src/main/java/com/app/tibibalance/ui/navigation/AppNavGraph.kt
 package com.app.tibibalance.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController // Usar NavHostController específicamente
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-// Importar todas las pantallas referenciadas
 import com.app.tibibalance.ui.screens.auth.ForgotPasswordScreen
 import com.app.tibibalance.ui.screens.auth.SignInScreen
 import com.app.tibibalance.ui.screens.auth.SignUpScreen
@@ -19,75 +18,79 @@ import com.app.tibibalance.ui.screens.settings.ChangePasswordScreenPreviewOnly
 import com.app.tibibalance.ui.screens.settings.DeleteAccountScreen
 import com.app.tibibalance.ui.screens.conection.ConnectedDeviceRoute
 
-
 /**
- * @brief Configura y muestra el [NavHost] principal que gestiona la navegación entre las diferentes pantallas de la aplicación.
+ * @file AppNavGraph.kt
+ * @brief Define el grafo de navegación principal de la aplicación TibiBalance.
  *
- * @details Utiliza [rememberNavController] para obtener o crear el controlador de navegación si no se proporciona uno externamente.
- * Define, mediante la función `composable`, la asociación entre cada ruta definida en [Screen]
- * (e.g., `Screen.Launch.route`) y el [Composable] de pantalla correspondiente (e.g., `LaunchScreen`).
- * La pantalla inicial del grafo se establece en [Screen.Launch]. El `navController` se pasa
- * a cada pantalla hija para permitirles iniciar acciones de navegación.
- *
- * @param navController El [NavHostController] que gestionará la navegación dentro de este grafo.
- * Si no se proporciona uno, se creará y recordará uno automáticamente usando [rememberNavController].
+ * @details
+ * - Utiliza NavHost para gestionar las rutas declaradas en Screen.
+ * - Cada ruta se asocia a su Composable correspondiente.
+ * - La ruta inicial es Screen.Launch.
+ * - Se incluye la pantalla de gestión de dispositivos Wear OS bajo Screen.ManageDevices.
  */
 @Composable
-fun AppNavGraph(navController: NavHostController = rememberNavController()) {
-    // NavHost es el contenedor que intercambia los Composables según la ruta actual.
+fun AppNavGraph(
+    navController: NavHostController = rememberNavController()
+) {
     NavHost(
-        navController = navController, // El controlador que gestiona la pila de backstack
-        startDestination = Screen.Launch.route // La ruta de la pantalla inicial
+        navController = navController,
+        startDestination = Screen.Launch.route
     ) {
-        // Define cada destino del grafo de navegación:
-        // Asocia la ruta "launch" con el Composable LaunchScreen
-        composable(Screen.Launch.route)      { LaunchScreen(navController) }
-        // Asocia la ruta "sign_in" con el Composable SignInScreen
-        composable(Screen.SignIn.route)      { SignInScreen(navController) }
-        // Asocia la ruta "sign_up" con el Composable SignUpScreen
-        composable(Screen.SignUp.route)      { SignUpScreen(navController) }
-        // Asocia la ruta "verify_email" con el Composable VerifyEmailScreen
-        composable(Screen.VerifyEmail.route) { VerifyEmailScreen(navController) }
-        // Asocia la ruta "forgot_pass" con el Composable ForgotPasswordScreen
-        composable(Screen.Forgot.route)      { ForgotPasswordScreen(navController) }
-        // Asocia la ruta "main" con el Composable MainScreen (que probablemente contiene su propio NavHost o Pager)
+        // Pantalla de lanzamiento / splash
+        composable(Screen.Launch.route) {
+            LaunchScreen(navController)
+        }
+
+        // Autenticación
+        composable(Screen.SignIn.route) {
+            SignInScreen(navController)
+        }
+        composable(Screen.SignUp.route) {
+            SignUpScreen(navController)
+        }
+        composable(Screen.VerifyEmail.route) {
+            VerifyEmailScreen(navController)
+        }
+        composable(Screen.Forgot.route) {
+            ForgotPasswordScreen(navController)
+        }
+
+        // Pantalla principal de la app (post-login)
         composable(Screen.Main.route) {
-            MainScreen(rootNav = navController) // <- parámetro corregido
+            MainScreen(rootNav = navController)
         }
 
-
-
-
-        // Aquí se podrían añadir más destinos (pantallas) a medida que la aplicación crezca.
-        // Por ejemplo:
-        // composable(Screen.ProfileEdit.route) { EditProfileScreen(navController) }
-        // composable("details/{itemId}") { backStackEntry ->
-        //     val itemId = backStackEntry.arguments?.getString("itemId")
-        //     DetailsScreen(navController, itemId)
-        // }
-
-        //Direcciona a la pantalla de Administrar dispositivos
+        // Administración de dispositivos Wear OS / conexión
         composable(Screen.ManageDevices.route) {
-            ConnectedDeviceRoute(navController = navController)
+            ConnectedDeviceRoute()  // Se elimina el parámetro navController
         }
 
-        //Direcciona a la pantalla de norificaciones
-        composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }
-        //Direcciona a la pantalla de editar perfil
+        // Configuración de notificaciones
+        composable(Screen.NotificationSettings.route) {
+            ConfigureNotificationScreen(
+                onNavigateUp = { navController.popBackStack() }
+            )
+        }
+
+        // Editar perfil personal
         composable(Screen.EditPersonal.route) {
             EditProfileScreen(navController)
         }
-        //Direcciona a la pantalla de cambiar contraseña
+
+        // Cambio de contraseña (vista previa)
         composable("changePassword") {
-            ChangePasswordScreenPreviewOnly(navController = navController)
+            ChangePasswordScreenPreviewOnly(navController)
         }
 
+        // Eliminar cuenta
         composable("delete_account/{isGoogleUser}") { backStackEntry ->
-            val isGoogleUserArg = backStackEntry.arguments?.getString("isGoogleUser")?.toBooleanStrictOrNull() ?: false
+            val isGoogleUser = backStackEntry.arguments
+                ?.getString("isGoogleUser")
+                ?.toBooleanStrictOrNull() ?: false
 
             DeleteAccountScreen(
                 navController = navController,
-                isGoogleUser = isGoogleUserArg
+                isGoogleUser = isGoogleUser
             )
         }
     }

@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation("androidx.compose.foundation:foundation")   // versión la pone tu compose-bom
+    implementation ("com.google.accompanist:accompanist-pager:0.30.1")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.30.1")
 
 
     /* ──────────────── Persistencia local (Room) ──────────────── */

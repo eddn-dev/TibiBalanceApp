@@ -84,4 +84,13 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
+
+    // Wearable Data Layer
+    implementation ("com.google.android.gms:play-services-wearable:19.0.0")
+
+    // Kotlinx Serialization JSON
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // Si tu modelo DailyMetrics está en el módulo app, agrega también:
+    implementation (project(":app"))
 }

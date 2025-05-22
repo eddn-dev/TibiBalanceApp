@@ -27,6 +27,7 @@
  */
 package com.app.tibibalance.ui.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,7 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.app.tibibalance.ui.components.buttons.PrimaryButton // Para preview
 import com.app.tibibalance.ui.components.texts.Description // Para preview
-import com.app.tibibalance.ui.components.texts.Title // Para preview
+import com.app.tibibalance.ui.components.texts.Title
+import com.app.tibibalance.ui.components.GraphsSlider
 import kotlinx.coroutines.CoroutineScope // Import necesario
 import kotlinx.coroutines.launch
 
@@ -163,7 +166,7 @@ fun ModalWithTabs(
                             // Cambia el fondo según si está seleccionada
                             .background(if (selected) selectedTabColor else unselectedTabColor)
                             // Padding interno de la pestaña
-                            .padding(vertical = 4.dp, horizontal = 12.dp),
+                            .padding(vertical = 2.dp, horizontal = 12.dp),
                         // Contenido de la pestaña (el texto)
                         text = {
                             Text(
@@ -204,7 +207,7 @@ fun ModalWithTabs(
 
 // --- Preview para ModalWithTabs con Espacio para Botón ---
 @OptIn(ExperimentalFoundationApi::class)
-@Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)")
+@Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)", heightDp = 600)
 @Composable
 private fun ModalWithTabsPreview() {
     MaterialTheme {
@@ -219,6 +222,37 @@ private fun ModalWithTabsPreview() {
                             text = "Aquí va la información semanal.",
                             textAlign = TextAlign.Center
                         )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        val dummyCharts = listOf<@Composable () -> Unit>(
+                            {
+                                Canvas(Modifier.fillMaxSize().background(Color(0xFF3EA8FE))) {
+                                    drawCircle(Color.White, style = Stroke(8f))
+                                }
+                            },
+                            {
+                                Canvas(Modifier.fillMaxSize().background(Color(0xFFFE3E3E))) {
+                                    drawLine(
+                                        Color.White,
+                                        start = center.copy(x = 0f, y = size.height),
+                                        end = center.copy(x = size.width, y = 0f),
+                                        strokeWidth = 8f
+                                    )
+                                }
+                            },
+                            {
+                                Canvas(Modifier.fillMaxSize().background(Color(0xFF3EDE3E))) {
+                                    drawRect(Color.White, style = Stroke(8f))
+                                }
+                            }
+                        )
+                        MaterialTheme {
+                            GraphsSlider(
+                                charts = dummyCharts,
+                                pageHeight = 180.dp,
+                                thumbSize  = 50.dp,
+                                spacing    = 8.dp
+                            )
+                        }
                         Spacer(modifier = Modifier.height(20.dp))
                         PrimaryButton(text = "Ver Semana", onClick = {})
                     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,16 +16,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.texts.Title
+import com.app.tibibalance.domain.model.DailyMetrics
 
 /**
- * UI pura para mostrar estado de conexión y permitir refrescar.
+ * UI compuesta para mostrar el estado de conexión y las métricas diarias.
  *
- * @param isConnected    Estado booleano de si el dispositivo Wear/Bluetooth está conectado.
- * @param onRefreshClick Callback para volver a comprobar la conexión.
+ * @param metrics Datos de métricas diarias o null si no hay conexión.
+ * @param onRefreshClick Callback para volver a comprobar la conexión y recargar métricas.
  */
 @Composable
 fun ConnectedDeviceScreen(
-    isConnected: Boolean,
+    metrics: DailyMetrics?,
     onRefreshClick: () -> Unit
 ) {
     // Degradado de fondo
@@ -43,18 +45,34 @@ fun ConnectedDeviceScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
+            // Tarjeta de estado y métricas
             Card(
                 shape = MaterialTheme.shapes.medium,
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFAED3E3)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .height(60.dp)
+                    .padding(8.dp)
             ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Estado de conexión
                     Title(
-                        text = if (isConnected) "Dispositivo Conectado" else "No Conectado"
+                        text = if (metrics != null) "Dispositivo Conectado" else "No Conectado"
                     )
+
+                    // Muestra métricas si está conectado
+                    metrics?.let {
+                        Text(text = "Fecha: ${it.date}")
+                        Text(text = "Pasos: ${it.steps}")
+                        Text(text = "Calorías activas: ${it.activeCalories}")
+                        Text(text = "Minutos de ejercicio: ${it.exerciseMinutes}")
+                        Text(text = "Frecuencia cardiaca avg: ${it.avgHeartRate ?: "--"}")
+                    }
                 }
             }
 
@@ -72,25 +90,31 @@ fun ConnectedDeviceScreen(
 }
 
 /**
- * @brief Preview de [ConnectedDeviceScreen] mostrando el estado conectado.
+ * @brief Preview de [ConnectedDeviceScreen] mostrando métricas de ejemplo.
  */
 @Preview(showBackground = true)
 @Composable
 fun ConnectedDeviceScreenPreview_Connected() {
     ConnectedDeviceScreen(
-        isConnected = true,
+        metrics = DailyMetrics(
+            date = "2025-05-21",
+            steps = 1234,
+            activeCalories = 250.0,
+            exerciseMinutes = 30,
+            avgHeartRate = 72.5
+        ),
         onRefreshClick = {}
     )
 }
 
 /**
- * @brief Preview de [ConnectedDeviceScreen] mostrando el estado no conectado.
+ * @brief Preview de [ConnectedDeviceScreen] mostrando estado no conectado.
  */
 @Preview(showBackground = true)
 @Composable
 fun ConnectedDeviceScreenPreview_NotConnected() {
     ConnectedDeviceScreen(
-        isConnected = false,
+        metrics = null,
         onRefreshClick = {}
     )
 }

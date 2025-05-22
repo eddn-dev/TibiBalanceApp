@@ -111,7 +111,7 @@ fun ModalContainer(
                         // Padding interno para el contenido, dejando espacio arriba si hay botón 'X'
                         .padding(
                             top = if (closeButtonEnabled) 40.dp else 16.dp, // Más padding superior si hay botón
-                            start = 16.dp,
+                            start = 10.dp,
                             end = 16.dp,
                             bottom = 16.dp
                         )
