@@ -52,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.buttons.PrimaryButton // Para preview
 import com.app.tibibalance.ui.components.texts.Description // Para preview
 import com.app.tibibalance.ui.components.texts.Title
@@ -222,8 +223,8 @@ fun StatsTabContent(
     emotionLabel: String,
     highlightedHabitName: String,
     highlightedHabitNote: String,
-    habitIconName: String
-    //highlightedHabitIcon: Int // <- agregamos este parámetro
+    habitIconName: String,
+    emotionIconName: String
 ) {
     Column(
         //horizontalAlignment = Alignment.CenterHorizontally,
@@ -259,7 +260,7 @@ fun StatsTabContent(
 
         //graphContent()
 
-        Spacer(modifier = Modifier.height(20.dp))
+       // Spacer(modifier = Modifier.height(20.dp))
 
         FormContainer(
             backgroundColor = Color(0xFFD9D9D9),
@@ -277,80 +278,123 @@ fun StatsTabContent(
                 textAlign = TextAlign.Start
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+           // Spacer(modifier = Modifier.height(2.dp))
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FormContainer(
-                        backgroundColor = Color(0xFF95D0BA),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(75.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = exerciseValue, fontWeight = FontWeight.Bold)
-                            Text(text = "Ejercicio", fontSize = 12.sp)
-                        }
-                    }
 
-                    FormContainer(
-                        backgroundColor = Color(0xFFF7B074),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(75.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                FormContainer(
+                    backgroundColor = Color(0xFF95D0BA),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                ) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = caloriesValue, fontWeight = FontWeight.Bold)
-                            Text(text = "Calorías", fontSize = 12.sp)
+                            ImageContainer(
+                                resId = R.drawable.ic_exercise,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                           // Column {
+                            Text(text = exerciseValue, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = "Ejercicio", fontSize = 12.sp)
+                            //}
                         }
+
+
+                }
+
+                FormContainer(
+                    backgroundColor = Color(0xFFF7B074),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ImageContainer(
+                            resId = R.drawable.ic_fire,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        //Column {
+                        Text(text = caloriesValue, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Calorías", fontSize = 12.sp)
+                       // }
                     }
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FormContainer(
-                        backgroundColor = Color(0xFFEEC86F),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(75.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = stepsValue, fontWeight = FontWeight.Bold)
-                            Text(text = "Pasos", fontSize = 12.sp)
-                        }
-                    }
 
-                    FormContainer(
-                        backgroundColor = Color(0xFF95B5C6),
+                FormContainer(
+                    backgroundColor = Color(0xFFEEC86F),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                ) {
+
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .height(75.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                        ImageContainer(
+                            resId = R.drawable.ic_steps,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                       // Column {
+                        Text(text = stepsValue, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Pasos", fontSize = 12.sp)
+                        //}
+                    }
+                }
+
+                FormContainer(
+                    backgroundColor = Color(0xFF95B5C6),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                ) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ImageContainer(
+                            resId = iconVectorByName(emotionIconName),
+                            contentDescription = null,
+                            modifier = Modifier.size(27.dp)
+                        )
+                        Column {
                             Text(text = emotionLabel, fontWeight = FontWeight.Bold)
                             Text(text = "Emoción dominante", fontSize = 12.sp)
                         }
                     }
+
+
                 }
+
             }
         }
 
@@ -364,7 +408,7 @@ fun StatsTabContent(
         )
 
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
 
         FormContainer(
@@ -386,7 +430,7 @@ fun StatsTabContent(
                     IconContainer(
                         icon = iconByName(habitIconName),
                         contentDescription = "prueba",
-                        modifier = Modifier.size(38.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = highlightedHabitName,
@@ -402,11 +446,12 @@ fun StatsTabContent(
 
 
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = highlightedHabitNote,
-            //fontSize = 12.sp,
-            color = Color.DarkGray
+            color = Color.DarkGray,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
 
     }
@@ -519,5 +564,17 @@ private fun ModalWithTabsPreview() {
             // Muestra un botón para reabrir el diálogo en la preview
             Button(onClick = { visible = true }) { Text("Mostrar Modal con Pestañas") }
         }
+    }
+}
+
+
+fun iconVectorByName(name: String): Int  {
+    return when (name) {
+        "iconangryimage" -> R.drawable.iconangryimage
+        "iconfearimage" -> R.drawable.iconfearimage
+        "icondisgustimage" -> R.drawable.icondisgustimage
+        "iconhappyimage" -> R.drawable.iconhappyimage
+        "iconsadimage" -> R.drawable.iconsadimage
+        else -> R.drawable.iconcalmimage
     }
 }

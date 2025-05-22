@@ -329,7 +329,8 @@ fun HomeScreen() {
                             emotionLabel = "Feliz",
                             highlightedHabitName = "Caminar diario",
                             highlightedHabitNote = "Llevas 5 dias cumpliendolo",
-                            habitIconName = "Book"
+                            habitIconName = "Book",
+                            emotionIconName = "iconangryimage"
                             //highlightedHabitIcon = { iconByName("walking") }
                         )
                     },
@@ -345,7 +346,8 @@ fun HomeScreen() {
                             emotionLabel = "Motivado",
                             highlightedHabitName = "Yoga",
                             highlightedHabitNote = "26 dias de cumplimiento",
-                            habitIconName = "Book"
+                            habitIconName = "Book",
+                            emotionIconName = "iconangryimage"
                             //highlightedHabitIcon = { iconByName("yoga") }
                         )
                     }
