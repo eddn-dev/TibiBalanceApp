@@ -8,8 +8,8 @@ val Blue40 = Color(0xFF0A66D9)   // tono más oscuroal White  = Color(0xFFFFFFF
 val Grey10 = Color(0xFFECECEC)   // superficies suaves (cards)
 val White       = Color(0xFFFFFFFF)
 
-// Colores para modo oscuro
-// Paleta personalizada modo oscuro
+// COLORES PARA MODO OSCURO
+
 val DarkBackground = Color(0xFF121212)     // fondo principal
 val DarkSurface = Color(0xFF1A1A1A)        // tarjetas, contenedores
 val DarkPrimary = Color(0xFF4DA6FF)        // botones, íconos activos

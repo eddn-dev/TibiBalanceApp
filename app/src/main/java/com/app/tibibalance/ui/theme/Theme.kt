@@ -24,6 +24,7 @@ private val AppColorScheme = lightColorScheme(
     outline       = Grey10
 )
 
+//PARA EL MODO OSCURO
 private val DarkColorScheme = darkColorScheme(
     primary       = DarkPrimary,
     onPrimary     = DarkText,
@@ -45,7 +46,7 @@ private val DarkColorScheme = darkColorScheme(
 
 
 
-/* ─── Tema raíz (solo light) ─── */
+/* ─── Tema raíz (solo light) ─── */ (SE MODIFICO EL COMPOSABLE PARA EL MODO OSCURO)
 @Composable
 fun TibiBalanceTheme(
     useDarkTheme: Boolean = true,
