@@ -3,7 +3,7 @@
  * @ingroup di_module
  *
  * @brief   Módulo Hilt que configura y provee la instancia singleton de la base de datos
- *          Room ([AppDb]) y TODOS sus DAOs, incluido el nuevo [HabitActivityDao]. // 🆕
+ *          Room ([AppDb]) y TODOS sus DAOs, incluido el nuevo [HabitActivityDao] y [MetricsDao].
  *
  * @details  Responsabilidades:
  *  • Crear la base de datos con [`Room.databaseBuilder`].
@@ -18,7 +18,11 @@ package com.app.tibibalance.di
 import android.content.Context
 import androidx.room.Room
 import com.app.tibibalance.data.local.AppDb
-import com.app.tibibalance.data.local.dao.*
+import com.app.tibibalance.data.local.dao.HabitActivityDao
+import com.app.tibibalance.data.local.dao.HabitDao
+import com.app.tibibalance.data.local.dao.HabitTemplateDao
+import com.app.tibibalance.data.local.dao.MetricsDao
+import com.app.tibibalance.data.local.dao.ProfileDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,6 +36,13 @@ object DatabaseModule {
 
     /* ────────────── Base de datos ────────────── */
 
+    /**
+     * @brief Construye la instancia singleton de la base de datos Room.
+     * @param ctx Contexto de la aplicación.
+     * @return Instancia de [AppDb].
+     *
+     * ⚠️ Si cambias el esquema sin migrar, se eliminarán los datos existentes.
+     */
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): AppDb =
@@ -40,16 +51,33 @@ object DatabaseModule {
             klass   = AppDb::class.java,
             name    = "tibibalance.db"
         )
-            // ⚠️ OJO: elimina datos si cambias el esquema sin migrar.
             .fallbackToDestructiveMigration()
             .build()
 
     /* ────────────── DAOs ────────────── */
 
-    @Provides fun provideProfileDao      (db: AppDb): ProfileDao       = db.profileDao()
-    @Provides fun provideHabitDao        (db: AppDb): HabitDao         = db.habitDao()
-    @Provides fun provideHabitTemplateDao(db: AppDb): HabitTemplateDao = db.habitTemplateDao()
+    /** @brief DAO para manejar el perfil de usuario. */
+    @Provides
+    fun provideProfileDao(db: AppDb): ProfileDao =
+        db.profileDao()
 
-    /** @brief Provee el DAO que registra cada ALERT/COMPLETED/SKIPPED de un hábito. */ // 🆕
-    @Provides fun provideHabitActivityDao(db: AppDb): HabitActivityDao = db.habitActivityDao() // 🆕
+    /** @brief DAO para gestionar entidades de hábito. */
+    @Provides
+    fun provideHabitDao(db: AppDb): HabitDao =
+        db.habitDao()
+
+    /** @brief DAO para manejar plantillas de hábito. */
+    @Provides
+    fun provideHabitTemplateDao(db: AppDb): HabitTemplateDao =
+        db.habitTemplateDao()
+
+    /** @brief DAO para registrar cada ALERT/COMPLETED/SKIPPED de un hábito. */
+    @Provides
+    fun provideHabitActivityDao(db: AppDb): HabitActivityDao =
+        db.habitActivityDao()
+
+    /** @brief DAO para gestionar las métricas diarias de salud. */
+    @Provides
+    fun provideMetricsDao(db: AppDb): MetricsDao =
+        db.metricsDao()
 }
