@@ -457,10 +457,6 @@ fun StatsTabContent(
     }
 }
 
-
-
-
-
 // --- Preview para ModalWithTabs con Espacio para Botón ---
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)", heightDp = 600)
