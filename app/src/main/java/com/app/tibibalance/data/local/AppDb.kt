@@ -20,7 +20,7 @@ import com.app.tibibalance.data.local.mapper.NotifConverters
         HabitActivityEntity::class,
         MetricsEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 @TypeConverters(

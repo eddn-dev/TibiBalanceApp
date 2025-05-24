@@ -1,7 +1,9 @@
+// src/main/java/com/app/tibibalance/MainActivity.kt
 package com.app.tibibalance
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -36,57 +38,54 @@ import java.time.ZoneId
  * @brief Actividad principal de TibiBalance.
  *
  * @details
- * - Inicializa Hilt para inyección de dependencias.
- * - Configura Health Connect para lectura de datos de salud (pasos, calorías, ejercicio, frecuencia cardíaca).
- * - Lee y guarda las métricas diarias en la base de datos Room.
- * - Carga la navegación de la app con Jetpack Compose.
- *
- * @author
+ * - Configura edge-to-edge.
+ * - Sincroniza plantillas de hábito.
+ * - Inicializa Health Connect (si está instalado), atrapando excepción si no lo está.
+ * - Solicita permisos de Health Connect.
+ * - Lee y guarda métricas diarias.
+ * - Monta el grafo de navegación Compose.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    /// Repositorio de plantillas de hábito inyectado por Hilt.
     @Inject
     lateinit var templateRepo: HabitTemplateRepository
 
-    /// Repositorio de métricas inyectado por Hilt.
     @Inject
     lateinit var metricsRepository: MetricsRepository
 
-    /// Launcher para solicitar múltiples permisos en tiempo de ejecución.
+    /// Launcher para solicitar permisos de Health Connect.
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
 
-    /// Cliente de Health Connect para acceder a datos de salud.
-    private lateinit var healthConnectClient: HealthConnectClient
+    /// Cliente de Health Connect, o null si no está disponible.
+    private var healthConnectClient: HealthConnectClient? = null
 
-    /**
-     * @brief Punto de entrada al crear la actividad.
-     * @param savedInstanceState Bundle con estado previo (si existe).
-     *
-     * - Configura edge-to-edge.
-     * - Sincroniza plantillas una sola vez y comienza listener.
-     * - Inicializa Health Connect.
-     * - Prepara el launcher de permisos.
-     * - Monta la UI con Compose.
-     * - Solicita permisos de Health Connect.
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Edge-to-edge layout
+        // Edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        // Sincronización inicial de plantillas
+        // Sincronización de plantillas
         lifecycleScope.launch(Dispatchers.IO) {
             templateRepo.refreshOnce()
             templateRepo.startSync(this)
         }
 
-        // Inicializa Health Connect Client
-        healthConnectClient = HealthConnectClient.getOrCreate(this)
+        // Inicializa Health Connect atrapando IllegalStateException si falta el servicio
+        healthConnectClient = try {
+            HealthConnectClient.getOrCreate(this)
+        } catch (e: IllegalStateException) {
+            Toast.makeText(
+                this,
+                "Health Connect no está disponible en este dispositivo",
+                Toast.LENGTH_LONG
+            ).show()
+            Log.w("MainActivity", "Health Connect no disponible", e)
+            null
+        }
 
-        // Configura el launcher para permisos de Health Connect
+        // Configura el launcher de permisos
         requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
                 if (result.all { it.value }) {
@@ -97,14 +96,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-        // Monta la UI de Compose
+        // Monta la UI
         setContent {
             TibiBalanceTheme {
                 AppNavGraph()
             }
         }
 
-        // Define y solicita los permisos necesarios
+        // Define y lanza petición de permisos
         val permissions = arrayOf(
             "android.permission.health.READ_STEPS",
             "android.permission.health.READ_EXERCISE",
@@ -115,15 +114,15 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * @brief Lee todas las métricas diarias (pasos, calorías activas, minutos de ejercicio,
-     *        frecuencia cardíaca promedio) y las guarda en la base de datos.
+     * @brief Lee y guarda métricas diarias desde Health Connect.
      *
-     * - Crea un ReadRecordsRequest para cada tipo de registro con rango de hoy.
-     * - Suma o procesa los datos según corresponda.
-     * - Construye un objeto DailyMetrics.
-     * - Llama a MetricsRepository.saveMetrics() para persistir los datos.
+     * - Si no hay cliente, sale sin hacer nada.
+     * - Lee pasos, calorías, ejercicio y frecuencia cardiaca.
+     * - Persiste un [DailyMetrics] en la base de datos.
      */
     private fun fetchAndSaveDailyMetrics() {
+        val client = healthConnectClient ?: return
+
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val now = Instant.now()
@@ -132,60 +131,62 @@ class MainActivity : ComponentActivity() {
                     .atZone(ZoneId.systemDefault())
                     .toInstant()
 
-                // --- Lectura de pasos ---
-                val stepsRequest = ReadRecordsRequest<StepsRecord>(
-                    StepsRecord::class,
-                    TimeRangeFilter.between(startOfDay, now)
+                // Pasos
+                val stepsResp = client.readRecords(
+                    ReadRecordsRequest(
+                        recordType = StepsRecord::class,
+                        timeRangeFilter = TimeRangeFilter.between(startOfDay, now)
+                    )
                 )
-                val stepsResponse = healthConnectClient.readRecords(stepsRequest)
-                val totalSteps = stepsResponse.records.sumOf { it.count }
+                val totalSteps = stepsResp.records.sumOf { it.count }
 
-                // --- Lectura de calorías activas ---
-                val caloriesRequest = ReadRecordsRequest<ActiveCaloriesBurnedRecord>(
-                    ActiveCaloriesBurnedRecord::class,
-                    TimeRangeFilter.between(startOfDay, now)
+                // Calorías activas
+                val calResp = client.readRecords(
+                    ReadRecordsRequest(
+                        recordType = ActiveCaloriesBurnedRecord::class,
+                        timeRangeFilter = TimeRangeFilter.between(startOfDay, now)
+                    )
                 )
-                val caloriesResponse = healthConnectClient.readRecords(caloriesRequest)
-                val totalCalories = caloriesResponse.records.sumOf { it.energy.inCalories }
+                val totalCalories = calResp.records.sumOf { it.energy.inCalories }
 
-                // --- Lectura de ejercicio ---
-                val exerciseRequest = ReadRecordsRequest<ExerciseSessionRecord>(
-                    ExerciseSessionRecord::class,
-                    TimeRangeFilter.between(startOfDay, now)
+                // Ejercicio
+                val exResp = client.readRecords(
+                    ReadRecordsRequest(
+                        recordType = ExerciseSessionRecord::class,
+                        timeRangeFilter = TimeRangeFilter.between(startOfDay, now)
+                    )
                 )
-                val exerciseResponse = healthConnectClient.readRecords(exerciseRequest)
-                val totalMinutes = exerciseResponse.records
-                    .sumOf { record ->
-                        val durationMs = record.endTime.toEpochMilli() - record.startTime.toEpochMilli()
-                        durationMs / (1000 * 60)
-                    }
+                val totalMinutes = exResp.records.sumOf { rec ->
+                    val durMs = rec.endTime.toEpochMilli() - rec.startTime.toEpochMilli()
+                    durMs / (1000 * 60)
+                }
 
-                // --- Lectura de frecuencia cardíaca ---
-                val hrRequest = ReadRecordsRequest<HeartRateRecord>(
-                    HeartRateRecord::class,
-                    TimeRangeFilter.between(startOfDay, now)
+                // Frecuencia cardiaca
+                val hrResp = client.readRecords(
+                    ReadRecordsRequest(
+                        recordType = HeartRateRecord::class,
+                        timeRangeFilter = TimeRangeFilter.between(startOfDay, now)
+                    )
                 )
-                val hrResponse = healthConnectClient.readRecords(hrRequest)
-                val allBeats = hrResponse.records
+                val allBeats = hrResp.records
                     .flatMap { it.samples }
                     .map { it.beatsPerMinute }
-                val avgHeartRate = if (allBeats.isNotEmpty()) allBeats.average() else null
+                val avgHr = if (allBeats.isNotEmpty()) allBeats.average() else null
 
-                // --- Construcción del modelo y guardado ---
+                // Construye y guarda
                 val today = LocalDateTime.now().toLocalDate().toString()
-                val daily = DailyMetrics(
+                val metrics = DailyMetrics(
                     date = today,
                     steps = totalSteps,
                     activeCalories = totalCalories,
                     exerciseMinutes = totalMinutes,
-                    avgHeartRate = avgHeartRate
+                    avgHeartRate = avgHr
                 )
-
-                metricsRepository.saveMetrics(daily)
-                Log.i("HealthConnect", "Métricas diarias guardadas: $daily")
+                metricsRepository.saveMetrics(metrics)
+                Log.i("HealthConnect", "Métricas guardadas: $metrics")
 
             } catch (e: Exception) {
-                Log.e("HealthConnect", "Error al leer o guardar métricas", e)
+                Log.e("HealthConnect", "Error leyendo o guardando métricas", e)
             }
         }
     }
