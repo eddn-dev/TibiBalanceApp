@@ -59,6 +59,11 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)            // Material-3, Nav, Icons, Activity
 
+
+    // ——— Añade esta línea: Compose UI Graphics (DrawScope, PointMode…) ———
+    implementation("androidx.compose.ui:ui-graphics:1.4.7")
+
+
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.coil.compose)
