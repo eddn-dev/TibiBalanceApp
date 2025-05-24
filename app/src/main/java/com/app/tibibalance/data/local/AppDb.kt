@@ -8,6 +8,8 @@ import com.app.tibibalance.data.local.converter.HabitConverter
 import com.app.tibibalance.data.local.converter.InstantTypeConverter
 import com.app.tibibalance.data.local.dao.*
 import com.app.tibibalance.data.local.entity.*
+import com.app.tibibalance.data.local.dao.MetricsDao
+import com.app.tibibalance.data.local.entity.MetricsEntity
 import com.app.tibibalance.data.local.mapper.NotifConverters
 
 @Database(
@@ -16,9 +18,9 @@ import com.app.tibibalance.data.local.mapper.NotifConverters
         HabitEntity::class,
         HabitTemplateEntity::class,
         HabitActivityEntity::class,
-        MetricsEntity::class          // ← Añadido
+        MetricsEntity::class
     ],
-    version = 6,                      // ← Incrementa la versión
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(
@@ -34,5 +36,5 @@ abstract class AppDb : RoomDatabase() {
     abstract fun habitActivityDao(): HabitActivityDao
 
     /** @brief DAO para las métricas diarias. */
-    abstract fun metricsDao(): MetricsDao      // ← Añadido
+    abstract fun metricsDao(): MetricsDao
 }
