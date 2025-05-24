@@ -2,28 +2,50 @@
 package com.app.tibibalance.ui.screens.conection
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.app.tibibalance.domain.model.DailyMetrics
-import com.app.tibibalance.ui.metrics.MetricsViewModel
 
 /**
- * @brief Route para mostrar la pantalla de conexión de Wear OS y métricas.
+ * @file    ConnectedDeviceRoute.kt
+ * @ingroup ui_screens_conection
+ * @brief   Route que conecta el ViewModel con la UI de conexión Wear OS y métricas.
  *
  * @details
- * - Inyecta el [MetricsViewModel].
- * - Obtiene el último valor de métricas.
- * - Invoca [ConnectedDeviceScreen] pasando el objeto [DailyMetrics]? y el callback.
+ *  - Inyecta [ConnectedViewModel].
+ *  - Observa los cuatro StateFlows: conexión, métricas, carga y error.
+ *  - Dispara la comprobación inicial de conexión y carga de métricas.
+ *  - Llama a [ConnectedDeviceScreen] pasando todos los parámetros.
+ *
+ * @see ConnectedViewModel
+ * @see ConnectedDeviceScreen
  */
 @Composable
 fun ConnectedDeviceRoute(
-    viewModel: MetricsViewModel = hiltViewModel()
+    vm: ConnectedViewModel = hiltViewModel()
 ) {
-    // Estado de métricas: null = no conectado, no null = conectado
-    val metrics = viewModel.latest.collectAsState().value
+    // 1. Obtenemos el estado actual de cada flujo
+    val isConnected by vm.isConnected.collectAsState()
+    val metrics    by vm.latest.collectAsState()
+    val isLoading  by vm.isLoading.collectAsState()
+    val isError    by vm.isError.collectAsState()
 
+    // 2. Al montar la ruta, disparamos la comprobación inicial
+    LaunchedEffect(Unit) {
+        vm.refreshConnection()
+        vm.refreshMetrics()
+    }
+
+    // 3. Invocamos la pantalla con todos los parámetros
     ConnectedDeviceScreen(
-        metrics = metrics,
-        onRefreshClick = { viewModel.refreshMetrics() }
+        metrics        = metrics,
+        isConnected    = isConnected,
+        isLoading      = isLoading,
+        isError        = isError,
+        onRefreshClick = {
+            vm.refreshConnection()
+            vm.refreshMetrics()
+        }
     )
 }
