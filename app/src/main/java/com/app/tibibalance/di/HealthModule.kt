@@ -2,6 +2,7 @@
 package com.app.tibibalance.di
 
 import com.app.tibibalance.data.health.FakeDailyHistoryDataSource
+import com.app.tibibalance.data.health.FakeIntradayHealthStatsDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,4 +16,12 @@ object HealthModule {
     @Singleton
     fun provideDailyHistorySource(): FakeDailyHistoryDataSource =
         FakeDailyHistoryDataSource()
+
+    // --- NUEVO proveedor intradía ---
+    @Provides
+    @Singleton
+    fun provideIntradayHealthStatsSource(): FakeIntradayHealthStatsDataSource =
+        FakeIntradayHealthStatsDataSource()
 }
+
+

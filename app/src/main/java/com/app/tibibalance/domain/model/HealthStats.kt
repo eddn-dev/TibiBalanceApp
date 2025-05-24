@@ -7,5 +7,6 @@ package com.app.tibibalance.domain.model
 data class HealthStats(
     val steps: Long,
     val calories: Double,
-    val heartRate: Double
+    val heartRate: Double,
+    val exerciseMinutes: Int
 )

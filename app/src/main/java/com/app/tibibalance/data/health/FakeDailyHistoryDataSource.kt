@@ -59,7 +59,8 @@ class FakeDailyHistoryDataSource @Inject constructor() {
                 history[date] = HealthStats(
                     steps     = rng.nextLong(5_000, 12_000),
                     calories  = rng.nextDouble(1_600.0, 3_000.0),
-                    heartRate = rng.nextDouble(60.0, 95.0)
+                    heartRate = rng.nextDouble(60.0, 95.0),
+                    exerciseMinutes = 0
                 )
             }
             date = date.plusDays(1)
