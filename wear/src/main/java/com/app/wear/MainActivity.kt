@@ -20,11 +20,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.app.tibibalance.domain.model.DailyMetrics
+import com.app.wear.model.DailyMetrics
+import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
-import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.NodeClient
-import com.google.android.gms.wearable.MessageClient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -44,7 +42,7 @@ class MainActivity : ComponentActivity() {
             WearAppScreen()
         }
 
-        // Ejemplo de envío automático (puedes llamarlo cuando tengas tus métricas)
+        // Ejemplo de envío automático (descomenta cuando tengas métricas reales):
         // val sampleMetrics = DailyMetrics("2025-05-21", 1000L, 200.0, 30L, 72.5)
         // sendMetricsToPhone(sampleMetrics)
     }
@@ -60,8 +58,10 @@ class MainActivity : ComponentActivity() {
     private fun sendMetricsToPhone(metrics: DailyMetrics) {
         val payload = Json.encodeToString(metrics).toByteArray()
 
-        Wearable.getNodeClient(this).nodes
-            .addOnSuccessListener { nodes ->
+        // Usamos el método connectedNodes() en lugar de .nodes
+        Wearable.getNodeClient(this)
+            .connectedNodes
+            .addOnSuccessListener { nodes: List<Node> ->
                 for (node in nodes) {
                     Wearable.getMessageClient(this)
                         .sendMessage(node.id, "/daily-metrics", payload)

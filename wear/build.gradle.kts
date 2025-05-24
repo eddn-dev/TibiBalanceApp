@@ -91,6 +91,5 @@ dependencies {
     // Kotlinx Serialization JSON
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
-    // Si tu modelo DailyMetrics está en el módulo app, agrega también:
-    implementation (project(":app"))
+    // Si tu modelo DailyMetrics está en el módulo app, agrega también: implementation (project(":app"))
 }
