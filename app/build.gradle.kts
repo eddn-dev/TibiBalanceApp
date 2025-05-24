@@ -109,7 +109,7 @@ dependencies {
     implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
     implementation ("com.google.firebase:firebase-firestore-ktx:24.8.1")
     implementation ("com.google.firebase:firebase-auth-ktx:22.1.1")
-    implementation ("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation ("com.google.android.gms:play-services-wearable:19.0.0")
     implementation("androidx.health:health-services-client:1.1.0-alpha05")
 
 

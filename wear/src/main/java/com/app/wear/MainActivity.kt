@@ -43,8 +43,8 @@ class MainActivity : ComponentActivity() {
         }
 
         // Ejemplo de envío automático (descomenta cuando tengas métricas reales):
-        // val sampleMetrics = DailyMetrics("2025-05-21", 1000L, 200.0, 30L, 72.5)
-        // sendMetricsToPhone(sampleMetrics)
+         val sampleMetrics = DailyMetrics("2025-05-21", 1000L, 200.0, 30L, 72.5)
+         sendMetricsToPhone(sampleMetrics)
     }
 
     /**
