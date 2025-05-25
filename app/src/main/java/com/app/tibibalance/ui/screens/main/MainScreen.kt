@@ -1,8 +1,30 @@
-// src/main/java/com/app/tibibalance/ui/screens/main/MainScreen.kt
+/**
+ * @file    MainScreen.kt
+ * @ingroup ui_screens_main
+ * @brief   Composable raíz que contiene la pantalla principal de navegación tras el login.
+ *
+ * @details
+ * Esta pantalla actúa como contenedor principal tras iniciar sesión. Organiza
+ * las secciones de la app mediante un `HorizontalPager` y una `BottomNavBar`.
+ *
+ * La pestaña de inicio (`Screen.Home`) muestra un resumen de actividad diaria. Se
+ * integra con el `MetricsViewModel` para determinar si hay conexión con el reloj
+ * y mostrar contenido correspondiente:
+ *
+ * - Si **no hay reloj conectado**, se muestra el componente `HomeModalsSection` con
+ *   un tip del día y la opción de conectar el reloj.
+ * - Si **sí hay conexión**, se muestran métricas de pasos, ejercicio, calorías y ritmo cardíaco.
+ *
+ * También responde a eventos del `MainViewModel` como el cierre de sesión o eliminación de cuenta.
+ *
+ * @param rootNav Controlador de navegación global (desde AppNavGraph).
+ * @param mainVm ViewModel principal que maneja eventos como cerrar sesión.
+ */
+@file:Suppress("UNUSED_PARAMETER") // Para parámetros de navegaciones no implementadas aún
+
 package com.app.tibibalance.ui.screens.main
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -16,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,30 +50,22 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.app.tibibalance.ui.components.navigation.BottomNavBar
 import com.app.tibibalance.ui.components.navigation.bottomItems
+import com.app.tibibalance.ui.metrics.MetricsViewModel
 import com.app.tibibalance.ui.navigation.Screen
 import com.app.tibibalance.ui.screens.emotional.EmotionalCalendarScreen
-import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.habits.ShowHabitsScreen
+import com.app.tibibalance.ui.screens.home.HomeScreen
 import com.app.tibibalance.ui.screens.settings.SettingsScreen
-import com.app.tibibalance.ui.screens.settings.SettingsUiState
 import com.app.tibibalance.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 
-/**
- * @file    MainScreen.kt
- * @ingroup ui_screens_main
- * @brief   Composable raíz con barra inferior y paginador.
- *
- * @param rootNav NavController global para navegación fuera de este flujo.
- * @param mainVm  ViewModel que maneja eventos como cierre de sesión.
- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     rootNav: NavHostController,
     mainVm: MainViewModel = hiltViewModel()
 ) {
-    // Definimos las rutas de las pestañas
+    // Define las rutas por pestaña
     val routes = listOf(
         Screen.Emotions.route,
         Screen.Habits.route,
@@ -59,23 +74,24 @@ fun MainScreen(
         Screen.Settings.route
     )
 
-    // NavController interno para sincronizar con el HorizontalPager
     val innerNav = rememberNavController()
     val pagerState = rememberPagerState(initialPage = 2) { routes.size }
     val scope = rememberCoroutineScope()
 
-    // NavHost "sombra" para innerNav (height=0)
+    // ViewModel para obtener el estado de conexión del reloj
+    val metricsVm: MetricsViewModel = hiltViewModel()
+    val latest by metricsVm.latest.collectAsState()
+
+    // Mantiene sincronía de rutas (invisible)
     NavHost(
         navController = innerNav,
         startDestination = Screen.Home.route,
         modifier = Modifier.height(0.dp)
     ) {
-        routes.forEach { route ->
-            composable(route) { /* No renderiza UI aquí */ }
-        }
+        routes.forEach { route -> composable(route) { /* Sin UI aquí */ } }
     }
 
-    // Función para navegar el pager al pulsar la barra inferior
+    // Sincroniza barra inferior con página activa
     fun goTo(route: String) {
         val index = routes.indexOf(route)
         if (index >= 0) {
@@ -83,7 +99,7 @@ fun MainScreen(
         }
     }
 
-    // Sincronizar cambios de página con innerNav
+    // Navega al cambiar de página
     LaunchedEffect(pagerState.currentPage) {
         val route = routes[pagerState.currentPage]
         if (innerNav.currentDestination?.route != route) {
@@ -93,7 +109,7 @@ fun MainScreen(
         }
     }
 
-    // Escuchar evento de cierre de sesión para navegar fuera
+    // Escucha eventos globales (ej. cerrar sesión)
     LaunchedEffect(Unit) {
         mainVm.events.collect { ev ->
             if (ev is MainEvent.SignedOut) {
@@ -104,7 +120,6 @@ fun MainScreen(
         }
     }
 
-    // UI principal
     Scaffold(
         bottomBar = {
             BottomNavBar(
@@ -122,13 +137,24 @@ fun MainScreen(
                 .fillMaxSize()
         ) { page ->
             when (routes[page]) {
-                Screen.Home.route -> HomeScreen()
+                Screen.Home.route -> HomeScreen(
+                    isWatchConnected = latest != null,
+                    onNavigateToConnectedDevices = {
+                        rootNav.navigate(Screen.ManageDevices.route)
+                    }
+                )
+
                 Screen.Emotions.route -> EmotionalCalendarScreen()
+
                 Screen.Habits.route -> ShowHabitsScreen()
+
                 Screen.Profile.route -> Box(
-                    Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) { Text("Perfil", fontSize = 32.sp) }
+                ) {
+                    Text("Perfil", fontSize = 32.sp)
+                }
+
                 Screen.Settings.route -> SettingsTab(mainVm)
             }
         }
@@ -136,9 +162,9 @@ fun MainScreen(
 }
 
 /**
- * @brief Sub-composable para la pestaña Ajustes.
+ * @brief Sub-componente para la pestaña de Ajustes dentro del pager.
  *
- * @param mainVm ViewModel principal para acciones globales (cerrar sesión).
+ * @param mainVm ViewModel principal para manejar acciones globales como eliminar cuenta o cerrar sesión.
  */
 @Composable
 private fun SettingsTab(mainVm: MainViewModel) {
@@ -147,13 +173,13 @@ private fun SettingsTab(mainVm: MainViewModel) {
 
     SettingsScreen(
         state = uiState,
-        onEditPersonal = { /* TODO: navegar a editar perfil */ },
-        onAchievements = { /* TODO: navegar a logros */ },
+        onEditPersonal = { /* TODO: Implementar navegación a editar perfil */ },
+        onAchievements = { /* TODO: Implementar navegación a logros */ },
         onSignOut = mainVm::signOut,
         onDelete = {
             vm.deleteAccount()
             mainVm.signOut()
         },
-        onNotis = { /* TODO: navegar a notificaciones */ }
+        onNotis = { /* TODO: Implementar navegación a configuración de notificaciones */ }
     )
 }
