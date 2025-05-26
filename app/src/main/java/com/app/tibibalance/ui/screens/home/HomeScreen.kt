@@ -27,9 +27,13 @@ import com.app.tibibalance.ui.components.containers.HabitContainer
 import com.app.tibibalance.ui.components.texts.Description
 import com.app.tibibalance.ui.components.texts.Title
 import kotlin.math.roundToInt
+import com.app.tibibalance.R
+import com.app.tibibalance.ui.components.*
+import com.app.tibibalance.ui.components.chart.AxisLineChart
 
 @Composable
 fun HomeScreen() {
+
     // Inyectamos el ViewModel intradía
     val vm: IntradayStatsViewModel = hiltViewModel()
     val stats by vm.stats.collectAsState()
@@ -91,19 +95,32 @@ fun HomeScreen() {
                 ) {
                     // Pasos
                     AchievementContainer(
-                        icon        = { /* icono pasos */ },
-                        title       = "$stepsToday",
+                        icon = { // Slot para el icono.
+                            ImageContainer(
+                                resId = R.drawable.iconstepsimage,
+                                contentDescription = "Pasos",
+                                modifier = Modifier.size(40.dp)
+                            )
+                        },
+
+                        title = "$stepsToday",
                         description = "Pasos",
-                        percent     = ((stepsToday * 100L) / 10_000L).toInt().coerceIn(0, 100),
-                        modifier    = Modifier.weight(1f)
+                        percent = ((stepsToday * 100L) / 10_000L).toInt().coerceIn(0, 100),
+                        modifier = Modifier.weight(1f)
                     )
                     // Calorías
                     AchievementContainer(
-                        icon        = { /* icono calorías */ },
-                        title       = "$caloriesToday",
+                        icon = {
+                            ImageContainer(
+                                resId = R.drawable.iconfireimage,
+                                contentDescription = "Calorías quemadas",
+                                modifier = Modifier.size(40.dp)
+                            )
+                        },
+                        title = "$caloriesToday",
                         description = "Kcal",
-                        percent     = (caloriesToday * 100 / 3000).coerceIn(0, 100),
-                        modifier    = Modifier.weight(1f)
+                        percent = (caloriesToday * 100 / 3000).coerceIn(0, 100),
+                        modifier = Modifier.weight(1f)
                     )
                 }
 
@@ -113,11 +130,17 @@ fun HomeScreen() {
                 ) {
                     // Minutos de ejercicio
                     AchievementContainer(
-                        icon        = { /* icono ejercicio */ },
-                        title       = "${stats.exerciseMinutes} min",
+                        icon = {
+                            ImageContainer(
+                                resId = R.drawable.iconclockimage,
+                                contentDescription = "Minutos de ejercicio",
+                                modifier = Modifier.size(40.dp)
+                            )
+                        },
+                        title = "${stats.exerciseMinutes} min",
                         description = "Ejercicio",
-                        percent     = ((stats.exerciseMinutes * 100) / 60).coerceIn(0, 100),
-                        modifier    = Modifier.weight(1f)
+                        percent = ((stats.exerciseMinutes * 100) / 60).coerceIn(0, 100),
+                        modifier = Modifier.weight(1f)
                     )
                     // BPM: sólo como valor, sin barra de progreso
                     Column(
@@ -141,14 +164,14 @@ fun HomeScreen() {
             // Meta de pasos (ej. 10,000 pasos)
             Title(text = "Meta de pasos")
             Surface(
-                shape    = RoundedCornerShape(16.dp),
-                color    = Color(0xFFF5FBFD),
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFFF5FBFD),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp)
             ) {
                 Column(
-                    modifier             = Modifier
+                    modifier = Modifier
                         .fillMaxSize()
                         .padding(12.dp),
                     verticalArrangement = Arrangement.SpaceBetween
@@ -169,8 +192,8 @@ fun HomeScreen() {
                         )
                     }
                     Description(
-                        text      = "$stepsToday / 10,000",
-                        modifier  = Modifier.fillMaxWidth(),
+                        text = "$stepsToday / 10,000",
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -181,13 +204,26 @@ fun HomeScreen() {
             Title(text = "Actividad Reciente")
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 HabitContainer(
-                    icon = { /* Icono habit */ },
+                    icon = {
+                        ImageContainer(
+                            resId = R.drawable.iconwalkingimage,
+                            contentDescription = "Caminata rápida",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+
                     text = "Caminata rápida • 20 min",
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {}
                 )
                 HabitContainer(
-                    icon = { /* Icono habit */ },
+                    icon = {
+                        ImageContainer(
+                            resId = R.drawable.iconyogaimage,
+                            contentDescription = "Yoga",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
                     text = "Yoga • 30 min",
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {}
@@ -210,5 +246,89 @@ fun HomeScreen() {
                 onDismissRequest = { showModal = false }
             )
         }
+
+
+        if (showModal) {
+            var selectedTabIndex by remember { mutableStateOf(0) }
+
+            val data = if (selectedTabIndex == 0) weekly else monthly
+
+            val dummyCharts = listOf<@Composable () -> Unit>(
+                {
+                    Column(Modifier.fillMaxSize()) {
+                        Text("Pasos", Modifier.align(Alignment.CenterHorizontally))
+                        AxisLineChart(
+                            values = data.steps,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .background(Color.White)
+                        )
+                    }
+                },
+                {
+                    Column(Modifier.fillMaxSize()) {
+                        Text("Calorías", Modifier.align(Alignment.CenterHorizontally))
+                        AxisLineChart(
+                            values = data.cals,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .background(Color.White)
+                        )
+                    }
+                },
+                {
+                    Column(Modifier.fillMaxSize()) {
+                        Text("Frecuencia Cardíaca", Modifier.align(Alignment.CenterHorizontally))
+                        AxisLineChart(
+                            values = data.hr,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .background(Color.White)
+                        )
+                    }
+                }
+            )
+
+            ModalWithTabs(
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { selectedTabIndex = it },
+                onDismissRequest = { showModal = false },
+                tabs = listOf(
+                    ModalTabItem("Semanal") {
+                        StatsTabContent(
+                            graphTitle = "Resumen semanal",
+                            charts = dummyCharts,
+                            statsLabel = "Estadísticas semanales",
+                            stepsValue = "7,120",
+                            caloriesValue = "1,800",
+                            exerciseValue = "120 min",
+                            emotionLabel = "Feliz",
+                            highlightedHabitName = "Caminar diario",
+                            highlightedHabitNote = "Llevas 5 días cumpliéndolo",
+                            habitIconName = "Book",
+                            emotionIconName = "iconangryimage"
+                        )
+                    },
+                    ModalTabItem("Mensual") {
+                        StatsTabContent(
+                            graphTitle = "Resumen mensual",
+                            charts = dummyCharts,
+                            statsLabel = "Estadísticas mensuales",
+                            stepsValue = "28,430",
+                            caloriesValue = "7,200",
+                            exerciseValue = "480 min",
+                            emotionLabel = "Motivado",
+                            highlightedHabitName = "Yoga",
+                            highlightedHabitNote = "26 días de cumplimiento",
+                            habitIconName = "Book",
+                            emotionIconName = "iconangryimage"
+                        )
+                    }
+                )
+            )
+        }
     }
-}
+    }

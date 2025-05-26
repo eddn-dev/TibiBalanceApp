@@ -52,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.app.tibibalance.R
 import com.app.tibibalance.ui.components.buttons.PrimaryButton // Para preview
 import com.app.tibibalance.ui.components.texts.Description // Para preview
@@ -60,6 +61,7 @@ import com.app.tibibalance.ui.components.GraphsSlider
 import com.app.tibibalance.ui.components.buttons.IconButton
 import com.app.tibibalance.ui.components.inputs.iconByName
 import com.app.tibibalance.ui.components.texts.Subtitle
+import com.app.tibibalance.ui.screens.home.StatsHistoryViewModel
 import kotlinx.coroutines.CoroutineScope // Import necesario
 import kotlinx.coroutines.launch
 
@@ -107,6 +109,8 @@ data class ModalTabItem(
 @OptIn(ExperimentalFoundationApi::class) // Necesario para PagerState y HorizontalPager
 @Composable
 fun ModalWithTabs(
+    selectedTabIndex: Int,
+    onTabSelected: (Int) -> Unit,
     onDismissRequest: () -> Unit,
     tabs: List<ModalTabItem>,
     modifier: Modifier = Modifier,
@@ -121,6 +125,7 @@ fun ModalWithTabs(
     selectedTextColor: Color = contentColorFor(selectedTabColor),
     unselectedTextColor: Color = contentColorFor(unselectedTabColor).copy(alpha = 0.7f)
 ) {
+
     // No renderizar nada si no hay pestañas que mostrar
     if (tabs.isEmpty()) return
 
@@ -463,6 +468,7 @@ fun StatsTabContent(
 
 // --- Preview para ModalWithTabs con Espacio para Botón ---
 @OptIn(ExperimentalFoundationApi::class)
+/*
 @Preview(showBackground = true, name = "Modal Con Pestañas (Espacio Botón)", heightDp = 600)
 @Composable
 private fun ModalWithTabsPreview() {
@@ -550,6 +556,7 @@ private fun ModalWithTabsPreview() {
 
         if (visible) {
             ModalWithTabs(
+
                 onDismissRequest = { visible = false }, // Cierra el modal en la preview
                 tabs = sampleTabs,
                 containerColor = previewContainerColor,
@@ -566,7 +573,7 @@ private fun ModalWithTabsPreview() {
         }
     }
 }
-
+*/
 
 fun iconVectorByName(name: String): Int  {
     return when (name) {
