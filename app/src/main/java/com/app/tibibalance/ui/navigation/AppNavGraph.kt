@@ -66,7 +66,7 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         composable(Screen.EditPersonal.route) { EditProfileScreen(navController) }
 
         //Direcciona a la pantalla de logros
-        composable(Screen.Achievements.route) {AchievementsScreen(navController) }
+        composable(Screen.Achievements.route) {AchievementsScreen(onNavigateUp = { navController.popBackStack() })  }
 
         //Direcciona a la pantalla de cambiar contraseña
         composable("changePassword") {

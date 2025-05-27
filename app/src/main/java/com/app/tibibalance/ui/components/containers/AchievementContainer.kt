@@ -24,9 +24,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.ui.components.ProgressBar
 
+
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.res.painterResource
+
+
 @Composable
 fun AchievementContainer(
-    icon: @Composable () -> Unit,
+    iconRes: Int,
     title: String,
     description: String,
     percent: Int,
@@ -34,36 +41,56 @@ fun AchievementContainer(
     modifier: Modifier = Modifier
 ) {
     val alphaValue = if (isUnlocked) 1f else 0.4f
+    val colorMatrix = if (isUnlocked) ColorMatrix() else ColorMatrix().apply { setToSaturation(0f) }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(Color(0xFFF5FBFD), shape = RoundedCornerShape(16.dp))
-            .padding(16.dp)
-            .alpha(alphaValue), // Aplica opacidad general si está bloqueado
+            .padding(horizontal = 12.dp, vertical = 8.dp) // reduce padding
+            .alpha(alphaValue),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        icon()
+        Image(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(50.dp), // más pequeño
+            colorFilter = ColorFilter.colorMatrix(colorMatrix)
+        )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp) // espacio compacto entre elementos
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.Black
+                color = Color.Black,
+                maxLines = 1
             )
 
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.DarkGray
+                color = Color.DarkGray,
+                maxLines = 2
             )
 
             ProgressBar(
                 percent = percent,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
+
+            /*if (!isUnlocked) {
+                Text(
+                    text = "No desbloqueado",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }*/
         }
     }
 }
+

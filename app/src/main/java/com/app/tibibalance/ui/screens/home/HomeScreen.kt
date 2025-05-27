@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.app.tibibalance.R
 import com.app.tibibalance.domain.model.HealthStats
 import com.app.tibibalance.ui.components.buttons.PrimaryButton
 import com.app.tibibalance.ui.components.buttons.SecondaryButton
@@ -91,7 +92,7 @@ fun HomeScreen() {
                 ) {
                     // Pasos
                     AchievementContainer(
-                        icon        = { /* icono pasos */ },
+                        iconRes        = R.drawable.racha, //imagen del logro
                         title       = "$stepsToday",
                         description = "Pasos",
                         percent     = ((stepsToday * 100L) / 10_000L).toInt().coerceIn(0, 100),
@@ -99,7 +100,7 @@ fun HomeScreen() {
                     )
                     // Calorías
                     AchievementContainer(
-                        icon        = { /* icono calorías */ },
+                        iconRes      = R.drawable.racha,   //imagen del logro
                         title       = "$caloriesToday",
                         description = "Kcal",
                         percent     = (caloriesToday * 100 / 3000).coerceIn(0, 100),
@@ -113,7 +114,7 @@ fun HomeScreen() {
                 ) {
                     // Minutos de ejercicio
                     AchievementContainer(
-                        icon        = { /* icono ejercicio */ },
+                        iconRes        = R.drawable.racha, //imagen del logro
                         title       = "${stats.exerciseMinutes} min",
                         description = "Ejercicio",
                         percent     = ((stats.exerciseMinutes * 100) / 60).coerceIn(0, 100),
