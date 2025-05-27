@@ -12,6 +12,7 @@ import com.app.tibibalance.ui.screens.auth.SignInScreen
 import com.app.tibibalance.ui.screens.auth.SignUpScreen
 import com.app.tibibalance.ui.screens.auth.VerifyEmailScreen
 import com.app.tibibalance.ui.screens.habits.ConfigureNotificationScreen
+import com.app.tibibalance.ui.screens.settings.AchievementsScreen
 import com.app.tibibalance.ui.screens.launch.LaunchScreen
 import com.app.tibibalance.ui.screens.profile.EditProfileScreen
 import com.app.tibibalance.ui.screens.main.MainScreen
@@ -62,9 +63,11 @@ fun AppNavGraph(navController: NavHostController = rememberNavController()) {
         //Direcciona a la pantalla de norificaciones
         composable(Screen.NotificationSettings.route) { ConfigureNotificationScreen(onNavigateUp = { navController.popBackStack() }) }
         //Direcciona a la pantalla de editar perfil
-        composable(Screen.EditPersonal.route) {
-            EditProfileScreen(navController)
-        }
+        composable(Screen.EditPersonal.route) { EditProfileScreen(navController) }
+
+        //Direcciona a la pantalla de logros
+        composable(Screen.Achievements.route) {AchievementsScreen(navController) }
+
         //Direcciona a la pantalla de cambiar contraseña
         composable("changePassword") {
             ChangePasswordScreenPreviewOnly(navController = navController)

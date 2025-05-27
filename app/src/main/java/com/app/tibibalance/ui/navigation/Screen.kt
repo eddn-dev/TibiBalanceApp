@@ -79,6 +79,8 @@ sealed class Screen(val route: String) {
     data object NotificationSettings : Screen("main/settings/notifications")
     /** @brief Pantalla para Editar perfil del usuario. de settings */
     data object EditPersonal : Screen("main/settings/edit_profile")
+    /** @brief Pantalla para logros*/
+    data object Achievements : Screen("achievements")
     /** @brief Pantalla para cambiar contraseña */
     data object ChangePassword : Screen("changePassword")
 

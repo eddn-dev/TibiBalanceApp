@@ -196,7 +196,7 @@ private fun SettingsTab(mainVm: MainViewModel, rootNav: NavHostController) {
         onNavigateUp   = rootNav::navigateUp,         // Acción para el botón Atrás (usa el NavController global).
         onEditPersonal = {  rootNav.navigate(Screen.EditPersonal.route) },
         onDevices      = { /* TODO: Navegar a pantalla de dispositivos */ },
-        onAchievements = { /* TODO: Navegar a pantalla de logros */ },
+        onAchievements = { rootNav.navigate(Screen.Achievements.route) },
         onSignOut      = mainVm::signOut,             // Acción de cierre de sesión (manejada por MainViewModel).
         onDelete       = { /* TODO: Implementar borrado de cuenta */ },
         onNotis        = { rootNav.navigate(Screen.NotificationSettings.route) }

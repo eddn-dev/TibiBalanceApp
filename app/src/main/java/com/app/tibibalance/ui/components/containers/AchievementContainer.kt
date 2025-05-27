@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.app.tibibalance.ui.components.ProgressBar
@@ -29,13 +30,17 @@ fun AchievementContainer(
     title: String,
     description: String,
     percent: Int,
+    isUnlocked: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val alphaValue = if (isUnlocked) 1f else 0.4f
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(Color(0xFFF5FBFD), shape = RoundedCornerShape(16.dp))
-            .padding(16.dp),
+            .padding(16.dp)
+            .alpha(alphaValue), // Aplica opacidad general si está bloqueado
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon()

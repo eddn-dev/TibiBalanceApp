@@ -146,6 +146,11 @@ fun ModalConfigNotification(
                 modifier = Modifier.fillMaxWidth()
             )
 
+
+
+
+
+
             // Días (dos columnas igualmente espaciadas)
             Text("Repetir hábito:", style = MaterialTheme.typography.bodyMedium)
 

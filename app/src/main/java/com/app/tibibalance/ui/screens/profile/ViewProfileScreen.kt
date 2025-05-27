@@ -47,6 +47,12 @@ import com.app.tibibalance.ui.components.buttons.SecondaryButton
 import com.app.tibibalance.ui.components.inputs.InputText
 import com.app.tibibalance.ui.components.texts.Subtitle
 
+
+import com.app.tibibalance.ui.components.containers.AchievementContainer
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+
+
 /**
  * @brief Composable que define la interfaz de usuario para la pantalla de visualización del perfil.
  *
@@ -137,6 +143,85 @@ fun ViewProfileScreen() {
                             .width(150.dp) // Ancho fijo para este botón.
                     )
                 }
+
+                //container de logros
+
+
+                FormContainer (
+                    backgroundColor = Color(0xFFAED3E3),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    AchievementContainer(
+                        icon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.racha),
+                                contentDescription = "fire"
+                            )
+                        },
+                        title = "Racha",
+                        description = "Usaste la app 3 días seguidos",
+                        percent = 70, // progreso  de logro
+                        isUnlocked = false // <- Este aparecerá como bloqueado
+                    )
+
+                    AchievementContainer(
+                        icon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_smile),
+                                contentDescription = "Smile"
+                            )
+                        },
+                        title = "Todo en su lugar",
+                        description = "Registra un estado de ánimo “feliz” por siete días consecutivos",
+                        percent = 70, // progreso  de logro
+                        isUnlocked = false // <- Este aparecerá como bloqueado
+                    )
+
+
+                    AchievementContainer(
+                        icon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_medal),
+                                contentDescription = "medal"
+                            )
+                        },
+                        title = "Siete días en línea",
+                        description = "Cumplir un hábito por siete días consecutivos",
+                        percent = 70, // progreso  de logro
+                        isUnlocked = false // <- Este aparecerá como bloqueado
+                    )
+
+
+                    AchievementContainer(
+                        icon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.iconperfilphoto),
+                                contentDescription = "FotoPerfil"
+                            )
+                        },
+                        title = "Un placer conocernos",
+                        description = "Agrega una foto de perfil",
+                        percent = 70, // progreso  de logro
+                        isUnlocked = false // <- Este aparecerá como bloqueado
+                    )
+
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
         }
     }
