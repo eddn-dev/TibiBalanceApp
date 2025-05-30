@@ -65,41 +65,77 @@ fun AchievementsScreen(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
-
                 AchievementContainer(
-                    iconRes = R.drawable.racha,
-                    title = "Racha",
-                    description = "Usaste la app 3 días seguidos",
+                    iconRes = R.drawable.camera,
+                    title = "Un placer conocernos",
+                    description = "Agrega una foto de perfil.",
                     percent = 70, // progreso  de logro
                     isUnlocked = true // <- Este aparecerá como bloqueado
                 )
 
                 AchievementContainer(
-                    iconRes = R.drawable.ic_smile,
+                    iconRes = R.drawable.medalla,
+                    title = "Siete en línea",
+                    description = "Cumplir un hábito por siete días consecutivos.",
+                    percent = 70, // progreso  de logro
+                    isUnlocked = true // <- Este aparecerá como bloqueado
+                )
+
+                AchievementContainer(
+                    iconRes = R.drawable.salud,
+                    title = "Tibio saludable",
+                    description = "Agrega un hábito de salud.",
+                    percent = 70, // progreso  de logro
+                    isUnlocked = true // <- Este aparecerá como bloqueado
+                )
+
+                AchievementContainer(
+                    iconRes = R.drawable.productivo,
+                    title = "Tibio productivo",
+                    description = "Agrega un hábito de productividad.",
+                    percent = 70, // progreso  de logro
+                    isUnlocked = true // <- Este aparecerá como bloqueado
+                )
+
+                AchievementContainer(
+                    iconRes = R.drawable.bienestar,
+                    title = "Tibio del bienestar",
+                    description = "Agrega un hábito de bienestar.",
+                    percent = 70, // progreso  de logro
+                    isUnlocked = true // <- Este aparecerá como bloqueado
+                )
+
+                AchievementContainer(
+                    iconRes = R.drawable.explorer,
+                    title = "El inicio del sendero",
+                    description = "Agrega tu primer hábito personalizado.",
+                    percent = 70, // progreso  de logro
+                    isUnlocked = true // <- Este aparecerá como bloqueado
+                )
+
+                AchievementContainer(
+                    iconRes = R.drawable.arquitecto,
+                    title = "Arquitecto profesional",
+                    description = "Agrega cinco hábitos personalizados.",
+                    percent = 70, // progreso  de logro
+                    isUnlocked = true // <- Este aparecerá como bloqueado
+                )
+
+                AchievementContainer(
+                    iconRes = R.drawable.calendar,
                     title = "Todo en su lugar",
-                    description = "Registra un estado de ánimo “feliz” por siete días consecutivos",
+                    description = "Registra un estado de ánimo “feliz” por siete días consecutivos.",
                     percent = 70, // progreso  de logro
-                    isUnlocked = false // <- Este aparecerá como bloqueado
+                    isUnlocked = true // <- Este aparecerá como bloqueado
                 )
-
 
                 AchievementContainer(
-                    iconRes = R.drawable.ic_medal,
-                    title = "Siete días en línea",
-                    description = "Cumplir un hábito por siete días consecutivos",
+                    iconRes = R.drawable.reloj,
+                    title = "¡Ya es hora!",
+                    description = "Personaliza la notificación de un hábito.",
                     percent = 70, // progreso  de logro
-                    isUnlocked = false // <- Este aparecerá como bloqueado
+                    isUnlocked = true // <- Este aparecerá como bloqueado
                 )
-
-
-                AchievementContainer(
-                    iconRes = R.drawable.iconperfilphoto,
-                    title = "Un placer conocernos",
-                    description = "Agrega una foto de perfil",
-                    percent = 70, // progreso  de logro
-                    isUnlocked = false // <- Este aparecerá como bloqueado
-                )
-
             }
 
         }
